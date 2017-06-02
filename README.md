@@ -2,6 +2,8 @@
 
 Yet another VSCode extension for Crystal Programming Language.
 
+![crystal logo](https://raw.githubusercontent.com/faustinoaq/vscode-crystal-lang/master/images/icon.png)
+
 ## Features
 
 This extensions provide syntax highlighting and snippets based on [Crystal documentation](https://crystal-lang.org/docs/).
