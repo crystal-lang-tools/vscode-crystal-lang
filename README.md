@@ -12,8 +12,8 @@ This extensions provide syntax highlighting and snippets based on [Crystal docum
 
 # Other related extensions
 
-* [vscode-crystal](https://github.com/g3ortega/vscode-crystal): syntax and useful Framework snippets.
-* [crystal-ide](https://github.com/kofno/crystal-ide): syntax and error checking.
+* [vscode-crystal](https://github.com/g3ortega/vscode-crystal): syntax highlighting and useful framework snippets.
+* [crystal-ide](https://github.com/kofno/crystal-ide): syntax highlighting and error checking.
 
 ## Release Notes
 
