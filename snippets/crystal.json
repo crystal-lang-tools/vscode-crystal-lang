@@ -1,0 +1,274 @@
+{
+	"HTTP simple server": {
+		"prefix": "http server",
+		"body": [
+				"server = HTTP::Server.new(${1:\"0.0.0.0\"}, ${2:8080}) do |context|",
+  				"\tcontext.response.content_type = \"text/plain\"",
+  				"\tcontext.response.print \"Hello world!\"",
+				"end"
+			],
+		"description": "HTTP Server example."
+	},
+	"HTTP server with handlers": {
+		"prefix": "http server with handlers",
+		"body": [
+				"HTTP::Server.new(${1:\"127.0.0.1\"}, ${2:8080}, [",
+  				"\tHTTP::ErrorHandler.new,",
+  				"\tHTTP::LogHandler.new,",
+  				"\tHTTP::StaticFileHandler.new(\".\"),",
+				"]).listen"
+			],
+		"description": "HTTP Server example with error, logs and static handler."
+	},
+	"Exception block": {
+		"prefix": "begin",
+		"body": [
+			"begin",
+			"\t$1",
+			"rescue exception",
+			"\t",
+			"end"
+		],
+		"description": "Rescue any exception and access the rescued exception using exception variable in the rescue clause."
+	},
+	"Exception block with ensure": {
+		"prefix": "begin ensure",
+		"body": [
+			"begin",
+			"\t$1",
+			"rescue exception",
+			"\t",
+			"ensure",
+			"\t",
+			"end"
+		],
+		"description": "Rescue with ensure clause executed at the end, expression regardless of whether an exception was raised or not."
+	},
+	"Exception block with else": {
+		"prefix": "begin else",
+		"body": [
+			"begin",
+			"\t$1",
+			"rescue exception",
+			"\t",
+			"else",
+			"\t",
+			"end"
+		],
+		"description": "An else clause is executed only if no exceptions were rescued."
+	},
+	"Exception block with else and ensure": {
+		"prefix": "begin else ensure",
+		"body": [
+			"begin",
+			"\t$1",
+			"rescue exception",
+			"\t",
+			"else",
+			"\t",
+			"ensure",
+			"\t",
+			"end"
+		],
+		"description": "Exception block with ensure and else."
+	},
+	"Module definition": {
+		"prefix": "module",
+		"body": [
+			"module ${ModuleName}",
+			"\t$0",
+			"end"
+		],
+		"description": "Module as namespaces for defining other types, methods and constants or as partial types that can be mixed in other types."
+	},
+	"Class definition": {
+		"prefix": "class",
+		"body": [
+			"class ${ClassName}",
+			"\t$0",
+			"end"
+		],
+		"description": "A class is a blueprint from which individual objects are created. Class names, and indeed all type names, begin with a capital letter in Crystal."
+	},
+	"Class definition with initialize": {
+		"prefix": "class init",
+		"body": [
+			"class ${ClassName}",
+			"\tdef initialize",
+			"\t\t$0",
+			"\tend",
+			"end"
+		],
+		"description": "Use initialize method as constructor for a class instance."
+	},
+	"method definition": {
+		"prefix": "def",
+		"body": [
+			"def ${method_name}",
+			"\t$0",
+			"end"
+		],
+		"description": "Method names begin with a lowercase letter and, as a convention, only use lowercase letters, underscores and numbers."
+	},
+	"Struct definition": {
+		"prefix": "struct",
+		"body": [
+			"struct ${StructName}",
+			"\t$0",
+			"end"
+		],
+		"description": "Struct allocates it on the stack instead of the heap and  is passed by value."
+	},
+	"Union definition": {
+		"prefix": "union",
+		"body": [
+			"union ${UnionName}",
+			"\t$0",
+			"end"
+		],
+		"description": "Allocates the union on the stack."
+	},
+	"Enum definition": {
+		"prefix": "enum",
+		"body": [
+			"enum ${EnumName}",
+			"\t$0",
+			"end"
+		],
+		"description": "An enum is a set of integer values, where each value has an associated name."
+	},
+	"Lib definition": {
+		"prefix": "lib",
+		"body": [
+			"lib ${LibName}",
+			"\t$0",
+			"end"
+		],
+		"description": "A lib declaration groups C functions and types that belong to a library."
+	},
+	"fun definition": {
+		"prefix": "fun",
+		"body": [
+			"fun ${fun_name}",
+			"\t$0",
+			"end"
+		],
+		"description": "A fun declaration is a primitive function that support primitive types only and inside a lib binds to a C function."
+	},
+	"macro definition": {
+		"prefix": "macro",
+		"body": [
+			"macro ${macro_name}",
+			"\t$0",
+			"end"
+		],
+		"description": "Macros are methods that receive AST nodes at compile-time and produce code that is pasted into a program."
+	},
+	"if": {
+		"prefix": "if",
+		"body": [
+			"if ${test}",
+			"\t$0",
+			"end"
+		],
+		"description": "An if evaluates the given branch if its condition is truthy."
+	},
+	"if else": {
+		"prefix": "if else",
+		"body": [
+			"if ${test}",
+			"\t$0",
+			"else",
+			"\t",
+			"end"
+		],
+		"description": "It evaluates if when condition is true and the else branch when condition is false."
+	},
+	"if elsif": {
+		"prefix": "if elsif",
+		"body": [
+			"if ${test}",
+			"\t$0",
+			"elsif ",
+			"\t",
+			"end"
+		],
+		"description": "To write a chain of if-else-if you use elsif."
+	},
+	"if elsif else": {
+		"prefix": "if elsif else",
+		"body": [
+			"if ${test}",
+			"\t$0",
+			"elsif ",
+			"\t",
+			"else",
+			"\t",
+			"end"
+		],
+		"description": "Add elif and else to conditional structure."
+	},
+	"unless": {
+		"prefix": "unless",
+		"body": [
+			"unless ${test}",
+			"\t$0",
+			"end"
+		],
+		"description": " That is, it behaves in the opposite way of an if."
+	},
+	"until loop": {
+		"prefix": "until",
+		"body": [
+			"until ${test}",
+			"\t$0",
+			"end"
+		],
+		"description": "An until is just syntax sugar for a while with the condition negate."
+	},
+	"while loop": {
+		"prefix": "while",
+		"body": [
+			"while ${test}",
+			"\t$0",
+			"end"
+		],
+		"description": "A while executes its body as long as its condition is truthy."
+	},
+	"loop": {
+		"prefix": "loop",
+		"body": [
+			"loop do",
+			"\t$0",
+			"end"
+		],
+		"description": "A loop executes its body forever until a break."
+	},
+	"spawn": {
+		"prefix": "spawn",
+		"body": [
+			"spawn do",
+			"\t$0",
+			"end"
+		],
+		"description": "A loop executes its body forever until a break."
+	},
+	"block do": {
+		"prefix": "d",
+		"body": [
+			"do",
+			"\t$0",
+			"end"
+		],
+		"description": "Create a block without arguments"
+	},
+	"block do with args": {
+		"prefix": "do",
+		"body": [
+			"do |$1|",
+			"\t$0",
+			"end"
+		],
+		"description": "Create a block with arguments"
+	}
+}
