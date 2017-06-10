@@ -270,5 +270,17 @@
 			"end"
 		],
 		"description": "Create a block with arguments"
+	},
+	"case": {
+		"prefix": "case",
+		"body": [
+			"case ${exp}",
+			"when ${value}",
+			"\t$0",
+			"else",
+			"\t",
+			"end"
+		],
+		"description": "A case is a control expression which functions a bit like pattern matching."
 	}
 }
