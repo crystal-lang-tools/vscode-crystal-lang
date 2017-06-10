@@ -2,8 +2,6 @@
 
 Yet another VSCode extension for Crystal Programming Language.
 
-![crystal logo](https://raw.githubusercontent.com/faustinoaq/vscode-crystal-lang/master/images/icon.png)
-
 ## Features
 
 This extensions provide syntax highlighting and snippets based on [Crystal documentation](https://crystal-lang.org/docs/).
@@ -17,13 +15,11 @@ This extensions provide syntax highlighting and snippets based on [Crystal docum
 
 ## Release Notes
 
-### 1.0.0 (2017-06-02)
-
-- Initial release of `vscode-crystal-lang`
+See [Changelog](https://github.com/faustinoaq/vscode-crystal-lang/blob/master/CHANGELOG.md)
 
 ## Contributing
 
-1. Fork it https://github.com/faustinoaq/vscde-crystal-lang/fork
+1. Fork it https://github.com/faustinoaq/vscode-crystal-lang/fork
 2. Create your feature branch `git checkout -b my-new-feature`
 3. Commit your changes `git commit -am 'Add some feature'`
 4. Push to the branch `git push origin my-new-feature`
