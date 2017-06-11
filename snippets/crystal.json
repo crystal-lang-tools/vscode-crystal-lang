@@ -75,7 +75,7 @@
 	"Module definition": {
 		"prefix": "module",
 		"body": [
-			"module ${ModuleName}",
+			"module ${1:ModuleName}",
 			"\t$0",
 			"end"
 		],
@@ -84,7 +84,7 @@
 	"Class definition": {
 		"prefix": "class",
 		"body": [
-			"class ${ClassName}",
+			"class ${1:ClassName}",
 			"\t$0",
 			"end"
 		],
@@ -93,7 +93,7 @@
 	"Class definition with initialize": {
 		"prefix": "class init",
 		"body": [
-			"class ${ClassName}",
+			"class ${1:ClassName}",
 			"\tdef initialize",
 			"\t\t$0",
 			"\tend",
@@ -104,7 +104,7 @@
 	"method definition": {
 		"prefix": "def",
 		"body": [
-			"def ${method_name}",
+			"def ${1:method_name}",
 			"\t$0",
 			"end"
 		],
@@ -113,7 +113,7 @@
 	"Struct definition": {
 		"prefix": "struct",
 		"body": [
-			"struct ${StructName}",
+			"struct ${1:StructName}",
 			"\t$0",
 			"end"
 		],
@@ -122,7 +122,7 @@
 	"Union definition": {
 		"prefix": "union",
 		"body": [
-			"union ${UnionName}",
+			"union ${1:UnionName}",
 			"\t$0",
 			"end"
 		],
@@ -131,7 +131,7 @@
 	"Enum definition": {
 		"prefix": "enum",
 		"body": [
-			"enum ${EnumName}",
+			"enum ${1:EnumName}",
 			"\t$0",
 			"end"
 		],
@@ -140,7 +140,7 @@
 	"Lib definition": {
 		"prefix": "lib",
 		"body": [
-			"lib ${LibName}",
+			"lib ${1:LibName}",
 			"\t$0",
 			"end"
 		],
@@ -149,7 +149,7 @@
 	"fun definition": {
 		"prefix": "fun",
 		"body": [
-			"fun ${fun_name}",
+			"fun ${1:fun_name}",
 			"\t$0",
 			"end"
 		],
@@ -158,7 +158,7 @@
 	"macro definition": {
 		"prefix": "macro",
 		"body": [
-			"macro ${macro_name}",
+			"macro ${1:macro_name}",
 			"\t$0",
 			"end"
 		],
@@ -167,7 +167,7 @@
 	"if": {
 		"prefix": "if",
 		"body": [
-			"if ${test}",
+			"if ${1:test}",
 			"\t$0",
 			"end"
 		],
@@ -176,7 +176,7 @@
 	"if else": {
 		"prefix": "if else",
 		"body": [
-			"if ${test}",
+			"if ${1:test}",
 			"\t$0",
 			"else",
 			"\t",
@@ -187,7 +187,7 @@
 	"if elsif": {
 		"prefix": "if elsif",
 		"body": [
-			"if ${test}",
+			"if ${1:test}",
 			"\t$0",
 			"elsif ",
 			"\t",
@@ -198,7 +198,7 @@
 	"if elsif else": {
 		"prefix": "if elsif else",
 		"body": [
-			"if ${test}",
+			"if ${1:test}",
 			"\t$0",
 			"elsif ",
 			"\t",
@@ -211,7 +211,7 @@
 	"unless": {
 		"prefix": "unless",
 		"body": [
-			"unless ${test}",
+			"unless ${1:test}",
 			"\t$0",
 			"end"
 		],
@@ -220,7 +220,7 @@
 	"until loop": {
 		"prefix": "until",
 		"body": [
-			"until ${test}",
+			"until ${1:test}",
 			"\t$0",
 			"end"
 		],
@@ -229,7 +229,7 @@
 	"while loop": {
 		"prefix": "while",
 		"body": [
-			"while ${test}",
+			"while ${1:test}",
 			"\t$0",
 			"end"
 		],
@@ -274,8 +274,8 @@
 	"case": {
 		"prefix": "case",
 		"body": [
-			"case ${exp}",
-			"when ${value}",
+			"case ${1:exp}",
+			"when ${2:value}",
 			"\t$0",
 			"else",
 			"\t",
