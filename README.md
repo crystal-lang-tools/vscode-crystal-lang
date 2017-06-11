@@ -2,6 +2,38 @@
 
 Yet another VSCode extension for Crystal Programming Language.
 
+## Features
+
+* Syntax highlighting for `.cr` and `.ecr`
+* Code snippets for `.cr` files
+* Increment and decrement identation
+* Formatting code using `crystal tool format`
+* Linter using `crystal build --no-color --no-codegen -f json`
+
+### Syntax highlighting
+
+![crystal syntax](https://raw.githubusercontent.com/faustinoaq/vscode-crystal-lang/master/images/ecr.png)
+
+### Snippets
+
+![crystal snippet](https://raw.githubusercontent.com/faustinoaq/vscode-crystal-lang/master/images/snippet.png)
+
+### Identation
+
+![crystal identation](https://raw.githubusercontent.com/faustinoaq/vscode-crystal-lang/master/images/identation00.gif)
+
+![crystal identation](https://raw.githubusercontent.com/faustinoaq/vscode-crystal-lang/master/images/identation01.gif)
+
+### Linter
+
+![crystal linter](https://raw.githubusercontent.com/faustinoaq/vscode-crystal-lang/master/images/linter.png)
+
+### Format
+
+![crystal format](https://raw.githubusercontent.com/faustinoaq/vscode-crystal-lang/master/images/format.gif)
+
+Syntax and snippets are based on [Crystal documentation](https://crystal-lang.org/docs/).
+
 ## Configuration
 
 ```javascript
@@ -11,18 +43,6 @@ Yet another VSCode extension for Crystal Programming Language.
   "crystal-lang.mainFile": "/absolute/src/file/path" // Use absolute path (${} variables don't work)
 }
 ```
-
-## Features
-
-* Syntax highlighting for `.cr` and `.ecr`
-* Code snippets for `.cr` files
-* Increment and decrement identation
-* Formatting code using `crystal tool format`
-* Linter using `crystal build --no-color --no-codegen -f json`
-
-![crystal cup example code](http://i.imgur.com/L1Xdm7A.png)
-
-Syntax and snippets are based on [Crystal documentation](https://crystal-lang.org/docs/).
 
 ## Based on these extensions
 
