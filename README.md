@@ -7,7 +7,7 @@ Yet another VSCode extension for Crystal Programming Language.
 * Syntax highlighting for `.cr` and `.ecr`
 * Code snippets for `.cr` files
 * Increment and decrement identation
-* Formatting code using `crystal tool format`
+* Formatting code using `crystal tool format -`
 * Linter using `crystal build --no-color --no-codegen -f json`
 
 ### Syntax highlighting
@@ -57,9 +57,8 @@ Syntax and snippets are based on [Crystal documentation](https://crystal-lang.or
 
 ## Knows issues
 
-* Linter and formatter are implemented using Node.js `exec` so perfomance could be affected.
+* Linter and formatter are implemented using Node.js `child_process` so perfomance could be affected.
 * Linter is disabled by default, enable using `"crystal-lang.verifyFiles": true`
-* Formatter creates temp file because `crystal tool format` don't print to stdout. [#1863](https://github.com/crystal-lang/crystal/issues/1863)
 * ECR syntax is very basic, some keywords aren't highlighted. You can use vscode text.html instead.
 * Some errors can't be detected because `crystal` (0.22.0) don't use `stderr`. [#4494](https://github.com/crystal-lang/crystal/pull/4494)
 
