@@ -12,7 +12,7 @@ function validateFile(document: vscode.TextDocument) {
     if (config['mainFile'] !== "") {
         fileName = config['mainFile'];
     }
-    child_process.exec(`crystal build --no-color --no-codegen -f json ${fileName}`, (err, response) => {
+    child_process.exec(`crystal build --no-color --no-codegen -f json "${fileName}"`, (err, response) => {
         analyzeDocument(response, '', problemsLimit);
     })
 }
