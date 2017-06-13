@@ -1,5 +1,9 @@
 # Change Log
 
+## [Unreleased]
+### Added
+- Untitled Formatter and basic linter
+
 ## [0.0.4] - 2017-06-11
 ### Fix
 - Filepath with spaces or special characters

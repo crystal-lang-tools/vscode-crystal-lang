@@ -17,7 +17,15 @@ function execFormatter(document: vscode.TextDocument) {
 }
 
 async function format(document: vscode.TextDocument) {
-    let fileName = document.fileName;
+    let fileName: vscode.Uri | string;
+    // document.fileName soporta caracteres especiales
+    // En cambio document.uri codifica los caracteres
+    // por eso solo se utiliza uri para untitled
+    if (document.uri['_formatted'].startsWith('untitled:')) {
+        fileName = document.uri;
+    } else {
+        fileName = document.fileName;
+    }
     let response = await execFormatter(document);
     let editData: vscode.TextEdit[] = [];
     if (analyzeDocument(response.toString(), fileName)) {

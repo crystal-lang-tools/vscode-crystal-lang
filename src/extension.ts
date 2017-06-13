@@ -1,6 +1,5 @@
 'use strict';
 import * as vscode from 'vscode';
-import * as path from 'path';
 
 import { formatRegistration } from './formatter'
 import { diagnosticCollection, openValidate, saveValidate } from './linter'
