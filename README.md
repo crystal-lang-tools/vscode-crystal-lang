@@ -53,7 +53,7 @@ Syntax and snippets are based on [Crystal documentation](https://crystal-lang.or
 
 ## Roadmap
 
-* Implement more vscode features like [Nim](https://github.com/fr1zle/vscode-nim) and [Elixir](https://github.com/fr1zle/vscode-elixir) extensions.
+* Implement more vscode features like [Nim](https://github.com/pragmagic/vscode-nim) and [Elixir](https://github.com/fr1zle/vscode-elixir) extensions.
 
 ## Knows issues
 
