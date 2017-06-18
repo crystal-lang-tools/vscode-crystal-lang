@@ -4,6 +4,13 @@
 ### Added
 - Untitled Formatter and basic linter
 
+### TODO
+- Hover (Using context)
+- Symbols (Using hierarchy)
+- Referencies (using crystal tool implementations)
+- Completions (Using crystal tool type)
+- Syntax based on JSON
+
 ## [0.0.4] - 2017-06-11
 ### Fix
 - Filepath with spaces or special characters
