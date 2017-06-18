@@ -241,7 +241,7 @@
 			<key>comment</key>
 			<string>everything being a reserved word, not a value and needing a 'end' is a..</string>
 			<key>match</key>
-			<string>(?&lt;!\.)\b(BEGIN|alias|as|begin|case|abstract|class|END|ensure|for|fun|if|ifdef|in|lib|module|of|out|private|protected|rescue|struct|with|union|enum|macro|then|type|unless|until|while)\b(?![?!])</string>
+			<string>(?&lt;!\.)\b(BEGIN|alias|as|begin|case|abstract|class|END|ensure|for|fun|if|ifdef|in|lib|module|of|out|private|protected|rescue|struct|with|union|enum|macro|then|type|unless|until|while|select)\b(?![?!])</string>
 			<key>name</key>
 			<string>keyword.control.primary.crystal</string>
 		</dict>
