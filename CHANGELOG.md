@@ -1,7 +1,7 @@
 # Change Log
 
 ## [Unreleased]
-### Added
+### TODO
 - Hover (using context).
 - Symbols (using hierarchy).
 - Referencies (using implementations).
