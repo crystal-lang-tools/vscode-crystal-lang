@@ -78,7 +78,7 @@
 				"key": "Ctrl+Shift+I"
 			}
 		],
-	   "configuration": {
+		"configuration": {
 			"type": "object",
 			"title": "Crystal Lang configuration",
 			"properties": {
@@ -98,7 +98,7 @@
 					"description": "Controls the maximum number of problems."
 				}
 			}
-	   }
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "tsc -p ./",
