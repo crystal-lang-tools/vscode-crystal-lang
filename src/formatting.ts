@@ -28,7 +28,8 @@ export const documentFormatting = languages.registerDocumentFormattingEditProvid
 		let response = await execFormat(document);
 		let textEditData: TextEdit[] = [];
 
-		if (responseDiagnostics(response.toString(), document.uri).length == 0) {
+		if ((responseDiagnostics(response.toString(), document.uri).length == 0) &&
+		     response.toString().length > 0) {
 			let lastLineId = document.lineCount - 1;
 			let range = new Range(0, 0, lastLineId, document.lineAt(lastLineId).text.length);
 			textEditData = [TextEdit.replace(range, response.toString())];
