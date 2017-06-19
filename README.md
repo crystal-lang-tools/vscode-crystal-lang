@@ -38,9 +38,9 @@ Syntax and snippets are based on [Crystal documentation](https://crystal-lang.or
 
 ```javascript
 {
-  "crystal-lang.verifyFiles": true, // enable crystal linter, disabled by default
-  "crystal-lang.maxNumberOfProblems": 10, // Max amount of problems by crystal build
-  "crystal-lang.mainFile": "/absolute/src/file/path" // Use absolute path (${} variables don't work)
+  "crystal-lang.problems": true, // enable crystal linter, disabled by default
+  "crystal-lang.problemsLimit": 10, // Max amount of problems by crystal build
+  "crystal-lang.mainFile": "/absolute/src/file/path" // Use main file instead of current one.
 }
 ```
 
@@ -58,9 +58,10 @@ Syntax and snippets are based on [Crystal documentation](https://crystal-lang.or
 ## Knows issues
 
 * Linter and formatter are implemented using Node.js `child_process` so perfomance could be affected.
-* Linter is disabled by default, enable using `"crystal-lang.verifyFiles": true`
+* Linter is disabled by default, enable using `"crystal-lang.problems": true`
 * ECR syntax is very basic, some keywords aren't highlighted. You can use vscode text.html instead.
 * Some errors can't be detected because `crystal` (0.22.0) don't use `stderr`. [#4494](https://github.com/crystal-lang/crystal/pull/4494)
+* Take care of messages like `using compiler at .bin/crystal` because extension can parse output.
 
 ## Release Notes
 
