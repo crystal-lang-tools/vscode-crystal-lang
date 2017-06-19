@@ -2,7 +2,7 @@
 	"name": "crystal-lang",
 	"displayName": "Crystal Language",
 	"description": "The Crystal Programming Language",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"publisher": "faustinoaq",
 	"icon": "images/icon.svg",
 	"license": "MIT",
