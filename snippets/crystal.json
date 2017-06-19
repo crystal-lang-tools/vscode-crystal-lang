@@ -282,5 +282,15 @@
 			"end"
 		],
 		"description": "A case is a control expression which functions a bit like pattern matching."
+	},
+	"select": {
+		"prefix": "select",
+		"body": [
+			"select",
+			"when ${1:ch.receive}",
+			"\t$0",
+			"end"
+		],
+		"description": "Wait for channels messages using a case statement."
 	}
 }
