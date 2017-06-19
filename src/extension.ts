@@ -1,24 +1,21 @@
 'use strict';
-import * as vscode from 'vscode';
+import { ExtensionContext } from 'vscode';
+import { platform } from 'os';
 
-import { formatRegistration } from './formatter'
-import { diagnosticCollection, openValidate, saveValidate } from './linter'
+import { languageConfiguration } from './configuration'
+import { documentFormatting } from './formatting'
+import { diagnosticCollection, diagnosticOnOpen, diagnosticOnSave } from './diagnostic'
 
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: ExtensionContext) {
+	context.subscriptions.push(languageConfiguration);
 
-    // Add indentation rules for crystal language
-    const indentationRules = vscode.languages.setLanguageConfiguration('crystal', {
-        indentationRules: {
-            increaseIndentPattern: /^.*(do|fun|def|macro|struct|class|lib|module|begin|rescue|if|elif|else).*$/,
-            decreaseIndentPattern: /^.*(rescue|elif|else|end).*$/
-        }
-    });
+	// Crystal doesn't support Windows yet
+	if (platform() === 'win32') { return; }
 
-    context.subscriptions.push(indentationRules);
-    context.subscriptions.push(formatRegistration);
-    context.subscriptions.push(diagnosticCollection);
-    context.subscriptions.push(openValidate);
-    context.subscriptions.push(saveValidate);
+	context.subscriptions.push(documentFormatting);
+	context.subscriptions.push(diagnosticCollection);
+	context.subscriptions.push(diagnosticOnOpen);
+	context.subscriptions.push(diagnosticOnSave);
 }
 
 export function deactivate() {

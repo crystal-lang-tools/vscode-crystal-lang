@@ -1,116 +1,116 @@
 {
-    "name": "crystal-lang",
-    "displayName": "Crystal Language",
-    "description": "The Crystal Programming Language",
-    "version": "0.0.4",
-    "publisher": "faustinoaq",
-    "icon": "images/icon.svg",
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/faustinoaq/vscode-crystal-lang"
-    },
-    "bugs": "https://github.com/faustinoaq/vscode-crystal-lang/issues",
-    "engines": {
-        "vscode": "^1.12.0"
-    },
-    "keywords": [
-        "crystal",
-        "syntax",
-        "languages"
-    ],
-    "categories": [
-        "Languages"
-    ],
-    "galleryBanner": {
-        "color": "#000000",
-        "theme": "dark"
-    },
-    "activationEvents": [
-        "onLanguage:crystal"
-    ],
-    "main": "./out/src/extension",
-    "contributes": {
-        "languages": [
-            {
-                "id": "crystal",
-                "aliases": [
-                    "Crystal",
-                    "crystal"
-                ],
-                "extensions": [
-                    ".cr"
-                ],
-                "configuration": "./crystal-configuration.json"
-            },
-            {
-                "id": "ecr",
-                "aliases": [
-                    "Embed Crystal"
-                ],
-                "extensions": [
-                    ".ecr"
-                ],
-                "configuration": "./ecr-configuration.json"
-            }
-        ],
-        "grammars": [
-            {
-                "language": "crystal",
-                "scopeName": "source.crystal",
-                "path": "./syntaxes/crystal.tmLanguage"
-            },
-            {
-                "language": "ecr",
-                "scopeName": "text.ecr",
-                "path": "./syntaxes/ecr.json"
-            }
-        ],
-        "snippets": [
-            {
-                "language": "crystal",
-                "path": "./snippets/crystal.json"
-            }
-        ],
-        "keybindings": [
-            {
-                "command": "editor.action.formatDocument",
-                "key": "Ctrl+Shift+I"
-            }
-        ],
-       "configuration": {
-            "type": "object",
-            "title": "Crystal Lang configuration",
-            "properties": {
-                "crystal-lang.verifyFiles": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Allow to check errors using crystal build."
-                },
-                "crystal-lang.mainFile": {
-                    "type": "string",
-                    "default": "",
-                    "description": "Check main file instead of current file. Useful in a crystal project where a main file require them all."
-                },
-				"crystal-lang.maxNumberOfProblems": {
+	"name": "crystal-lang",
+	"displayName": "Crystal Language",
+	"description": "The Crystal Programming Language",
+	"version": "0.0.4",
+	"publisher": "faustinoaq",
+	"icon": "images/icon.svg",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/faustinoaq/vscode-crystal-lang"
+	},
+	"bugs": "https://github.com/faustinoaq/vscode-crystal-lang/issues",
+	"engines": {
+		"vscode": "^1.12.0"
+	},
+	"keywords": [
+		"crystal",
+		"syntax",
+		"languages"
+	],
+	"categories": [
+		"Languages"
+	],
+	"galleryBanner": {
+		"color": "#000000",
+		"theme": "dark"
+	},
+	"activationEvents": [
+		"onLanguage:crystal"
+	],
+	"main": "./out/src/extension",
+	"contributes": {
+		"languages": [
+			{
+				"id": "crystal",
+				"aliases": [
+					"Crystal",
+					"crystal"
+				],
+				"extensions": [
+					".cr"
+				],
+				"configuration": "./crystal-configuration.json"
+			},
+			{
+				"id": "ecr",
+				"aliases": [
+					"Embed Crystal"
+				],
+				"extensions": [
+					".ecr"
+				],
+				"configuration": "./ecr-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "crystal",
+				"scopeName": "source.crystal",
+				"path": "./syntaxes/crystal.tmLanguage"
+			},
+			{
+				"language": "ecr",
+				"scopeName": "text.ecr",
+				"path": "./syntaxes/ecr.json"
+			}
+		],
+		"snippets": [
+			{
+				"language": "crystal",
+				"path": "./snippets/crystal.json"
+			}
+		],
+		"keybindings": [
+			{
+				"command": "editor.action.formatDocument",
+				"key": "Ctrl+Shift+I"
+			}
+		],
+	   "configuration": {
+			"type": "object",
+			"title": "Crystal Lang configuration",
+			"properties": {
+				"crystal-lang.problems": {
+					"type": "boolean",
+					"default": false,
+					"description": "Allow to check errors using crystal build."
+				},
+				"crystal-lang.mainFile": {
+					"type": "string",
+					"default": "",
+					"description": "Check main file instead of current file. Useful in a crystal project where a main file require them all."
+				},
+				"crystal-lang.problemsLimit": {
 					"type": "number",
 					"default": 20,
 					"description": "Controls the maximum number of problems."
 				}
-            }
-       }
-    },
-    "scripts": {
-        "vscode:prepublish": "tsc -p ./",
-        "compile": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "node ./node_modules/vscode/bin/test"
-    },
-    "devDependencies": {
-        "typescript": "^2.0.3",
-        "vscode": "^1.0.0",
-        "mocha": "^2.3.3",
-        "@types/node": "^6.0.40",
-        "@types/mocha": "^2.2.32"
-    }
+			}
+	   }
+	},
+	"scripts": {
+		"vscode:prepublish": "tsc -p ./",
+		"compile": "tsc -watch -p ./",
+		"postinstall": "node ./node_modules/vscode/bin/install",
+		"test": "node ./node_modules/vscode/bin/test"
+	},
+	"devDependencies": {
+		"typescript": "^2.0.3",
+		"vscode": "^1.0.0",
+		"mocha": "^2.3.3",
+		"@types/node": "^6.0.40",
+		"@types/mocha": "^2.2.32"
+	}
 }
