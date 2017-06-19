@@ -5,18 +5,23 @@
 - Hover (using context).
 - Symbols (using hierarchy).
 - Referencies (using implementations).
-- Completions (using type).
+- Completions (using types).
 - Syntax using JSON instead of XML.
 - New screenshots and gifs.
 
 ## [0.0.5] - 2017-06-18
 ### Change
-- Filepath with spaces or special characters.
+- Refactoring files
+
+### Fix
+- Buffer `spawn` waits until `end` event.
+- Remove `fileName` redundancy.
+- Auto identation.
 
 ### Add
 - `select` snippet.
 - Formatting in Untitled windows.
-- 
+- Clean `crystal.tmLanguage`
 
 ## [0.0.4] - 2017-06-11
 ### Fix
