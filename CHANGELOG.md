@@ -9,6 +9,11 @@
 - Syntax using JSON instead of XML.
 - New screenshots and gifs.
 
+## [0.0.7] - 2017-06-19
+### Fix
+- ECR syntax.
+- `win32` error messages.
+
 ## [0.0.6] - 2017-06-18
 ### Fix
 - Bug when `response` is empty [#4590](https://github.com/crystal-lang/crystal/issues/4590)
