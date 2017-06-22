@@ -99,7 +99,7 @@ You can use [Nomo Dark icon theme](https://marketplace.visualstudio.com/items?it
 1. Linter is disabled by default, enable using `"crystal-lang.problems": true`
 2. Linter and formatter are implemented using Node.js `child_process` so perfomance could be affected. You can use a different problem level.
 
-3. ECR syntax is very basic, some keywords aren't highlighted. You can use vscode `text.html` instead or enable emmet for `text.ecr` in your `settings.json`:
+3. ECR syntax is very basic. You can use vscode `text.html` instead or enable emmet for `text.ecr` in your `settings.json`:
 
 ```json
 {
