@@ -167,7 +167,7 @@
 	"if": {
 		"prefix": "if",
 		"body": [
-			"if ${1:test}",
+			"if ${1:foo}",
 			"\t$0",
 			"end"
 		],
@@ -176,7 +176,7 @@
 	"if else": {
 		"prefix": "if else",
 		"body": [
-			"if ${1:test}",
+			"if ${1:foo}",
 			"\t$0",
 			"else",
 			"\t",
@@ -187,7 +187,7 @@
 	"if elsif": {
 		"prefix": "if elsif",
 		"body": [
-			"if ${1:test}",
+			"if ${1:foo}",
 			"\t$0",
 			"elsif ",
 			"\t",
@@ -198,7 +198,7 @@
 	"if elsif else": {
 		"prefix": "if elsif else",
 		"body": [
-			"if ${1:test}",
+			"if ${1:foo}",
 			"\t$0",
 			"elsif ",
 			"\t",
@@ -211,7 +211,7 @@
 	"unless": {
 		"prefix": "unless",
 		"body": [
-			"unless ${1:test}",
+			"unless ${1:foo}",
 			"\t$0",
 			"end"
 		],
@@ -220,7 +220,7 @@
 	"until loop": {
 		"prefix": "until",
 		"body": [
-			"until ${1:test}",
+			"until ${1:foo}",
 			"\t$0",
 			"end"
 		],
@@ -229,7 +229,7 @@
 	"while loop": {
 		"prefix": "while",
 		"body": [
-			"while ${1:test}",
+			"while ${1:foo}",
 			"\t$0",
 			"end"
 		],

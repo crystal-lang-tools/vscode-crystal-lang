@@ -1,13 +1,26 @@
 # Change Log
 
 ## [Unreleased]
-### TODO
-- Hover (using context).
-- Symbols (using hierarchy).
-- Referencies (using implementations).
-- Completions (using types).
+### Todo
+- Hover (using tool context).
+- Symbols (using tool hierarchy).
+- Referencies (using tool implementations).
+- Completions (using tool types).
 - Syntax using JSON instead of XML.
-- New screenshots and gifs.
+- Support for Language Server Protocol
+
+## [0.0.8] - 2017-06-22
+### Change
+- Refactoring source code
+
+### Add
+- Linter levels: syntax, build and none.
+- README new gifs and documentation.
+- ECR Snnipets
+
+### Fix
+- ECR Syntax.
+- CRYSTAL_PATH issues when using shards.
 
 ## [0.0.7] - 2017-06-19
 ### Fix

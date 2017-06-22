@@ -1,67 +1,116 @@
 # VSCode Extension for Crystal Language
 
-Yet another VSCode extension for Crystal Programming Language.
+This extension provides basic language support for Crystal and [ECR](https://crystal-lang.org/api/latest/ECR.html).
+
+![crystal icon](http://i.imgur.com/GoiQmzC.gif)
 
 ## Features
 
-* Syntax highlighting for `.cr` and `.ecr`
-* Code snippets for `.cr` files
 * Increment and decrement identation
-* Formatting code using `crystal tool format -`
-* Linter using `crystal build --no-color --no-codegen -f json`
-
-### Syntax highlighting
-
-![crystal syntax](https://raw.githubusercontent.com/faustinoaq/vscode-crystal-lang/master/images/ecr.png)
-
-### Snippets
-
-![crystal snippet](https://raw.githubusercontent.com/faustinoaq/vscode-crystal-lang/master/images/snippet.png)
-
-### Identation
-
-![crystal identation](https://raw.githubusercontent.com/faustinoaq/vscode-crystal-lang/master/images/identation00.gif)
-
-![crystal identation](https://raw.githubusercontent.com/faustinoaq/vscode-crystal-lang/master/images/identation01.gif)
-
-### Linter
-
-![crystal linter](https://raw.githubusercontent.com/faustinoaq/vscode-crystal-lang/master/images/linter.png)
-
-### Format
-
-![crystal format](https://raw.githubusercontent.com/faustinoaq/vscode-crystal-lang/master/images/format.gif)
-
-Syntax and snippets are based on [Crystal documentation](https://crystal-lang.org/docs/).
+* Formatting code support
+* Syntax highlighting
+* Linter support
+* Snippets
 
 ## Configuration
 
-```javascript
+Your `settings.json` with this extension configuration:
+
+```json
 {
-  "crystal-lang.problems": true, // enable crystal linter, disabled by default
-  "crystal-lang.problemsLimit": 10, // Max amount of problems by crystal build
-  "crystal-lang.mainFile": "/absolute/src/file/path" // Use main file instead of current one.
+  "crystal-lang.problems": "syntax",
+  "crystal-lang.problemsLimit": 10
+  "crystal-lang.mainFile": "/absolute/src/file/path",
 }
 ```
 
-## Based on these extensions
+### problems
 
-* [vscode-crystal](https://github.com/g3ortega/vscode-crystal): syntax highlighting and useful framework snippets.
-* [crystal-ide](https://github.com/kofno/crystal-ide): syntax highlighting and error checking.
-* [vscode-elixir](https://github.com/fr1zle/vscode-elixir): language support.
-* [vscode-nim](https://github.com/pragmagic/vscode-nim): language support.
+`crystal-lang.problems` allow to set diferents error levels. By default the linter just check syntax errors. The options are:
+
+- **syntax**: check syntax and tokens (default).
+- **build**: check requires, objects and methods (resource heavy).
+- **none**: disable linter.
+
+```json
+{
+	"crystal-lang.problems": "syntax | build | none",
+}
+```
+
+### poblemsLimit
+
+`crystal-lang.problemsLimit` allow to limit the amount of problems that appears in problems view. The default value is 20.
+
+### mainFile
+
+`crystal-lang.mainFile` works only when `crystal-lang.problems = "build"` because the extension needs to compile your code to get more info about problems but without generate an executable.
+
+This option is more resource heavy that the aboves.
+
+## Screenshots
+
+### Increment and decrement identation
+
+![identation](http://i.imgur.com/V15TxFb.gif)
+
+### Formatting code support
+
+![formatting](http://i.imgur.com/VTeOkOm.gif)
+
+### Syntax highlighting
+
+![ecr](http://i.imgur.com/w9aBlIH.gif)
+
+
+### Linter support
+
+![linter](http://i.imgur.com/ukl1jyg.gif)
+
+### Snippets
+
+![snippets](http://i.imgur.com/GNICZSH.gif)
+
+### Debugging
+
+[Native Debug](https://marketplace.visualstudio.com/items?itemName=webfreak.debug) is an excelent extension that allow you to debbug crystal and other languages that compile to binary.
+
+> Be sure of compile your crystal code with `--debug` flag
+
+![Native Debug extension](http://i.imgur.com/mrJzrxI.png)
+
+### Icon theme
+
+You can use [Nomo Dark icon theme](https://marketplace.visualstudio.com/items?itemName=be5invis.vscode-icontheme-nomo-dark) to see crystal icon:
+
+![Nomo Dark icon theme](http://i.imgur.com/6QxIyWV.png)
 
 ## Roadmap
 
-* Implement more vscode features like [Nim](https://github.com/pragmagic/vscode-nim) and [Elixir](https://github.com/fr1zle/vscode-elixir) extensions.
+- Referencies (using `crystal tool implementations`).
+- Completions (using `crystal tool types`).
+- Symbols (using `crystal tool hierarchy`).
+- Hover (using `crystal tool context`).
+- Syntax using JSON instead of XML.
+- Support for Language Server Protocol, see [Scry](https://github.com/kofno/scry)
 
-## Knows issues
+## Know issues
 
-* Linter and formatter are implemented using Node.js `child_process` so perfomance could be affected.
-* Linter is disabled by default, enable using `"crystal-lang.problems": true`
-* ECR syntax is very basic, some keywords aren't highlighted. You can use vscode text.html instead.
-* Some errors can't be detected because `crystal` (0.22.0) don't use `stderr`. [#4494](https://github.com/crystal-lang/crystal/pull/4494)
-* Take care of messages like `using compiler at .bin/crystal` because extension can parse output.
+1. Linter is disabled by default, enable using `"crystal-lang.problems": true`
+2. Linter and formatter are implemented using Node.js `child_process` so perfomance could be affected. You can use a different problem level.
+
+3. ECR syntax is very basic, some keywords aren't highlighted. You can use vscode `text.html` instead or enable emmet for `text.ecr` in your `settings.json`:
+
+```json
+{
+  "emmet.syntaxProfiles": {
+    "ecr": "html"
+  }
+}
+```
+
+4. Some errors can't be detected because `crystal` (0.22.0) don't use `stderr`. [#4494](https://github.com/crystal-lang/crystal/pull/4494)
+
 
 ## Release Notes
 

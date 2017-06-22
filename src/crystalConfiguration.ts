@@ -1,7 +1,6 @@
 'use strict';
-import { languages } from 'vscode';
 
-export const languageConfiguration = languages.setLanguageConfiguration('crystal', {
+export const crystalConfiguration = {
 	// Add indentation rules for crystal language
 	indentationRules: {
 		// /^.*(
@@ -21,4 +20,4 @@ export const languageConfiguration = languages.setLanguageConfiguration('crystal
 		// $/
 		decreaseIndentPattern: /^\s*(((rescue|ensure|else)\b)|(elsif\s.*)|(end(\..*|\b)))$/
 	}
-});
+}
