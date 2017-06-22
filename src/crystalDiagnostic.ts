@@ -44,7 +44,7 @@ export class CrystalDiagnostic {
 				this.responseDiagnostics(dataStorage, document.uri);
 			});
 			child.on('error', (error) => {
-				console.error("crystal binary NOT FOUND " + error);
+				console.error(error);
 			});
 		} else if (this.config['problems'] === "build" && document.uri['_formatted'].startsWith('file:') && this.processes.length < 3) {
 			let env = {
@@ -55,7 +55,7 @@ export class CrystalDiagnostic {
 			this.processes.push(1)
 			exec(`crystal build --no-debug --no-codegen --error-trace -f json "${fileName}"`, env, (err, response) => {
 				if (err) {
-					console.error("crystal binary NOT FOUND " + err);
+					console.error(err);
 				}
 				this.processes.pop();
 				this.responseDiagnostics(response, document.uri);
