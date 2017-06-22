@@ -19,8 +19,8 @@ Your `settings.json` with this extension configuration:
 ```json
 {
   "crystal-lang.problems": "syntax",
-  "crystal-lang.problemsLimit": 10
-  "crystal-lang.mainFile": "/absolute/src/file/path",
+  "crystal-lang.problemsLimit": 10,
+  "crystal-lang.mainFile": "/absolute/src/file/path"
 }
 ```
 
