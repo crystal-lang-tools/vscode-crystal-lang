@@ -18,9 +18,9 @@ Your `settings.json` with this extension configuration:
 
 ```json
 {
-  "crystal-lang.problems": "syntax",
-  "crystal-lang.problemsLimit": 10,
-  "crystal-lang.mainFile": "/absolute/src/file/path"
+	"crystal-lang.problems": "syntax",
+	"crystal-lang.problemsLimit": 10,
+	"crystal-lang.mainFile": "/absolute/src/file/path"
 }
 ```
 
@@ -29,7 +29,7 @@ Your `settings.json` with this extension configuration:
 `crystal-lang.problems` allow to set diferents error levels. By default the linter just check syntax errors. The options are:
 
 - **syntax**: check syntax and tokens (default).
-- **build**: check requires, objects and methods (resource heavy).
+- **build**: check requires, objects and methods without codegen (resource heavy).
 - **none**: disable linter.
 
 ```json
@@ -44,9 +44,9 @@ Your `settings.json` with this extension configuration:
 
 ### mainFile
 
-`crystal-lang.mainFile` works only when `crystal-lang.problems = "build"` because the extension needs to compile your code to get more info about problems but without generate an executable.
+`crystal-lang.mainFile` says to the compiler which file should analize, it works only when `"crystal-lang.problems" = "build"` because the extension needs to compile your code to get more info about problems but without generate an executable.
 
-This option is more resource heavy that the aboves.
+This option is more resource heavy that the others.
 
 ## Screenshots
 
@@ -96,10 +96,9 @@ You can use [Nomo Dark icon theme](https://marketplace.visualstudio.com/items?it
 
 ## Know issues
 
-1. Linter is disabled by default, enable using `"crystal-lang.problems": true`
-2. Linter and formatter are implemented using Node.js `child_process` so perfomance could be affected. You can use a different problem level.
+- Linter and formatter are implemented using Node.js `child_process` so perfomance could be affected. You can use a different problem level.
 
-3. ECR syntax is very basic. You can use vscode `text.html` instead or enable emmet for `text.ecr` in your `settings.json`:
+- ECR syntax is very basic. You can use vscode `text.html` instead or enable emmet for `text.ecr` in your `settings.json`:
 
 ```json
 {
@@ -109,7 +108,7 @@ You can use [Nomo Dark icon theme](https://marketplace.visualstudio.com/items?it
 }
 ```
 
-4. Some errors can't be detected because `crystal` (0.22.0) don't use `stderr`. [#4494](https://github.com/crystal-lang/crystal/pull/4494)
+- Some errors can't be detected because `crystal` (0.22.0) don't use `stderr`. [#4494](https://github.com/crystal-lang/crystal/pull/4494)
 
 
 ## Release Notes
