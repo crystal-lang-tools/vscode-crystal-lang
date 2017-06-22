@@ -73,7 +73,7 @@ This option is more resource heavy that the aboves.
 
 ### Debugging
 
-[Native Debug](https://marketplace.visualstudio.com/items?itemName=webfreak.debug) is an excelent extension that allow you to debbug crystal and other languages that compile to binary.
+[Native Debug](https://marketplace.visualstudio.com/items?itemName=webfreak.debug) is an excelent extension that allow you to debug crystal and other languages that compile to binary.
 
 > Be sure of compile your crystal code with `--debug` flag
 
