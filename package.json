@@ -29,7 +29,7 @@
 	"activationEvents": [
 		"onLanguage:crystal"
 	],
-	"main": "./out/src/extension",
+	"main": "./out/src/crystalMain",
 	"contributes": {
 		"languages": [
 			{
@@ -70,6 +70,10 @@
 			{
 				"language": "crystal",
 				"path": "./snippets/crystal.json"
+			},
+			{
+				"language": "ecr",
+				"path": "./snippets/ecr.json"
 			}
 		],
 		"keybindings": [
@@ -83,14 +87,19 @@
 			"title": "Crystal Lang configuration",
 			"properties": {
 				"crystal-lang.problems": {
-					"type": "boolean",
-					"default": false,
-					"description": "Allow to check errors using crystal build."
+					"type": "string",
+					"default": "syntax",
+					"enum": [
+						"syntax",
+						"build",
+						"none"
+					],
+					"description": "Allow to check errors.\nsyntax: show syntax errors using format check\nbuild: compile source code without codegen\nnone: disable problems"
 				},
 				"crystal-lang.mainFile": {
 					"type": "string",
 					"default": "",
-					"description": "Check main file instead of current file. Useful in a crystal project where a main file require them all."
+					"description": "Check main file instead of current file.\nUseful in a crystal project where a main do require \"./**\""
 				},
 				"crystal-lang.problemsLimit": {
 					"type": "number",
