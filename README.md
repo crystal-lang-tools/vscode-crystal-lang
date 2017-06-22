@@ -1,6 +1,6 @@
 # VSCode Extension for Crystal Language
 
-This extension provides basic language support for Crystal and [ECR](https://crystal-lang.org/api/latest/ECR.html).
+This extension provides basic language support for [Crystal](http://crystal-lang.org) and [ECR](https://crystal-lang.org/api/latest/ECR.html).
 
 ![crystal icon](http://i.imgur.com/GoiQmzC.gif)
 
