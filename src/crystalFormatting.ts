@@ -22,7 +22,7 @@ export class CrystalFormatting {
 				resolve(dataStorage);
 			});
 			child.on('error', (error) => {
-				console.error(error);
+				console.error("crystal binary NOT FOUND " + error);
 				reject();
 			});
 		});
