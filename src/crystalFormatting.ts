@@ -1,47 +1,48 @@
-'use strict';
-import { Range, TextDocument, TextEdit } from 'vscode';
-import { spawn } from 'child_process';
+import * as vscode from 'vscode'
+import { spawn } from 'child_process'
+import { CrystalProblemsFinder } from "./crystalProblemsFinder";
 
-import { crystalDiagnostic } from './crystalDiagnostic'
-
-export class CrystalFormatting {
+export class CrystalFormattingProvider extends CrystalProblemsFinder implements vscode.DocumentFormattingEditProvider {
 
 	/**
 	 * Execute crystal tool format and get response.
 	 */
-	execFormat(document: TextDocument) {
+	execFormat(document: vscode.TextDocument) {
 		return new Promise(function (resolve, reject) {
-			let dataStorage = "";
-			let child = spawn('crystal', ['tool', 'format', '-f', 'json', '-']);
-			child.stdin.write(document.getText());
-			child.stdin.end();
+			let response = ''
+			let child = spawn('crystal', ['tool', 'format', '--no-color', '-f', 'json', '-'])
+			child.stdin.write(document.getText())
+			child.stdin.end()
 			child.stdout.on('data', (data) => {
-				dataStorage += data;
-			});
-			child.stdout.on('end', (data) => {
-				resolve(dataStorage);
-			});
-			child.on('error', (error) => {
-				console.error(error);
-				reject();
-			});
-		});
+				response += data
+			})
+			child.stdout.on('end', () => {
+				return resolve(response)
+			})
+			child.on('exit', (exitCode) => {
+				if (exitCode != 0) {
+					console.error('ERROR: crystal tool format exit with code ' + exitCode)
+					console.error('EINFO: syntax error or crystal bug')
+					return resolve('')
+				}
+			})
+		})
 	}
 
 	/**
 	 * Formatting provider checking syntax error before
 	 */
-	async provideDocumentFormattingEdits(document: TextDocument) {
-		let response = await this.execFormat(document);
-		let textEditData: TextEdit[] = [];
+	async provideDocumentFormattingEdits(document: vscode.TextDocument) {
+		let response = await this.execFormat(document)
+		let textEditData: vscode.TextEdit[] = []
 
-		if ((crystalDiagnostic.responseDiagnostics(response.toString(), document.uri).length == 0) &&
+		if ((this.searchProblems(response.toString(), document.uri).length == 0) &&
 			response.toString().length > 0) {
-			let lastLineId = document.lineCount - 1;
-			let range = new Range(0, 0, lastLineId, document.lineAt(lastLineId).text.length);
-			textEditData = [TextEdit.replace(range, response.toString())];
+			let lastLineId = document.lineCount - 1
+			let range = new vscode.Range(0, 0, lastLineId, document.lineAt(lastLineId).text.length)
+			textEditData = [vscode.TextEdit.replace(range, response.toString())]
 		}
 
-		return textEditData;
+		return textEditData
 	}
 }

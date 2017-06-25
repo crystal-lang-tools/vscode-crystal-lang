@@ -1,24 +1,46 @@
-'use strict';
-import { ExtensionContext, DocumentFilter, languages } from 'vscode';
-import { platform } from 'os';
+'use strict'
+import * as vscode from 'vscode';
+import { platform } from 'os'
 
+import { CrystalImplementationsProvider } from './crystalImplementations'
+import { crystalCompletionItemProvider } from "./crystalCompletion"
+import { CrystalDocumentSymbolProvider } from './crystalSymbols'
+import { CrystalFormattingProvider } from './crystalFormatting'
+import { diagnosticCollection } from './crystalProblemsFinder'
 import { crystalConfiguration } from './crystalConfiguration'
-import { CrystalFormatting } from './crystalFormatting';
-import { diagnosticCollection, diagnosticOnOpen, diagnosticOnSave } from './crystalDiagnostic';
+import { CrystalDiagnostic } from './crystalDiagnostic'
+import { CrystalHoverProvider } from './crystalHover'
 
-export const CRYSTAL_MODE: DocumentFilter = { language: 'crystal' };
+const CRYSTAL_MODE: vscode.DocumentFilter = { language: 'crystal', scheme: 'file' }
 
-export function activate(context: ExtensionContext) {
+const crystalDiagnostic = new CrystalDiagnostic()
 
-	context.subscriptions.push(languages.setLanguageConfiguration('crystal', crystalConfiguration));
+function crystalOnDidEvent(document) {
+	if (document.languageId == 'crystal') {
+		crystalDiagnostic.crystalDoDiagnostic(document)
+	}
+}
+
+export function activate(context: vscode.ExtensionContext) {
+
+	context.subscriptions.push(vscode.languages.setLanguageConfiguration('crystal', crystalConfiguration))
 
 	if (platform() !== 'win32') {
-		context.subscriptions.push(languages.registerDocumentFormattingEditProvider(CRYSTAL_MODE, new CrystalFormatting()));
-		context.subscriptions.push(diagnosticCollection);
-		context.subscriptions.push(diagnosticOnOpen);
-		context.subscriptions.push(diagnosticOnSave);
+		let commandDiagnostic = vscode.commands.registerTextEditorCommand('run.crystal.diagnostic', (editor, args) => {
+			crystalOnDidEvent(editor.document)
+		})
+		context.subscriptions.push(
+			diagnosticCollection,
+			commandDiagnostic,
+			vscode.languages.registerCompletionItemProvider(CRYSTAL_MODE, new crystalCompletionItemProvider()),
+			vscode.languages.registerDocumentFormattingEditProvider('crystal', new CrystalFormattingProvider()),
+			vscode.languages.registerDocumentSymbolProvider('crystal', new CrystalDocumentSymbolProvider()),
+			vscode.languages.registerHoverProvider(CRYSTAL_MODE, new CrystalHoverProvider()),
+			vscode.languages.registerImplementationProvider(CRYSTAL_MODE, new CrystalImplementationsProvider()),
+			vscode.workspace.onDidOpenTextDocument(crystalOnDidEvent),
+			vscode.workspace.onDidSaveTextDocument(crystalOnDidEvent)
+		)
 	}
-
 }
 
 export function deactivate() { }

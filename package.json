@@ -82,6 +82,10 @@
 				"key": "Ctrl+Shift+I"
 			}
 		],
+		"commands":{
+			"command": "run.crystal.diagnostic",
+			"title": "Run Crystal Diagnostic"
+		},
 		"configuration": {
 			"type": "object",
 			"title": "Crystal Lang configuration",
@@ -96,15 +100,35 @@
 					],
 					"description": "Allow to check errors.\nsyntax: show syntax errors using format check\nbuild: compile source code without codegen\nnone: disable problems"
 				},
+				"crystal-lang.implementations": {
+					"type": "boolean",
+					"default": false,
+					"description": "Allow to search implementation for method under cursor."
+				},
+				"crystal-lang.types": {
+					"type": "boolean",
+					"default": false,
+					"description": "Show type information when mouse is hover."
+				},
+				"crystal-lang.completion": {
+					"type": "boolean",
+					"default": false,
+					"description": "Suggest methods for a variable.\nSupports Literals only."
+				},
 				"crystal-lang.mainFile": {
 					"type": "string",
 					"default": "",
-					"description": "Check main file instead of current file.\nUseful in a crystal project where a main do require \"./**\""
+					"description": "Check main file instead of current file.\nUseful in a crystal project where a main files requires all."
 				},
 				"crystal-lang.problemsLimit": {
 					"type": "number",
 					"default": 20,
 					"description": "Controls the maximum number of problems."
+				},
+				"crystal-lang.processesLimit": {
+					"type": "number",
+					"default": 3,
+					"description": "Crystal processes running in background.\nSome files need more resources to check."
 				}
 			}
 		}
@@ -113,7 +137,7 @@
 		"vscode:prepublish": "tsc -p ./",
 		"compile": "tsc -watch -p ./",
 		"postinstall": "node ./node_modules/vscode/bin/install",
-		"test": "node ./node_modules/vscode/bin/test"
+		"test": "node ./node_modules/mocha/bin/mocha out/test/extension.test.js"
 	},
 	"devDependencies": {
 		"typescript": "^2.0.3",
