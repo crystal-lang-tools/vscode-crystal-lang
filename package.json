@@ -82,6 +82,10 @@
 				"key": "Ctrl+Shift+I"
 			}
 		],
+		"commands":{
+			"command": "run.crystal.diagnostic",
+			"title": "Run Crystal Diagnostic"
+		},
 		"configuration": {
 			"type": "object",
 			"title": "Crystal Lang configuration",
