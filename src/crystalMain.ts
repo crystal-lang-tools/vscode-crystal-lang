@@ -26,7 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.languages.setLanguageConfiguration('crystal', crystalConfiguration))
 
 	if (platform() !== 'win32') {
-		let commandDiagnostic = vscode.commands.registerTextEditorCommand('run.crystal.diagnostic', (editor, args) => {
+		let commandDiagnostic = vscode.commands.registerTextEditorCommand('crystal.run.diagnostic', (editor, args) => {
 			crystalOnDidEvent(editor.document)
 		})
 		context.subscriptions.push(

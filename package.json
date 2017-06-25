@@ -2,7 +2,7 @@
 	"name": "crystal-lang",
 	"displayName": "Crystal Language",
 	"description": "The Crystal Programming Language",
-	"version": "0.0.9",
+	"version": "0.1.0",
 	"publisher": "faustinoaq",
 	"icon": "images/icon.svg",
 	"license": "MIT",
@@ -82,10 +82,12 @@
 				"key": "Ctrl+Shift+I"
 			}
 		],
-		"commands":{
-			"command": "run.crystal.diagnostic",
-			"title": "Run Crystal Diagnostic"
-		},
+		"commands": [
+			{
+				"command": "crystal.run.diagnostic",
+				"title": "Run Crystal Diagnostic"
+			}
+		],
 		"configuration": {
 			"type": "object",
 			"title": "Crystal Lang configuration",
