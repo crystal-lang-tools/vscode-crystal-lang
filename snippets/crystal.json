@@ -101,6 +101,15 @@
 		],
 		"description": "Use initialize method as constructor for a class instance."
 	},
+	"constructor": {
+		"prefix": "init",
+		"body": [
+			"def initialize",
+			"\t$0",
+			"end"
+		],
+		"description": "Constructor method for an Object."
+	},
 	"method definition": {
 		"prefix": "def",
 		"body": [
