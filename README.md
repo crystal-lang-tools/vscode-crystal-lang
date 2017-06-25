@@ -1,8 +1,8 @@
 # VSCode Extension for Crystal Language
 
-This extension provides support for The [Crystal](http://crystal-lang.org) programming language.
+This extension provides support for The [Crystal](https://github.com/crystal-lang) programming language.
 
-![crystal icon](http://i.imgur.com/GoiQmzC.gif)
+![crystal icon](https://i.imgur.com/GoiQmzC.gif)
 
 ## Features
 
@@ -36,7 +36,7 @@ This extension provides support for The [Crystal](http://crystal-lang.org) progr
 
 `crystal-lang.problems` allow setting different error levels. By default, the problem finder just check syntax errors. The options are:
 
-![problem finder](http://i.imgur.com/ukl1jyg.gif)
+![problem finder](https://i.imgur.com/ukl1jyg.gif)
 
 - **syntax**: check syntax and tokens (default).
 - **build**: check requires, objects and methods without code gen (resource heavy).
@@ -50,7 +50,7 @@ This extension provides support for The [Crystal](http://crystal-lang.org) progr
 
 Problems are checked when a crystal document is opened or saved. If you wish you can add your customized keybinding for `Crystal Run Diagnostic` to run problem finder whenever you want.
 
-![run diagnostic](http://i.imgur.com/bLRgbdC.png)
+![run diagnostic](https://i.imgur.com/bLRgbdC.png)
 
 > Some features like implementations and show type on hover can show their own errors, set "crystal-lang.problems" = "none" to disable them.
 
@@ -86,7 +86,7 @@ Commonly crystal takes milliseconds to do something like formatting, but in some
 
 You can use this feature to peek or go to implementation of a method. It works per document only, full workspace navigation isn't available yet. However, you can try multiple files implementation setting mainFile in `settings.json`.
 
-![implementations](http://i.imgur.com/Fb0HVc6.gif)
+![implementations](https://i.imgur.com/Fb0HVc6.gif)
 
 ### Completion
 
@@ -94,11 +94,11 @@ This setting ensure to enable instance method completion using crystal tool cont
 
 Suggestion of methods and subtypes while typing is not supported. You need to type `.` (dot) or `::` (colons) and then press `CTRL + SPACE` or `CMD + SPACE` to call method suggestion.
 
-![instance method completion](http://i.imgur.com/3Peiizd.gif)
+![instance method completion](https://i.imgur.com/3Peiizd.gif)
 
 Basic code completion is always enabled. (Top Level, Symbols and Snippets)
 
-![subtypes completion](http://i.imgur.com/qC9UBzC.gif)
+![subtypes completion](https://i.imgur.com/qC9UBzC.gif)
 
 However, you can totally disable completions in `settings.json`:
 
@@ -116,7 +116,7 @@ However, you can totally disable completions in `settings.json`:
 
 Show type information for variables only. This feature uses `crystal tool context` to get types. Information is recalculated when the cursor changes line position.
 
-![types on hover](http://i.imgur.com/5COCsQX.gif)
+![types on hover](https://i.imgur.com/5COCsQX.gif)
 
 ## ERROR and INFO Messages
 
@@ -124,7 +124,7 @@ Show type information for variables only. This feature uses `crystal tool contex
 
 Sometimes in some proyects, `crystal tool` turns heavy, in this case you can check OUTPUT tab in VSCode.
 
-![error messages](http://i.imgur.com/e1G9iIi.png)
+![error messages](https://i.imgur.com/e1G9iIi.png)
 
 Some errors are:
 
@@ -140,11 +140,11 @@ Some errors are:
 
 The following images show crystal status bar messages:
 
-![crystal build](http://i.imgur.com/9nRIO5o.png)
+![crystal build](https://i.imgur.com/9nRIO5o.png)
 
-![crystal tool context](http://i.imgur.com/xCUt9GJ.png)
+![crystal tool context](https://i.imgur.com/xCUt9GJ.png)
 
-![crystal tool implementations](http://i.imgur.com/7qImusH.png)
+![crystal tool implementations](https://i.imgur.com/7qImusH.png)
 
 ## Know issues
 
@@ -162,7 +162,7 @@ The following images show crystal status bar messages:
 }
 ```
 
-- In some big projects like [crystal compiler](http://github.com/crystal-lang) itself, the setting `"crystal-lang.problems" = "build"` could be very unresponsible, use `"syntax"` instead.
+- In some big projects like [crystal compiler](https://github.com/crystal-lang) itself, the setting `"crystal-lang.problems" = "build"` could be very unresponsible, use `"syntax"` instead.
 
 - Also, you can disable _peek implementations, instance method completions and types on hover_ to free resources. (**Formatting** and **symbols completion** are **lightweight** features).
 
@@ -170,31 +170,31 @@ The following images show crystal status bar messages:
 
 ### Increment and decrement identation
 
-![identation](http://i.imgur.com/V15TxFb.gif)
+![identation](https://i.imgur.com/V15TxFb.gif)
 
 > Decrement `end` keyword on type is now avaliable in vscode insiders [#2262](https://github.com/Microsoft/vscode/issues/2262#issuecomment-309485218).
 
 ### Formatting code support
 
-![formatting](http://i.imgur.com/VTeOkOm.gif)
+![formatting](https://i.imgur.com/VTeOkOm.gif)
 
 ### Syntax highlighting
 
-![ecr](http://i.imgur.com/w9aBlIH.gif)
+![ecr](https://i.imgur.com/w9aBlIH.gif)
 
 ### Snippets
 
-![snippets](http://i.imgur.com/GNICZSH.gif)
+![snippets](https://i.imgur.com/GNICZSH.gif)
 
 ### Symbols
 
-![symbols](http://i.imgur.com/6cqcXD3.gif)
+![symbols](https://i.imgur.com/6cqcXD3.gif)
 
 ### Code Outline (NEW)
 
 Recent version of VSCode (1.13.1) allow to extensions creators show symbols in tree view. You can use the awesome [Code Outline](https://marketplace.visualstudio.com/items?itemName=patrys.vscode-code-outline) extension to see code tree of crystal document.
 
-![code outline](http://i.imgur.com/guRDY0T.png)
+![code outline](https://i.imgur.com/guRDY0T.png)
 
 ### Debugging
 
@@ -202,13 +202,13 @@ Recent version of VSCode (1.13.1) allow to extensions creators show symbols in t
 
 > Be sure of compile your crystal code with `--debug` flag
 
-![Native Debug extension](http://i.imgur.com/mrJzrxI.png)
+![Native Debug extension](https://i.imgur.com/mrJzrxI.png)
 
 ### Icon theme
 
 You can use the wonderful [Nomo Dark icon theme](https://marketplace.visualstudio.com/items?itemName=be5invis.vscode-icontheme-nomo-dark) to see crystal icon.
 
-![Nomo Dark icon theme](http://i.imgur.com/6QxIyWV.png)
+![Nomo Dark icon theme](https://i.imgur.com/6QxIyWV.png)
 
 ## Roadmap
 
