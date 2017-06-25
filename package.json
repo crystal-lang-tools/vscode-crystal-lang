@@ -4,7 +4,7 @@
 	"description": "The Crystal Programming Language",
 	"version": "0.1.0",
 	"publisher": "faustinoaq",
-	"icon": "images/icon.svg",
+	"icon": "images/icon.png",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
