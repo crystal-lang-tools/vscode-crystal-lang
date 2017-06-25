@@ -2,12 +2,24 @@
 
 ## [Unreleased]
 ### Todo
-- Hover (using tool context).
-- Symbols (using tool hierarchy).
-- Referencies (using tool implementations).
-- Completions (using tool types).
-- Syntax using JSON instead of XML.
-- Support for Language Server Protocol
+- Translate Crystal syntax from `.tmLanguage` to `.json`.
+- Support for Language Server Protocol.
+- Complete TODO's comments inside this source code.
+
+## [0.0.9] - 2017-06-25
+### Add
+- Show types on Hover
+- Peek and Go to Implementations
+- Show document symbols
+- Symbols suggestions
+- Instance Method sugegstions
+- Images and documentation
+- initialize method snippet
+- StatusBar messages
+
+### Fix
+- Typos in documentation
+- ECR snippet each
 
 ## [0.0.8] - 2017-06-22
 ### Change
