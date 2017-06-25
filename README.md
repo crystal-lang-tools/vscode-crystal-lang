@@ -22,18 +22,17 @@ This extension provides support for The [Crystal](http://crystal-lang.org) progr
 
 ```json
 {
-	"crystal-lang.problems": "syntax",
-	"crystal-lang.problemsLimit": 10,
-	"crystal-lang.mainFile": "",
-  "crystal-lang.processesLimit": 3,
-  "crystal-lang.implementations": false,
-  "crystal-lang.completion": false,
-  "crystal-lang.types": false,
-
+"crystal-lang.problems": "syntax",
+"crystal-lang.problemsLimit": 10,
+"crystal-lang.mainFile": "",
+"crystal-lang.processesLimit": 3,
+"crystal-lang.implementations": false,
+"crystal-lang.completion": false,
+"crystal-lang.types": false,
 }
 ```
 
-### problems
+### Problems
 
 `crystal-lang.problems` allow setting different error levels. By default, the problem finder just check syntax errors. The options are:
 
@@ -45,17 +44,21 @@ This extension provides support for The [Crystal](http://crystal-lang.org) progr
 
 ```json
 {
-	"crystal-lang.problems": "syntax | build | none",
+"crystal-lang.problems": "syntax | build | none",
 }
 ```
 
+Problems are checked when a crystal document is opened or saved. If you wish you can add your customized keybinding for `Crystal Run Diagnostic` to run problem finder whenever you want.
+
+![run diagnostic](http://i.imgur.com/bLRgbdC.png)
+
 > Some features like implementations and show type on hover can show their own errors, set "crystal-lang.problems" = "none" to disable them.
 
-### poblemsLimit
+### PoblemsLimit
 
 `crystal-lang.problemsLimit` allow to limit the amount of problems that appears in problems view. The default value is 20.
 
-### mainFile
+### MainFile
 
 `crystal-lang.mainFile` says to the compiler which file should analyze.
 
@@ -65,7 +68,7 @@ Also is used by features like **implementations** and show **type on hover** to 
 
 > Be sure that mainFile is a valid **absolute** filepath.
 
-### processesLimit
+### ProcessesLimit
 
 This extension limit of crystal processes executing in parallel because it doesn't use a language server yet, see [Scry](https://github.com/kofno/scry).
 
@@ -79,17 +82,23 @@ Commonly crystal takes milliseconds to do something like formatting, but in some
 
 > By default, is 3. In my computer each crystal process uses almost 50 MB and less than 1 second.
 
-### implementations
+### Implementations
 
 You can use this feature to peek or go to implementation of a method. It works per document only, full workspace navigation isn't available yet. However, you can try multiple files implementation setting mainFile in `settings.json`.
 
-### completion
+![implementations](http://i.imgur.com/Fb0HVc6.gif)
+
+### Completion
 
 This setting ensure to enable instance method completion using crystal tool context.
 
 Suggestion of methods and subtypes while typing is not supported. You need to type `.` (dot) or `::` (colons) and then press `CTRL + SPACE` or `CMD + SPACE` to call method suggestion.
 
+![instance method completion](http://i.imgur.com/3Peiizd.gif)
+
 Basic code completion is always enabled. (Top Level, Symbols and Snippets)
+
+![subtypes completion](http://i.imgur.com/qC9UBzC.gif)
 
 However, you can totally disable completions in `settings.json`:
 
@@ -103,16 +112,19 @@ However, you can totally disable completions in `settings.json`:
 }
 ```
 
-### types
+### Types
 
 Show type information for variables only. This feature uses `crystal tool context` to get types. Information is recalculated when the cursor changes line position.
 
+![types on hover](http://i.imgur.com/5COCsQX.gif)
 
 ## ERROR and INFO Messages
 
 > **show types**, **peek implementations** and **complete instance methods** check code errors, if errors exists it waits until they are fixed.
 
 Sometimes in some proyects, `crystal tool` turns heavy, in this case you can check OUTPUT tab in VSCode.
+
+![error messages](http://i.imgur.com/e1G9iIi.png)
 
 Some errors are:
 
@@ -125,6 +137,14 @@ Some errors are:
 - `INFO: implementations are disabled`: when `implementations` are disabled in settings.
 - `INFO: show types on hover is disabled`: when `types` are disabled in settings.
 - `INFO: instance method completion is disabled`: when `completion` is disabled in settings.
+
+The following images show crystal status bar messages:
+
+![crystal build](http://i.imgur.com/9nRIO5o.png)
+
+![crystal tool context](http://i.imgur.com/xCUt9GJ.png)
+
+![crystal tool implementations](http://i.imgur.com/7qImusH.png)
 
 ## Know issues
 
@@ -146,7 +166,7 @@ Some errors are:
 
 - Also, you can disable _peek implementations, instance method completions and types on hover_ to free resources. (**Formatting** and **symbols completion** are **lightweight** features).
 
-## Screenshots
+## More Screenshots
 
 ### Increment and decrement identation
 
@@ -166,9 +186,15 @@ Some errors are:
 
 ![snippets](http://i.imgur.com/GNICZSH.gif)
 
+### Symbols
+
+![symbols](http://i.imgur.com/6cqcXD3.gif)
+
 ### Code Outline (NEW)
 
 Recent version of VSCode (1.13.1) allow to extensions creators show symbols in tree view. You can use the awesome [Code Outline](https://marketplace.visualstudio.com/items?itemName=patrys.vscode-code-outline) extension to see code tree of crystal document.
+
+![code outline](http://i.imgur.com/guRDY0T.png)
 
 ### Debugging
 
@@ -187,7 +213,7 @@ You can use the wonderful [Nomo Dark icon theme](https://marketplace.visualstudi
 ## Roadmap
 
 - Translate Crystal syntax from `.tmLanguage` to `.json`.
-- Support for Language Server Protocol, see [Scry](https://github.com/kofno/scry)]
+- Support for Language Server Protocol, see [Scry](https://github.com/kofno/scry)
 
 ## Release Notes
 
