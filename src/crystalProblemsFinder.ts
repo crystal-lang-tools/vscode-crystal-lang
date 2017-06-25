@@ -42,7 +42,7 @@ export class CrystalProblemsFinder {
 				throw err
 			}
 		} else {
-			diagnosticCollection.delete(uri)
+			diagnosticCollection.clear()
 		}
 		diagnosticCollection.set(diagnostics)
 		return diagnostics
