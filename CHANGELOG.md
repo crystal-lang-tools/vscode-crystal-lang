@@ -6,6 +6,14 @@
 - Support for Language Server Protocol.
 - Complete TODO's comments inside this source code.
 
+## [0.1.1] - 2017-06-26
+### Change
+- Symbols support in windows
+
+## Fix
+- Fix package.json
+- Fix output messages
+
 ## [0.0.9] - 2017-06-25
 ### Add
 - Show types on Hover
