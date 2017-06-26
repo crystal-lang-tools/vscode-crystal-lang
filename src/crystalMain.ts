@@ -17,24 +17,29 @@ const crystalDiagnostic = new CrystalDiagnostic()
 
 function crystalOnDidEvent(document) {
 	if (document.languageId == 'crystal') {
-		crystalDiagnostic.crystalDoDiagnostic(document)
+		if (platform() !== 'win32') {
+			crystalDiagnostic.crystalDoDiagnostic(document)
+		} else {
+			console.log('INFO: some crystal features are not supported in windows yet.')
+		}
 	}
 }
 
 export function activate(context: vscode.ExtensionContext) {
 
+	let commandDiagnostic = vscode.commands.registerTextEditorCommand('crystal.run.diagnostic', (editor, args) => {
+		crystalOnDidEvent(editor.document)
+	})
+
 	context.subscriptions.push(
 		vscode.languages.setLanguageConfiguration('crystal', crystalConfiguration),
 		vscode.languages.registerDocumentSymbolProvider('crystal', new CrystalDocumentSymbolProvider()),
+		commandDiagnostic
 	)
 
 	if (platform() !== 'win32') {
-		let commandDiagnostic = vscode.commands.registerTextEditorCommand('crystal.run.diagnostic', (editor, args) => {
-			crystalOnDidEvent(editor.document)
-		})
 		context.subscriptions.push(
 			diagnosticCollection,
-			commandDiagnostic,
 			vscode.languages.registerCompletionItemProvider(CRYSTAL_MODE, new crystalCompletionItemProvider()),
 			vscode.languages.registerDocumentFormattingEditProvider('crystal', new CrystalFormattingProvider()),
 			vscode.languages.registerHoverProvider(CRYSTAL_MODE, new CrystalHoverProvider()),
