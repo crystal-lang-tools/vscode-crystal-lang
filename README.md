@@ -118,21 +118,24 @@ Show type information for variables only. This feature uses `crystal tool contex
 
 ![types on hover](https://i.imgur.com/5COCsQX.gif)
 
-## ERROR and INFO Messages
+## Messages
 
 > **show types**, **peek implementations** and **complete instance methods** check code errors, if errors exists it waits until they are fixed.
 
-Sometimes in some proyects, `crystal tool` turns heavy, in this case you can check OUTPUT tab in VSCode.
+Sometimes in some projects, `crystal tool` turns heavy, in this case you can check error and info messages.
 
 ![error messages](https://i.imgur.com/e1G9iIi.png)
 
-Some errors are:
+Errors are shown in developer tools:
 
 - `ERROR: crystal formatter --check`: when crystal errors are found in your code.
 - `ERROR: crystal build`: when crystal build --no-codegen failed.
 - `ERROR: crystal tool context`: when crystal tool found errors in your code.
 - `ERROR: spawn`: when crystal program not exist in path or `mainFile` is wrong.
 - `ERROR: JSON parse`: when crystal output is different of JSON.
+
+Info messages are shown in output tab:
+
 - `INFO: processesLimit has been reached`: your project is taking too much time to analyze.
 - `INFO: implementations are disabled`: when `implementations` are disabled in settings.
 - `INFO: show types on hover is disabled`: when `types` are disabled in settings.
