@@ -27,7 +27,7 @@ export class CrystalDiagnostic extends CrystalProblemsFinder {
 			child.on('exit', (exitCode) => {
 				if (exitCode != 0) {
 					console.error('ERROR: crystal tool format --check exit with code ' + exitCode)
-					console.error('EINFO: not formatted or syntax error or crystal bug')
+					console.info('INFO: not formatted or syntax error or crystal bug')
 				}
 			})
 		} else if (CrystalLimit.processes < CrystalLimit.limit() && config['problems'] == 'build') {
@@ -60,12 +60,12 @@ export class CrystalDiagnostic extends CrystalProblemsFinder {
 			child.on('exit', (exitCode) => {
 				if (exitCode != 0) {
 					console.error('ERROR: crystal build exit with code ' + exitCode)
-					console.error('EINFO: file not found or build error or crystal bug')
+					console.info('INFO: file not found or build error or crystal bug')
 				}
 			})
 		} else if (config['problems'] != 'none') {
 			console.error('ERROR: processesLimit has been reached')
-			console.error('EINFO: crystal is taking a moment to build')
+			console.info('INFO: crystal is taking a moment to build')
 		}
 	}
 }

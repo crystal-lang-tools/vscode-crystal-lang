@@ -47,12 +47,12 @@ export class CrystalContext extends CrystalProblemsFinder {
 				child.on('exit', (exitCode) => {
 					if (exitCode != 0) {
 						console.error('ERROR: crystal tool context exit with code ' + exitCode)
-						console.error('EINFO: code error or crystal bug')
+						console.info('INFO: code error or crystal bug')
 					}
 				})
 			} else if (config[mode]) {
 				console.error('ERROR: processesLimit has been reached')
-				console.error('EINFO: crystal is taking a moment to check context')
+				console.info('INFO: crystal is taking a moment to check context')
 				return resolve('{"status":"blocked"}')
 			} else {
 				return resolve('{"status":"disabled"}')

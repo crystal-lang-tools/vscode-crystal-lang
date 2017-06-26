@@ -23,7 +23,10 @@ function crystalOnDidEvent(document) {
 
 export function activate(context: vscode.ExtensionContext) {
 
-	context.subscriptions.push(vscode.languages.setLanguageConfiguration('crystal', crystalConfiguration))
+	context.subscriptions.push(
+		vscode.languages.setLanguageConfiguration('crystal', crystalConfiguration),
+		vscode.languages.registerDocumentSymbolProvider('crystal', new CrystalDocumentSymbolProvider()),
+	)
 
 	if (platform() !== 'win32') {
 		let commandDiagnostic = vscode.commands.registerTextEditorCommand('crystal.run.diagnostic', (editor, args) => {
@@ -34,7 +37,6 @@ export function activate(context: vscode.ExtensionContext) {
 			commandDiagnostic,
 			vscode.languages.registerCompletionItemProvider(CRYSTAL_MODE, new crystalCompletionItemProvider()),
 			vscode.languages.registerDocumentFormattingEditProvider('crystal', new CrystalFormattingProvider()),
-			vscode.languages.registerDocumentSymbolProvider('crystal', new CrystalDocumentSymbolProvider()),
 			vscode.languages.registerHoverProvider(CRYSTAL_MODE, new CrystalHoverProvider()),
 			vscode.languages.registerImplementationProvider(CRYSTAL_MODE, new CrystalImplementationsProvider()),
 			vscode.workspace.onDidOpenTextDocument(crystalOnDidEvent),

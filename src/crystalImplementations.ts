@@ -1,6 +1,6 @@
 'use strict'
 import * as vscode from 'vscode'
-import { exec, spawn } from 'child_process'
+import { spawn } from 'child_process'
 import { dirname } from 'path'
 
 import { CrystalProblemsFinder } from './crystalProblemsFinder'
@@ -50,12 +50,12 @@ export class CrystalImplementationsProvider extends CrystalProblemsFinder implem
 				child.on('exit', (exitCode) => {
 					if (exitCode != 0) {
 						console.error('ERROR: crystal tool implementations exit with code ' + exitCode)
-						console.error('EINFO: code error or crystal bug')
+						console.info('INFO: code error or crystal bug')
 					}
 				})
 			} else if (config['implementations']) {
 				console.error('ERROR: processesLimit has been reached')
-				console.error('EINFO: crystal is taking a moment to check implementation')
+				console.info('INFO: crystal is taking a moment to check implementation')
 				return resolve('')
 			} else {
 				return resolve('{"status":"disabled"}')
