@@ -72,7 +72,7 @@ Also is used by features like **implementations** and show **type on hover** to 
 
 This extension block the amout crystal processes executing in parallel because it doesn't use a language server yet, see [Scry](https://github.com/kofno/scry).
 
-Commonly crystal takes milliseconds to do something like formatting, but in some projects other features like implementations or completion can take a moment. To prevent using too many resources you can set the amount of problems with:
+Commonly crystal takes milliseconds to do something like formatting, but in some projects other features like implementations or completion can take a moment. To prevent using too many resources you can set the amount of processes with:
 
 ```json
 {
