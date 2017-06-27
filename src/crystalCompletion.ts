@@ -193,7 +193,7 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 					// }
 					// Add SubTypes completion
 					for (let symbol of symbols) {
-						if (symbol.containerName == container && symbol.kind != 11) {
+						if (symbol.containerName == container && symbol.kind != vscode.SymbolKind.Function) {
 							this.createCompletionItem(symbol.name, symbol.containerName, `Belongs to ${container}`, symbol.kind)
 						}
 					}
