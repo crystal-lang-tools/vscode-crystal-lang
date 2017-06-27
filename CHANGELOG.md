@@ -6,11 +6,19 @@
 - Support for Language Server Protocol.
 - Complete TODO's comments inside this source code.
 
+## [0.1.2] - 2017-06-26
+### Add
+- Basic symbols completion on Windows
+
+### Fix
+- Improve completion algorithm
+- Fix typos
+
 ## [0.1.1] - 2017-06-26
 ### Change
-- Symbols support in windows
+- Symbols support on Windows
 
-## Fix
+### Fix
 - Fix package.json
 - Fix output messages
 
@@ -20,7 +28,7 @@
 - Peek and Go to Implementations
 - Show document symbols
 - Symbols suggestions
-- Instance Method sugegstions
+- Instance Method suggestions
 - Images and documentation
 - initialize method snippet
 - StatusBar messages

@@ -32,6 +32,8 @@ This extension provides support for The [Crystal](https://github.com/crystal-lan
 }
 ```
 
+> On Windows the document must use `LF` instead of `CRLF` to allow symbols completion.
+
 ### Problems
 
 `crystal-lang.problems` allow setting different error levels. By default, the problem finder just check syntax errors. The options are:
@@ -52,7 +54,7 @@ Problems are checked when a crystal document is opened or saved. If you wish you
 
 ![run diagnostic](https://i.imgur.com/bLRgbdC.png)
 
-> Some features like implementations and show type on hover can show their own errors, set "crystal-lang.problems" = "none" to disable them.
+> Some features like **implementations** and **show type on hover** can show their own errors.
 
 ### PoblemsLimit
 
@@ -120,22 +122,19 @@ Show type information for variables only. This feature uses `crystal tool contex
 
 ## Messages
 
-> **show types**, **peek implementations** and **complete instance methods** check code errors, if errors exists it waits until they are fixed.
+> **show types**, **peek implementations** and **complete instance methods** tools check code errors, if errors exists they wait until they are fixed.
 
 Sometimes in some projects, `crystal tool` turns heavy, in this case you can check error and info messages.
 
-![error messages](https://i.imgur.com/e1G9iIi.png)
+![messages](https://i.imgur.com/e1G9iIi.png)
 
-Errors are shown in developer tools:
+Errors and info messages are shown in developer tools:
 
 - `ERROR: crystal formatter --check`: when crystal errors are found in your code.
 - `ERROR: crystal build`: when crystal build --no-codegen failed.
 - `ERROR: crystal tool context`: when crystal tool found errors in your code.
 - `ERROR: spawn`: when crystal program not exist in path or `mainFile` is wrong.
 - `ERROR: JSON parse`: when crystal output is different of JSON.
-
-Info messages are shown in output tab:
-
 - `INFO: processesLimit has been reached`: your project is taking too much time to analyze.
 - `INFO: implementations are disabled`: when `implementations` are disabled in settings.
 - `INFO: show types on hover is disabled`: when `types` are disabled in settings.
