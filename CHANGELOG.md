@@ -6,6 +6,10 @@
 - Support for Language Server Protocol.
 - Complete TODO's comments inside this source code.
 
+## [0.1.3] - 2017-06-27
+### Fix
+- Subtypes completion
+
 ## [0.1.2] - 2017-06-26
 ### Add
 - Basic symbols completion on Windows
