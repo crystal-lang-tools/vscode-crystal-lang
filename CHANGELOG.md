@@ -6,6 +6,10 @@
 - Support for Language Server Protocol.
 - Complete TODO's comments inside this source code.
 
+## [0.1.5] - 2017-06-27
+### Fix
+- Enable completion support on Windows
+
 ## [0.1.4] - 2017-06-27
 ### Add
 - File method completion

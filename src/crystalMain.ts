@@ -34,13 +34,13 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.languages.setLanguageConfiguration('crystal', crystalConfiguration),
 		vscode.languages.registerDocumentSymbolProvider('crystal', new CrystalDocumentSymbolProvider()),
+		vscode.languages.registerCompletionItemProvider(CRYSTAL_MODE, new crystalCompletionItemProvider()),
 		commandDiagnostic
 	)
 
 	if (platform() !== 'win32') {
 		context.subscriptions.push(
 			diagnosticCollection,
-			vscode.languages.registerCompletionItemProvider(CRYSTAL_MODE, new crystalCompletionItemProvider()),
 			vscode.languages.registerDocumentFormattingEditProvider('crystal', new CrystalFormattingProvider()),
 			vscode.languages.registerHoverProvider(CRYSTAL_MODE, new CrystalHoverProvider()),
 			vscode.languages.registerImplementationProvider(CRYSTAL_MODE, new CrystalImplementationsProvider()),
