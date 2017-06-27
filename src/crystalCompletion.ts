@@ -103,12 +103,12 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 					// ----------------------------------------
 					// TODO: Add standard lib method completion
 					// ----------------------------------------
-					// if (!staticFound) {
-					// 	if (container == 'File') {
-					// 		this.pushCompletionMethods(TDATA.FILE)
-					// 		staticFound = true
-					// 	}
-					// }
+					if (!staticFound) {
+						if (container == 'File') {
+							this.pushCompletionMethods(TDATA.FILE_METHODS)
+							staticFound = true
+						}
+					}
 
 					// Add instance methods to variables (Don't works on windows yet)
 					if (!staticFound) {

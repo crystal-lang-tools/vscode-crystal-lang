@@ -932,6 +932,42 @@ export const PROC_METHODS = [
 	["call", " (method) #call(*args : *T) : R", "Invokes this Proc and returns the result."],
 	["partial", " (method) #partial(*args : *U) forall U", "Returns a new Proc that has its first arguments fixed to the values given by args."]
 ]
+export const FILE_METHODS = [
+	["basename", "(class method) .basename(path) : String", "Returns the last component of the given path."],
+	["basename", "(class method) .basename(path, suffix) : String", "Returns the last component of the given path."],
+	["chmod", "(class method) .chmod(path, mode : Int)", "Changes the permissions of the specified file."],
+	["chown", "(class method) .chown(path, uid : Int? = -1, gid : Int = -1, follow_symlinks = false)", "Changes the owner of the specified file."],
+	["delete", "(class method) .delete(path)", "Delete the file at path."],
+	["directory?", "(class method) .directory?(path) : Bool", "Returns true if the given path exists and is a directory."],
+	["dirname", "(class method) .dirname(path) : String", "Returns all components of the given path except the last one."],
+	["each_line", "(class method) .each_line(filename, encoding = nil, invalid = nil, chomp = true, &block)", "Yields each line in filename to the given block."],
+	["each_line", "(class method) .each_line(filename, encoding = nil, invalid = nil, chomp = true)", "Returns an Iterator for each line in filename."],
+	["empty?", "(class method) .empty?(path) : Bool", "Returns true if the file at path is empty, otherwise returns false."],
+	["executable?", "(class method) .executable?(path) : Bool", "Returns true if path is executable by the real user id of this process else returns false."],
+	["exists?", "(class method) .exists?(path) : Bool", "Returns true if path exists else returns false"],
+	["expand_path", "(class method) .expand_path(path, dir = nil) : String", "Converts path to an absolute path."],
+	["extname", "(class method) .extname(filename) : String", "Returns filename's extension, or an empty string if it has no extension."],
+	["file?", "(class method) .file?(path) : Bool", "Returns true if given path exists and is a file."],
+	["join", "(class method) .join(parts : Array | Tuple) : String", "Returns a new string formed by joining the strings using File::SEPARATOR."],
+	["join", "(class method) .join(*parts) : String", "Returns a new string formed by joining the strings using File::SEPARATOR."],
+	["link", "(class method) .link(old_path, new_path)", "Creates a new link (also known as a hard link) at new_path to an existing file given by old_path."],
+	["lstat", "(class method) .lstat(path) : Stat", "Returns a File::Stat object for the file given by path or raises Errno in case of an error."],
+	["new", "(class method) .new(filename : String, mode = 'r', perm = DEFAULT_CREATE_MODE, encoding = nil, invalid = nil) ---- .open(filename, mode = 'r', perm = DEFAULT_CREATE_MODE, encoding = nil, invalid = nil) : self", "Opens the file named by filename."],
+	["open", "(class method) .open(filename, mode = 'r', perm = DEFAULT_CREATE_MODE, encoding = nil, invalid = nil, &block)", "Opens the file named by filename."],
+	["read", "(class method) .read(filename, encoding = nil, invalid = nil) : String", "Returns the content of filename as a string."],
+	["read_lines", "(class method) .read_lines(filename, encoding = nil, invalid = nil, chomp = true) : Array(String)", "Returns all lines in filename as an array of strings."],
+	["readable?", "(class method) .readable?(path) : Bool", "Returns true if path is readable by the real user id of this process else returns false."],
+	["real_path", "(class method) .real_path(path) : String", "Resolves the real path of path by following symbolic links."],
+	["rename", "(class method) .rename(old_filename, new_filename)", "Moves old_filename to new_filename."],
+	["size", "(class method) .size(filename) : UInt64", "Returns the size of filename bytes."],
+	["stat", "(class method) .stat(path) : Stat", "Returns a File::Stat object for the file given by path or raises Errno in case of an error."],
+	["symlink", "(class method) .symlink(old_path, new_path)", "Creates a symbolic link at new_path to an existing file given by *old_path."],
+	["symlink?", "(class method) .symlink?(path) : Bool", "Returns true if the path is a symbolic link."],
+	["touch", "(class method) .touch(filename : String, time : Time = Time.now)", "Attempts to set the access and modification times of the file named in the filename parameter to the value given in time."],
+	["utime", "(class method) .utime(atime : Time, mtime : Time, filename : String) : Nil", "Sets the access and modification times of filename."],
+	["writable?", "(class method) .writable?(path) : Bool", "Returns true if path is writable by the real user id of this process else returns false."],
+	["write", "(class method) .write(filename, content, perm = DEFAULT_CREATE_MODE, encoding = nil, invalid = nil)", "Write the given content to filename."]
+]
 export const TOP_LEVEL_METHODS = [
 
 	["`", "`(command) : String", "Returns the standard output of executing command in a subshell."],
