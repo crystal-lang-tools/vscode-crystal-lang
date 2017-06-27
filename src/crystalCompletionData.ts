@@ -4,14 +4,14 @@
 // TODO: Include all the Standard Library ;-)
 // ------------------------------------------
 
-export const REFLECTION = [
+export const REFLECTION_METHODS = [
 	["is_a?", "(method) #is_a?", "The pseudo-method is_a? determines whether an expression's runtime type inherits or includes another type."],
 	["nil?", "(method) #nil?", "The pseudo-method nil? determines whether an expression's runtime is Nil."],
 	["responds_to?", "(method) #responds_to?", "The pseudo-method responds_to? determines whether a type has a method with the given name."],
 	["as", "(method) #as", "The as pseudo-method restricts the types of an expression."],
 	["as?", "(method) #as?", "The as? pseudo-method is similar to as, except that it returns nil instead of raising an exception when the type doesn't match. It also can't be used to cast between pointer types and other types.", 5]
 ]
-export const NIL = [
+export const NIL_METHODS = [
 	["clone", "(method) #clone", ""],
 	["to_json", " (method) #to_json(json : JSON::Builder)", ""],
 	["==", " (method) #==(other : Nil)", "Returns true: Nil has only one singleton value: nil."],
@@ -27,7 +27,7 @@ export const NIL = [
 	["to_yaml", " (method) #to_yaml(yaml : YAML::Builder)", ""],
 	["try", " (method) #try(&block)", "Doesn't yields to the block.", 5]
 ]
-export const BOOL = [
+export const BOOL_METHODS = [
 	["!=", "(method) #!=(other : Bool) : Bool", "Returns true if self is not equal to other."],
 	["&", " (method) #&(other : Bool)", "Bitwise AND."],
 	["==", " (method) #==(other : Bool) : Bool", "Returns true if self is equal to other."],
@@ -40,7 +40,7 @@ export const BOOL = [
 	["to_json", " (method) #to_json(json : JSON::Builder)", ""],
 	["to_yaml", " (method) #to_yaml(yaml : YAML::Builder)", "", 5]
 ]
-export const INT = [
+export const INT_METHODS = [
 	["%", "(method) #%(other : Int)", "Returns self modulo other."],
 	["**", "(method) #**(exponent : Float) : Float64", "Returns the value of raising self to the power of exponent."],
 	["**", "(method) #**(exponent : Int) : self", "Returns the value of raising self to the power of exponent."],
@@ -246,9 +246,8 @@ export const INT = [
 	["|", "(method) #|(other : Int32) : self", "Returns the result of performing a bitwise OR of self's and other's bits."],
 	["|", "(method) #|(other : Int16) : self", "Returns the result of performing a bitwise OR of self's and other's bits."],
 	["|", "(method) #|(other : Int8) : self", "Returns the result of performing a bitwise OR of self's and other's bits.", 5]
-
 ]
-export const FLOAT = [
+export const FLOAT_METHODS = [
 	["%", "(method) #%(other)", ""],
 	["-", " (method) #-", ""],
 	["<=>", " (method) #<=>(other : BigRational)", ""],
@@ -266,7 +265,7 @@ export const FLOAT = [
 	["seconds", " (method) #seconds", ""],
 	["to_json", " (method) #to_json(json : JSON::Builder)", ""]
 ]
-export const CHAR = [
+export const CHAR_METHODS = [
 	["%", "(method) #%(other)", ""],
 	["-", "(method) #-", ""],
 	["<=>", "(method) #<=>(other : BigRational)", ""],
@@ -286,7 +285,7 @@ export const CHAR = [
 	["to_big_i", "(method) #to_big_i : BigInt", "Returns a BigInt representing this float (rounded using floor)."],
 	["to_io", "(method) #to_io(io : IO, format : IO::ByteFormat)", "Writes this float to the given io in the given format."]
 ]
-export const STRING = [
+export const STRING_METHODS = [
 	["build", "(class method) .build(capacity = 64, &block) : self", "Builds a String by creating a String::Builder with the given initial capacity, yielding it to the block and finally getting a String out of it."],
 	["new", "(class method) .new(bytes : Bytes, encoding : String, invalid : Symbol? = nil) : String", "Creates a new String from the given bytes, which are encoded in the given encoding."],
 	["new", "(class method) .new(chars : Pointer(UInt8), bytesize, size = 6)", "Creates a new String from a pointer, indicating its bytesize count and, optionally, the UTF-8 codepoints count size."],
@@ -500,7 +499,7 @@ export const STRING = [
 	["unsafe_byte_slice", "(method) #unsafe_byte_slice(byte_offset, count)", ""],
 	["unsafe_byte_slice", "(method) #unsafe_byte_slice(byte_offset)", ""]
 ]
-export const SYMBOLS = [
+export const SYMBOLS_METHODS = [
 	["!=", "(method) #!=(other : Symbol) : Bool", "Returns true if self is not equal to other."],
 	["<=>", "(method) #<=>(other : Symbol)", "Compares symbol with other based on String#<=> method."],
 	["==", "(method) #==(other : Symbol) : Bool", "Returns true if self is equal to other."],
@@ -513,7 +512,7 @@ export const SYMBOLS = [
 	["to_json", "(method) #to_json(json : JSON::Builder)", ""],
 	["clone", "(method) #clone", ""]
 ]
-export const ARRAY = [
+export const ARRAY_METHODS = [
 	["build", "(class method) .build(capacity : Int, &block)", "Creates a new Array, allocating an internal buffer with the given capacity, and yielding that buffer."],
 	["each_product", "(class method) .each_product(arrays : Array(Array), reuse = false, &block)", ""],
 	["each_product", "(class method) .each_product(*arrays : Array, reuse = false, &block)", ""],
@@ -627,7 +626,7 @@ export const ARRAY = [
 	["unsafe_at", "(method) #unsafe_at(index : Int)", ""],
 	["update", "(method) #update(index : Int, &block)", ""]
 ]
-export const HASH = [
+export const HASH_METHODS = [
 	["new", "(class method) .new(block : Hash(K, V), K -> V? = nil, initial_capacity = nil)", "", 5],
 	["new", "(class method) .new(pull : YAML::PullParser, &block)", "", 5],
 	["new", "(class method) .new(initial_capacity = nil, &block : Hash(K, V), K -> V)", "", 5],
@@ -688,7 +687,7 @@ export const HASH = [
 	["values", " (method) #values", "Returns only the values as an Array.", 5],
 	["values_at", " (method) #values_at(*indexes : K)", "Returns a tuple populated with the elements at the given indexes.", 5]
 ]
-export const RANGE = [
+export const RANGE_METHODS = [
 	["===", "(method) #===(value)", "Same as #includes?, useful for the case expression."],
 	["begin", "(method) #begin : B", "Returns the object that defines the beginning of this range."],
 	["bsearch", "(method) #bsearch(&block)", "By using binary search, returns the first value for which the passed block returns true."],
@@ -707,9 +706,8 @@ export const RANGE = [
 	["step", "(method) #step(by = 1, &block)", "Iterates over this range, passing each nth element to the block."],
 	["sum", "(method) #sum(initial)", "If self is a Int range, it provides O(1) implementation, otherwise it is same as Enumerable#sum."],
 	["new", "(class method) .new(begin : B, end : E, exclusive : Bool = false)", "Constructs a Range using the given beginning and end."]
-
 ]
-export const REGEX = [
+export const REGEX_METHODS = [
 	["error?", "(method) #error?(source)", "Determines Regex's source validity."],
 	["escape", " (method) #escape(str) : String", "Returns a String constructed by escaping any metacharacters in str."],
 	["new", " (method) #new(source : String, options : Options = Options::None)", "Creates a new Regex out of the given source String."],
@@ -848,7 +846,7 @@ export const REGEX = [
 	["pointer", " (method) #pointer", ""],
 	["to_s", " (method) #to_s(io)", ""]
 ]
-export const TUPLE = [
+export const TUPLE_METHODS = [
 	["from", "(class method) .from(array : Array)", "Creates a tuple from the given array, with elements casted to the given types."],
 	["new", "(class method) .new(pull : JSON::PullParser)", ""],
 	["new", "(class method) .new(pull : YAML::PullParser)", ""],
@@ -885,7 +883,7 @@ export const TUPLE = [
 	["to_yaml", " (method) #to_yaml(yaml : YAML::Builder)", ""],
 	["unsafe_at", " (method) #unsafe_at(index : Int)", ""]
 ]
-export const NAMEDTUPLE = [
+export const NAMEDTUPLE_METHODS = [
 	["from", "(class method) .from(hash : Hash)", "Creates a named tuple from the given hash, with elements casted to the given types."],
 	["new", "(class method) .new(pull : JSON::PullParser)", ""],
 	["new", "(class method) .new(pull : YAML::PullParser)", ""],
@@ -919,7 +917,7 @@ export const NAMEDTUPLE = [
 	["to_json", " (method) #to_json(json : JSON::Builder)", ""],
 	["to_yaml", " (method) #to_yaml(yaml : YAML::Builder)", ""]
 ]
-export const PROC = [
+export const PROC_METHODS = [
 	["new", "(class method) .new(pointer : Pointer(Void), closure_data : Pointer(Void)", ""],
 	["==", "(method) #==(other : self)", ""],
 	["===", " (method) #===(other : self)", ""],
@@ -934,7 +932,7 @@ export const PROC = [
 	["call", " (method) #call(*args : *T) : R", "Invokes this Proc and returns the result."],
 	["partial", " (method) #partial(*args : *U) forall U", "Returns a new Proc that has its first arguments fixed to the values given by args."]
 ]
-export const TOP_LEVEL = [
+export const TOP_LEVEL_METHODS = [
 
 	["`", "`(command) : String", "Returns the standard output of executing command in a subshell."],
 	["abort", "abort(message, status = 1) : NoReturn", "Terminates execution immediately, printing message to STDERR and then calling exit(status)."],
@@ -976,4 +974,138 @@ export const TOP_LEVEL = [
 	["debugger", "debugger", ""],
 	["parallel", "parallel(*jobs)", ""],
 	["redefine_main", "redefine_main(name = main)", ""]
+]
+export const STRUCTS = [
+	["Atomic", "struct Atomic(T)", ""],
+	["Bigfloat", "struct BigFloat", ""],
+	["Bigint", "struct BigInt", ""],
+	["Bigrational", "struct BigRational", ""],
+	["Bitarray", "struct BitArray", ""],
+	["Bool", "struct Bool", ""],
+	["Char", "struct Char", ""],
+	["Complex", "struct Complex", ""],
+	["Enum", "abstract struct Enum", ""],
+	["Float", "abstract struct Float", ""],
+	["Float32", "struct Float32", ""],
+	["Float64", "struct Float64", ""],
+	["Int", "abstract struct Int", ""],
+	["Int16", "struct Int16", ""],
+	["Int32", "struct Int32", ""],
+	["Int64", "struct Int64", ""],
+	["Int8", "struct Int8", ""],
+	["Namedtuple", "struct NamedTuple(**T)", ""],
+	["Nil", "struct Nil", ""],
+	["Number", "abstract struct Number", ""],
+	["Pointer", "struct Pointer(T)", ""],
+	["Proc", "struct Proc(*T, R)", ""],
+	["Range", "struct Range(B, E)", ""],
+	["Reflect", "struct Reflect(X)", ""],
+	["Set", "struct Set(T)", ""],
+	["Slice", "struct Slice(T)", ""],
+	["Staticarray", "struct StaticArray(T, N)", ""],
+	["Struct", "abstract struct Struct", ""],
+	["Symbol", "struct Symbol", ""],
+	["Time", "struct Time", ""],
+	["Toplevel", "Top Level Namespace", ""],
+	["Tuple", "struct Tuple(*T)", ""],
+	["Uint16", "struct UInt16", ""],
+	["Uint32", "struct UInt32", ""],
+	["Uint64", "struct UInt64", ""],
+	["Uint8", "struct UInt8", ""],
+	["Union", "struct Union(*T)", ""],
+	["Value", "abstract struct Value", ""]
+]
+export const CLASSES = [
+	["Argumenterror", "class ArgumentError", ""],
+	["Array", "class Array(T)", ""],
+	["Box", "class Box(T)", ""],
+	["Channel", "abstract class Channel(T)", ""],
+	["Class", "abstract class Class", ""],
+	["Csv", "class CSV", ""],
+	["Deque", "class Deque(T)", ""],
+	["Dir", "class Dir", ""],
+	["Divisionbyzero", "class DivisionByZero", ""],
+	["Errno", "class Errno", ""],
+	["Exception", "class Exception", ""],
+	["Fiber", "class Fiber", ""],
+	["File", "class File", ""],
+	["Hash", "class Hash(K, V)", ""],
+	["Indexerror", "class IndexError", ""],
+	["Ini", "class INI", ""],
+	["Invalidbytesequenceerror", "class InvalidByteSequenceError", ""],
+	["Ipsocket", "class IPSocket", ""],
+	["Keyerror", "class KeyError", ""],
+	["Logger", "class Logger", ""],
+	["Markdown", "class Markdown", ""],
+	["Mutex", "class Mutex", ""],
+	["Object", "abstract class Object", ""],
+	["Optionparser", "class OptionParser", ""],
+	["Prettyprint", "class PrettyPrint", ""],
+	["Process", "class Process", ""],
+	["Reference", "class Reference", ""],
+	["Regex", "class Regex", ""],
+	["Socket", "class Socket", ""],
+	["String", "class String", ""],
+	["Stringpool", "class StringPool", ""],
+	["Stringscanner", "class StringScanner", ""],
+	["Tcpserver", "class TCPServer", ""],
+	["Tcpsocket", "class TCPSocket", ""],
+	["Tempfile", "class Tempfile", ""],
+	["Typecasterror", "class TypeCastError", ""],
+	["Udpsocket", "class UDPSocket", ""],
+	["Unixserver", "class UNIXServer", ""],
+	["Unixsocket", "class UNIXSocket", ""],
+	["Uri", "class URI", ""],
+	["Weakref", "class WeakRef(T)", ""]
+]
+export const MODULES = [
+	["Adler32", "module Adler32", ""],
+	["Base64", "module Base64", ""],
+	["Benchmark", "module Benchmark", ""],
+	["Colorize", "module Colorize", ""],
+	["Comparable", "module Comparable(T)", ""],
+	["Concurrent", "module Concurrent", ""],
+	["Crc32", "module CRC32", ""],
+	["Crypto", "module Crypto", ""],
+	["Crystal", "module Crystal", ""],
+	["Digest", "module Digest", ""],
+	["Dl", "module DL", ""],
+	["Ecr", "module ECR", ""],
+	["Enumerable", "module Enumerable(T)", ""],
+	["Env", "module ENV", ""],
+	["Fileutils", "module FileUtils", ""],
+	["Flate", "module Flate", ""],
+	["Gc", "module GC", ""],
+	["Gzip", "module Gzip", ""],
+	["Html", "module HTML", ""],
+	["Http", "module HTTP", ""],
+	["Indexable", "module Indexable(T)", ""],
+	["Io", "module IO", ""],
+	["Iterable", "module Iterable(T)", ""],
+	["Iterator", "module Iterator(T)", ""],
+	["Json", "module JSON", ""],
+	["Levenshtein", "module Levenshtein", ""],
+	["Llvm", "module LLVM", ""],
+	["Math", "module Math", ""],
+	["Oauth", "module OAuth", ""],
+	["Oauth2", "module OAuth2", ""],
+	["Openssl", "module OpenSSL", ""],
+	["Partialcomparable", "module PartialComparable(T)", ""],
+	["Random", "module Random", ""],
+	["Readline", "module Readline", ""],
+	["Securerandom", "module SecureRandom", ""],
+	["Spec", "module Spec", ""],
+	["System", "module System", ""],
+	["Termios", "module Termios", ""],
+	["Unicode", "module Unicode", ""],
+	["Xml", "module XML", ""],
+	["Yaml", "module YAML", ""],
+	["Zip", "module Zip", ""],
+	["Zlib", "module Zlib", ""]
+]
+export const ALIAS = [
+	["Bytes", "alias Bytes", ""]
+]
+export const ENUMS = [
+	["Signal", "enum Signal", ""]
 ]
