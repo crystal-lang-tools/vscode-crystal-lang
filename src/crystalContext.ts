@@ -1,9 +1,9 @@
 import * as vscode from 'vscode'
 import { spawn } from 'child_process'
-import { statusBarItem } from "./crystalStatusBar";
+import { statusBarItem } from "./crystalStatusBar"
 
-import { ENV, CrystalLimit } from "./crystalConfiguration";
-import { CrystalProblemsFinder } from "./crystalProblemsFinder";
+import { ENV, CrystalLimit } from "./crystalConfiguration"
+import { CrystalProblemsFinder } from "./crystalProblemsFinder"
 
 export class CrystalContext extends CrystalProblemsFinder {
 	/**
@@ -52,7 +52,6 @@ export class CrystalContext extends CrystalProblemsFinder {
 				})
 			} else if (config[mode]) {
 				console.error('ERROR: processesLimit has been reached')
-				console.info('INFO: crystal is taking a moment to check context')
 				return resolve('{"status":"blocked"}')
 			} else {
 				return resolve('{"status":"disabled"}')

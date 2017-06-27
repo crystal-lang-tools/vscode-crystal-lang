@@ -4,8 +4,8 @@ import { spawn } from 'child_process'
 import { dirname } from 'path'
 
 import { CrystalProblemsFinder } from './crystalProblemsFinder'
-import { ENV, CrystalLimit } from './crystalConfiguration';
-import { statusBarItem } from './crystalStatusBar';
+import { ENV, CrystalLimit } from './crystalConfiguration'
+import { statusBarItem } from './crystalStatusBar'
 
 export class CrystalImplementationsProvider extends CrystalProblemsFinder implements vscode.ImplementationProvider {
 
@@ -56,7 +56,7 @@ export class CrystalImplementationsProvider extends CrystalProblemsFinder implem
 			} else if (config['implementations']) {
 				console.error('ERROR: processesLimit has been reached')
 				console.info('INFO: crystal is taking a moment to check implementation')
-				return resolve('')
+				return resolve('{"status":"blocked"}')
 			} else {
 				return resolve('{"status":"disabled"}')
 			}
@@ -76,10 +76,10 @@ export class CrystalImplementationsProvider extends CrystalProblemsFinder implem
 						locations.push(location)
 					}
 				} else if (crystalMessageObject.status == 'disabled') {
-					console.error('INFO: crystal implementations are disabled')
+					console.info('INFO: crystal implementations are disabled')
 				}
 			} catch (err) {
-				console.error('JSON.parse failed to parse crystal implementations output')
+				console.error('ERROR: JSON.parse failed to parse crystal implementations output')
 				throw err
 			}
 		}

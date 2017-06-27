@@ -1,5 +1,5 @@
 'use strict'
-import * as vscode from 'vscode';
+import * as vscode from 'vscode'
 import { platform } from 'os'
 
 import { CrystalImplementationsProvider } from './crystalImplementations'
@@ -20,7 +20,7 @@ function crystalOnDidEvent(document) {
 		if (platform() !== 'win32') {
 			crystalDiagnostic.crystalDoDiagnostic(document)
 		} else {
-			console.log('INFO: some crystal features are not supported in windows yet.')
+			console.info('INFO: some crystal features are not supported in windows yet')
 		}
 	}
 }
