@@ -6,9 +6,12 @@
 - Support for Language Server Protocol.
 - Complete TODO's comments inside this source code.
 
-## [0.1.6] - 2017-06-28
+## [0.1.7] - 2017-06-28
 ### Change
 - Improve completion algorithm
+
+### Fix
+- Typos
 
 ## [0.1.5] - 2017-06-27
 ### Fix
