@@ -80,7 +80,7 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 		if (wordRange) {
 			// Check if a call token (.|::) follow the word for a method call
 			let range = new vscode.Range(wordRange.start.line, wordRange.start.character, wordRange.end.line, wordRange.end.character + 1)
-			let word = document.getText(range)
+			var word = document.getText(range)
 			if (word.endsWith('.')) {
 				completionFlag = true
 				try {
@@ -217,19 +217,27 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 			if (quotes == null && comment == null) {
 				// Complete document symbols
 				for (let symbol of symbols) {
-					this.createCompletionItem(symbol.name, symbol.containerName, '', symbol.kind)
+					if (word) {
+						if (symbol.name.startsWith(word.replace(')', ''))) {
+							this.createCompletionItem(symbol.name, symbol.containerName, '', symbol.kind)
+						}
+					} else {
+							this.createCompletionItem(symbol.name, symbol.containerName, '', symbol.kind)
+					}
 				}
-				// Complete Top Level Methods
-				this.pushCompletionMethods(TDATA.TOP_LEVEL_METHODS)
-				// Complete Standard lib
-				// ------------------------------------------
-				// TODO: Add standard lib types documentation
-				// ------------------------------------------
-				this.pushCompletionOther(TDATA.STRUCTS, vscode.SymbolKind.Struct)
-				this.pushCompletionOther(TDATA.CLASSES, vscode.SymbolKind.Class)
-				this.pushCompletionOther(TDATA.MODULES, vscode.SymbolKind.Module)
-				this.pushCompletionOther(TDATA.ENUMS, vscode.SymbolKind.Enum)
-				this.pushCompletionOther(TDATA.ALIAS, vscode.SymbolKind.Constant)
+				if (!wordRange) {
+					// Complete Top Level Methods
+					this.pushCompletionMethods(TDATA.TOP_LEVEL_METHODS)
+					// Complete Standard lib
+					// ------------------------------------------
+					// TODO: Add standard lib types documentation
+					// ------------------------------------------
+					this.pushCompletionOther(TDATA.STRUCTS, vscode.SymbolKind.Struct)
+					this.pushCompletionOther(TDATA.CLASSES, vscode.SymbolKind.Class)
+					this.pushCompletionOther(TDATA.MODULES, vscode.SymbolKind.Module)
+					this.pushCompletionOther(TDATA.ENUMS, vscode.SymbolKind.Enum)
+					this.pushCompletionOther(TDATA.ALIAS, vscode.SymbolKind.Constant)
+				}
 			}
 		}
 		return this.completions
