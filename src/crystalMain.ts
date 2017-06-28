@@ -20,7 +20,7 @@ function crystalOnDidEvent(document) {
 		if (platform() !== 'win32') {
 			crystalDiagnostic.crystalDoDiagnostic(document)
 		} else {
-			console.info('INFO: some crystal features are not supported in windows yet')
+			console.info('INFO: some crystal features are not supported on Windows yet')
 		}
 	}
 }
