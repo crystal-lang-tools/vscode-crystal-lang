@@ -145,14 +145,16 @@ The following features are implemented:
 
 > Only Linux 64 bit binary is avaliable, Win32 and Mac aren't supported yet.
 
-Scry server is distributed with this extension as a `.7z` file of **1.5 Mb**, and **10.5 Mb** uncompressed.
+Scry server is distributed and auto installed with this extension.
 
-Checksums for `scry.7z` version `0.5.0`
+It comes as a `.7z` file of **1.5 Mb** size, and **10.5 Mb** uncompressed.
+
+Checksums for `scry.7z` version `0.5.0~1`
 
 Type	| Checksum
 ------- | -------
-**MD5** | `66782e8a6c63b007b02bf6babc040508`
-**SHA-1** | `d2ea3536fd4678ece946202f8837ae5c33e3bb8f`
+**MD5** | `e53f6115f872be846d0a59618f283859`
+**SHA-1** | `1b450c702265a35ac5db1e19fddf6ce116d33038`
 
 ### LogLevel
 

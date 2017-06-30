@@ -6,11 +6,13 @@
 - Full Support for Language Server Protocol.
 - Complete TODO's comments inside this source code.
 
-## [0.1.9] - 2017-06-30
+## [0.2.0] - 2017-06-30
 ### Add
-- Add experimental support for Language Server Protocol using Scry.
+- Add experimental support for Language Server Protocol using [Scry](https://github.com/faustinoaq/scry).
 
 ## Fix
+- Fix bug not_nil!
+- Fix Content-Length bug, related [#25](https://github.com/palantir/python-language-server/issues/25)
 - Fix npm dependencies
 
 ## [0.1.7] - 2017-06-28
