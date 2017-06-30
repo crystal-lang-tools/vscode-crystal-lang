@@ -6,9 +6,12 @@
 - Full Support for Language Server Protocol.
 - Complete TODO's comments inside this source code.
 
-## [0.1.8] - 2017-06-30
+## [0.1.9] - 2017-06-30
 ### Add
 - Add experimental support for Language Server Protocol using Scry.
+
+## Fix
+- Fix npm dependencies
 
 ## [0.1.7] - 2017-06-28
 ### Change
