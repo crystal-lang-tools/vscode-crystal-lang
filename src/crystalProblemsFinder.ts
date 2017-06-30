@@ -24,8 +24,8 @@ export class CrystalProblemsFinder {
 		if (response.startsWith('[{"file":"') && config['problems'] !== 'none') {
 			try {
 				let results: CrystalError[] = JSON.parse(response)
-				let problemsLimit = config['problemsLimit']
-				let length = Math.min(problemsLimit, results.length)
+				let maxNumberOfProblems = config['maxNumberOfProblems']
+				let length = Math.min(maxNumberOfProblems, results.length)
 				for (let problem of results) {
 					let range = new vscode.Range(problem.line - 1, problem.column - 1, problem.line - 1, (problem.column + (problem.size || 0) - 1))
 					let diagnostic = new vscode.Diagnostic(range, problem.message, vscode.DiagnosticSeverity.Error)

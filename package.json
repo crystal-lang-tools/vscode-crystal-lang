@@ -2,7 +2,7 @@
 	"name": "crystal-lang",
 	"displayName": "Crystal Language",
 	"description": "The Crystal Programming Language",
-	"version": "0.1.7",
+	"version": "0.1.8",
 	"publisher": "faustinoaq",
 	"icon": "images/icon.png",
 	"license": "MIT",
@@ -122,7 +122,7 @@
 					"default": "",
 					"description": "Check main file instead of current file.\nUseful in a crystal project where a main files requires all."
 				},
-				"crystal-lang.problemsLimit": {
+				"crystal-lang.maxNumberOfProblems": {
 					"type": "number",
 					"default": 20,
 					"description": "Controls the maximum number of problems."
@@ -131,6 +131,23 @@
 					"type": "number",
 					"default": 3,
 					"description": "Crystal processes running in background.\nSome files need more resources to check."
+				},
+				"crystal-lang.server": {
+					"type": "boolean",
+					"default": false,
+					"description": "[Experimental]\nEnable Scry server\n(Language Server Protocol for Crystal)."
+				},
+				"crystal-lang.logLevel": {
+					"type": "string",
+					"default": "error",
+					"enum": [
+						"debug",
+						"info",
+						"warn",
+						"error",
+						"fatal"
+					],
+					"description": "Controls the amount of data logged by Scry server."
 				}
 			}
 		}
@@ -144,8 +161,12 @@
 	"devDependencies": {
 		"typescript": "^2.0.3",
 		"vscode": "^1.0.0",
+		"vscode-languageclient": "^2.2.1",
 		"mocha": "^2.3.3",
 		"@types/node": "^6.0.40",
 		"@types/mocha": "^2.2.32"
+	},
+	"dependencies": {
+		"node-7z": "^0.4.0"
 	}
 }

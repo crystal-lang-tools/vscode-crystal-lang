@@ -14,7 +14,13 @@ This extension provides support for The [Crystal](https://github.com/crystal-lan
 * Show variable type on Hover
 * Show and Peek Implementations
 * Increment and decrements indentation
-* Method completion for Literals, Symbols and Top Level Methods
+* Method completion for Literals and Symbols
+
+## Requirements
+
+You need [Crystal](https://github.com/crystal-lang) installed in your system to get compiler features like goTo implementation and diagnostics.
+
+Some features like _syntax highlighting_, _snippets_ and _symbols_ work without Crystal compiler, so you can code Crystal on Windows if you want :smile:
 
 ## Configuration
 
@@ -23,12 +29,14 @@ This extension provides support for The [Crystal](https://github.com/crystal-lan
 ```json
 {
 "crystal-lang.problems": "syntax",
-"crystal-lang.problemsLimit": 10,
+"crystal-lang.maxNumberOfProblems": 10,
 "crystal-lang.mainFile": "",
 "crystal-lang.processesLimit": 3,
 "crystal-lang.implementations": false,
 "crystal-lang.completion": false,
 "crystal-lang.types": false,
+"crystal-lang.server": false,
+"crystal-lang.logLevel": "error"
 }
 ```
 
@@ -58,7 +66,7 @@ Problems are checked when a crystal document is opened or saved. If you wish you
 
 ### PoblemsLimit
 
-`crystal-lang.problemsLimit` allow to limit the amount of problems that appears in problems view. The default value is 20.
+`crystal-lang.maxNumberOfProblems` allow to limit the amount of problems that appears in problems view. The default value is 20.
 
 ### MainFile
 
@@ -120,6 +128,54 @@ Show type information for variables only. This feature uses `crystal tool contex
 
 ![types on hover](https://i.imgur.com/5COCsQX.gif)
 
+### Server (NEW)
+
+It's **Experimental** feature using Scry and Language Server Protocol.
+
+> Reload your editor after enable this feature.
+
+[![Scry](http://i.imgur.com/ticTfT8.png)](https://github.com/faustinoaq/scry)
+
+The following features are implemented:
+
+- Formatting
+- Live Diagnostics
+- GoTo Definition
+- Peek Definition
+
+> Only Linux 64 bit binary is avaliable, Win32 and Mac aren't supported yet.
+
+Scry server is distributed with this extension as a `.7z` file of **1.5 Mb**, and **10.5 Mb** uncompressed.
+
+Checksums for `scry.7z` version `0.5.0`
+
+Type	| Checksum
+------- | -------
+**MD5** | `66782e8a6c63b007b02bf6babc040508`
+**SHA-1** | `d2ea3536fd4678ece946202f8837ae5c33e3bb8f`
+
+### LogLevel
+
+Controls the amount of data logged by Scry server.
+
+> You can see logs in `.scry.out` located in your home directory or your workspace.
+
+Levels avaliables:
+
+```json
+{
+"type": "string",
+"default": "error",
+"enum": [
+	"debug",
+	"info",
+	"warn",
+	"error",
+	"fatal"
+]
+}
+```
+
 ## Messages
 
 > **show types**, **peek implementations** and **complete instance methods** tools check code errors, if errors exists they wait until they are fixed.
@@ -165,6 +221,8 @@ The following images show crystal status bar messages:
 ```
 
 - In some big projects like [crystal compiler](https://github.com/crystal-lang) itself, the setting `"crystal-lang.problems" = "build"` could be very unresponsible, use `"syntax"` instead.
+
+- Scry server is experimental, some bug can appear. Scry is a bit heavy, it uses from 5 Mb until 500Mb of RAM in my computer.
 
 - Also, you can disable _peek implementations, instance method completions and types on hover_ to free resources. (**Formatting** and **symbols completion** are **lightweight** features).
 
@@ -215,7 +273,7 @@ You can use the wonderful [Nomo Dark icon theme](https://marketplace.visualstudi
 ## Roadmap
 
 - Translate Crystal syntax from `.tmLanguage` to `.json`.
-- Support for Language Server Protocol, see [Scry](https://github.com/kofno/scry)
+- Full Support for Language Server Protocol, see [Scry](https://github.com/kofno/scry)
 
 ## Release Notes
 
