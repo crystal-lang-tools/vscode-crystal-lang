@@ -134,7 +134,7 @@ It's **Experimental** feature using Scry and Language Server Protocol.
 
 > Reload your editor after enable this feature.
 
-[![Scry](http://i.imgur.com/ticTfT8.png)](https://github.com/faustinoaq/scry)
+[![Scry](https://i.imgur.com/ticTfT8.png)](https://github.com/faustinoaq/scry)
 
 The following features are implemented:
 
