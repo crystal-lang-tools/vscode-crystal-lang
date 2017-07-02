@@ -46,8 +46,8 @@ export class CrystalContext extends CrystalProblemsFinder {
 				})
 				child.on('exit', (exitCode) => {
 					if (exitCode != 0) {
-						console.error('ERROR: crystal tool context exit with code ' + exitCode)
-						console.info('INFO: code error or crystal bug')
+						// console.error('ERROR: crystal tool context exit with code ' + exitCode)
+						// console.info('INFO: code error or crystal bug')
 					}
 				})
 			} else if (config[mode]) {

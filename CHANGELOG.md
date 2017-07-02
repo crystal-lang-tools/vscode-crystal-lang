@@ -6,12 +6,21 @@
 - Full Support for Language Server Protocol.
 - Complete TODO's comments inside this source code.
 
+## [0.2.1] - 2017-07-1
+### Add
+- <%= snippet
+
+### Fix
+- Formatter bug when old file is bigger than new one.
+
+### Change
+- Remove some `console.info`, because too much logging.
+
 ## [0.2.0] - 2017-06-30
 ### Add
 - Add experimental support for Language Server Protocol using [Scry](https://github.com/faustinoaq/scry).
 
-## Fix
-- Fix bug not_nil!
+### Fix
 - Fix Content-Length bug, related [#25](https://github.com/palantir/python-language-server/issues/25)
 - Fix npm dependencies
 

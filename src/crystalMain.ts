@@ -75,7 +75,7 @@ export async function activate(context: vscode.ExtensionContext) {
 				// }
 				if (platform() == 'darwin') {
 					// command = context.asAbsolutePath('bin/darwin/scry')
-					console.info("INFO: This crystal binary isn't avaliable yet")
+					console.info("INFO: Mac binary isn't avaliable yet")
 				} else if (platform() == 'linux') {
 					command = context.asAbsolutePath('bin/linux/scry')
 				}

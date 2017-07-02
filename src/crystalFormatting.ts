@@ -21,8 +21,8 @@ export class CrystalFormattingProvider extends CrystalProblemsFinder implements 
 			})
 			child.on('exit', (exitCode) => {
 				if (exitCode != 0) {
-					console.error('ERROR: crystal tool format exit with code ' + exitCode)
-					console.info('INFO: syntax error or crystal bug')
+					// console.error('ERROR: crystal tool format exit with code ' + exitCode)
+					// console.info('INFO: syntax error or crystal bug')
 					return resolve('')
 				}
 			})

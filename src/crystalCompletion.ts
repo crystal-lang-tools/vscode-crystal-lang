@@ -167,12 +167,12 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 									}
 								}
 							} else if (crystalMessageObject.status == 'blocked') {
-								console.info('INFO: crystal is taking a moment to check context when completion')
+								// console.info('INFO: crystal is taking a moment to check context when completion')
 							} else if (crystalMessageObject.status == 'disabled') {
-								console.info('INFO: crystal instance method completion is disabled')
+								// console.info('INFO: crystal instance method completion is disabled')
 							}
 						} else {
-							console.info("INFO: instance method completion isn't avaliable on Windows yet")
+							// console.info("INFO: instance method completion isn't avaliable on Windows yet")
 						}
 					}
 				} catch (err) {

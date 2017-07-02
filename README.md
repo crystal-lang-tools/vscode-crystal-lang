@@ -28,15 +28,15 @@ Some features like _syntax highlighting_, _snippets_ and _symbols_ work without 
 
 ```json
 {
-"crystal-lang.problems": "syntax",
-"crystal-lang.maxNumberOfProblems": 10,
-"crystal-lang.mainFile": "",
-"crystal-lang.processesLimit": 3,
-"crystal-lang.implementations": false,
-"crystal-lang.completion": false,
-"crystal-lang.types": false,
-"crystal-lang.server": false,
-"crystal-lang.logLevel": "error"
+  "crystal-lang.problems": "syntax",
+  "crystal-lang.maxNumberOfProblems": 10,
+  "crystal-lang.mainFile": "",
+  "crystal-lang.processesLimit": 3,
+  "crystal-lang.implementations": false,
+  "crystal-lang.completion": false,
+  "crystal-lang.types": false,
+  "crystal-lang.server": false,
+  "crystal-lang.logLevel": "error"
 }
 ```
 
@@ -54,7 +54,7 @@ Some features like _syntax highlighting_, _snippets_ and _symbols_ work without 
 
 ```json
 {
-"crystal-lang.problems": "syntax | build | none",
+  "crystal-lang.problems": "syntax | build | none",
 }
 ```
 
@@ -86,7 +86,7 @@ Commonly crystal takes milliseconds to do something like formatting, but in some
 
 ```json
 {
-	"crystal-lang.processesLimit": 3,
+  "crystal-lang.processesLimit": 3,
 }
 ```
 
@@ -114,11 +114,11 @@ However, you can totally disable completions in `settings.json`:
 
 ```json
 {
-	"editor.quickSuggestions": {
-		"other": true,
-		"comments": false,
-		"strings": false
-	}
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": false
+  }
 }
 ```
 
@@ -143,18 +143,16 @@ The following features are implemented:
 - GoTo Definition
 - Peek Definition
 
-> Only Linux 64 bit binary is avaliable, Win32 and Mac aren't supported yet.
+> Win32 and Mac aren't supported yet.
 
 Scry server is distributed and auto installed with this extension.
 
-It comes as a `.7z` file of **1.5 Mb** size, and **10.5 Mb** uncompressed.
+Checksums for `scry.7z` version `0.5.0~2`
 
-Checksums for `scry.7z` version `0.5.0~1`
-
-Type	| Checksum
+OS	| Checksum
 ------- | -------
-**MD5** | `e53f6115f872be846d0a59618f283859`
-**SHA-1** | `1b450c702265a35ac5db1e19fddf6ce116d33038`
+**Linux** | `e8956b08ecaffd29b06857b716ab5379fde09ffe`
+
 
 ### LogLevel
 
@@ -166,15 +164,15 @@ Levels avaliables:
 
 ```json
 {
-"type": "string",
-"default": "error",
-"enum": [
-	"debug",
-	"info",
-	"warn",
-	"error",
-	"fatal"
-]
+  "type": "string",
+  "default": "error",
+  "enum": [
+    "debug",
+    "info",
+    "warn",
+    "error",
+    "fatal"
+  ]
 }
 ```
 
@@ -184,19 +182,11 @@ Levels avaliables:
 
 Sometimes in some projects, `crystal tool` turns heavy, in this case you can check error and info messages.
 
-![messages](https://i.imgur.com/e1G9iIi.png)
-
 Errors and info messages are shown in developer tools:
 
-- `ERROR: crystal formatter --check`: when crystal errors are found in your code.
-- `ERROR: crystal build`: when crystal build --no-codegen failed.
-- `ERROR: crystal tool context`: when crystal tool found errors in your code.
 - `ERROR: spawn`: when crystal program not exist in path or `mainFile` is wrong.
 - `ERROR: JSON parse`: when crystal output is different of JSON.
 - `INFO: processesLimit has been reached`: your project is taking too much time to analyze.
-- `INFO: implementations are disabled`: when `implementations` are disabled in settings.
-- `INFO: show types on hover is disabled`: when `types` are disabled in settings.
-- `INFO: instance method completion is disabled`: when `completion` is disabled in settings.
 
 The following images show crystal status bar messages:
 
