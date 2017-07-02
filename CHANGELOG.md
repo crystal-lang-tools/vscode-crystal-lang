@@ -6,12 +6,13 @@
 - Full Support for Language Server Protocol.
 - Complete TODO's comments inside this source code.
 
-## [0.2.1] - 2017-07-1
+## [0.2.2] - 2017-07-1
 ### Add
 - <%= snippet
 
 ### Fix
 - Formatter bug when old file is bigger than new one.
+- Add big binary to `.vscodeignore`, just keep compressed version.
 
 ### Change
 - Remove some `console.info`, because too much logging.

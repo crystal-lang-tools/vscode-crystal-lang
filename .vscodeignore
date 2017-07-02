@@ -7,3 +7,10 @@ src/**
 .gitignore
 tsconfig.json
 vsc-extension-quickstart.md
+.directory
+bin/linux/scry
+bin/linux/.scry.out
+bin/darwin/scry
+bin/darwin/.scry.out
+bin/win32/scry
+bin/win32/.scry.out
