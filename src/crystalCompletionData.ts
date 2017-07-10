@@ -513,6 +513,12 @@ export const SYMBOLS_METHODS = [
 	["clone", "(method) #clone", ""]
 ]
 export const ARRAY_METHODS = [
+	["join", "(method) #join(separator, io)", "Prints to io all the elements in the collection, separated by separator.", 5],
+	["join", "(method) #join(separator = \"\")", "Returns a String created by concatenating the elements in the collection, separated by separator (defaults to none).", 5],
+	["join", "(method) #join(separator, io, &block)", "Prints to io the concatenation of the elements, with the possibility of controlling how the printing is done via a block.", 5],
+	["join", "(method) #join(separator = \"\", &block)", "Returns a String created by concatenating the results of passing the elements in the collection to the passed block, separated by separator (defaults to none).", 5],
+	["each", "(method) #each", "Returns an iterator over the array entries.", 5],
+	["each", "(method) #each(&block) : Nil", "Calls the given block for each element and passes in the element.", 5],
 	["build", "(class method) .build(capacity : Int, &block)", "Creates a new Array, allocating an internal buffer with the given capacity, and yielding that buffer."],
 	["each_product", "(class method) .each_product(arrays : Array(Array), reuse = false, &block)", ""],
 	["each_product", "(class method) .each_product(*arrays : Array, reuse = false, &block)", ""],
@@ -847,6 +853,10 @@ export const REGEX_METHODS = [
 	["to_s", " (method) #to_s(io)", ""]
 ]
 export const TUPLE_METHODS = [
+	["join", "(method) #join(separator, io)", "Prints to io all the elements in the collection, separated by separator.", 5],
+	["join", "(method) #join(separator = \"\")", "Returns a String created by concatenating the elements in the collection, separated by separator (defaults to none).", 5],
+	["join", "(method) #join(separator, io, &block)", "Prints to io the concatenation of the elements, with the possibility of controlling how the printing is done via a block.", 5],
+	["join", "(method) #join(separator = \"\", &block)", "Returns a String created by concatenating the results of passing the elements in the collection to the passed block, separated by separator (defaults to none).", 5],
 	["from", "(class method) .from(array : Array)", "Creates a tuple from the given array, with elements casted to the given types."],
 	["new", "(class method) .new(pull : JSON::PullParser)", ""],
 	["new", "(class method) .new(pull : YAML::PullParser)", ""],

@@ -6,9 +6,18 @@
 - Full Support for Language Server Protocol.
 - Complete TODO's comments inside this source code.
 
+## [0.2.3] - 2017-07-10
+### Change
+- Update scry.
+- Language-client to old version to avoid initialize message error.
+
+### Add
+- Improve performance.
+- Method `each` and `join` to completion.
+
 ## [0.2.2] - 2017-07-1
 ### Add
-- <%= snippet
+- <%= snippet.
 
 ### Fix
 - Formatter bug when old file is bigger than new one.

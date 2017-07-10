@@ -147,11 +147,11 @@ The following features are implemented:
 
 Scry server is distributed and auto installed with this extension.
 
-Checksums for `scry.7z` version `0.5.0~2`
+Checksums for `scry.7z` version `0.5.0~3`
 
-OS	| Checksum
+OS	| SHA-1 Checksum
 ------- | -------
-**Linux** | `e8956b08ecaffd29b06857b716ab5379fde09ffe`
+**Linux** | `d61881c9307fd42a796974611de9d9b9d28d8fd9`
 
 
 ### LogLevel

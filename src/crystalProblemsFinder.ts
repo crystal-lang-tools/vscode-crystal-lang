@@ -27,15 +27,17 @@ export class CrystalProblemsFinder {
 				let maxNumberOfProblems = config['maxNumberOfProblems']
 				let length = Math.min(maxNumberOfProblems, results.length)
 				for (let problem of results) {
-					let range = new vscode.Range(problem.line - 1, problem.column - 1, problem.line - 1, (problem.column + (problem.size || 0) - 1))
-					let diagnostic = new vscode.Diagnostic(range, problem.message, vscode.DiagnosticSeverity.Error)
-					let file: vscode.Uri
-					if (problem.file.length > 0) {
-						file = vscode.Uri.file(problem.file)
-					} else {
-						file = uri
+					if (!problem.file.startsWith('/usr/lib') && !problem.file.startsWith(`${vscode.workspace.rootPath}/lib`)) {
+						let range = new vscode.Range(problem.line - 1, problem.column - 1, problem.line - 1, (problem.column + (problem.size || 0) - 1))
+						let diagnostic = new vscode.Diagnostic(range, problem.message, vscode.DiagnosticSeverity.Error)
+						let file: vscode.Uri
+						if (problem.file.length > 0) {
+							file = vscode.Uri.file(problem.file)
+						} else {
+							file = uri
+						}
+						diagnostics.push([file, [diagnostic]])
 					}
-					diagnostics.push([file, [diagnostic]])
 				}
 			} catch (err) {
 				console.error('ERROR: JSON.parse failed to parse crystal output')
