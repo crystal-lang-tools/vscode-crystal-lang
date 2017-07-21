@@ -4,7 +4,35 @@ This extension provides support for The [Crystal](https://github.com/crystal-lan
 
 ![crystal icon](https://i.imgur.com/GoiQmzC.gif)
 
-## Features
+- [1. Features](#1-features)
+- [2. Requirements](#2-requirements)
+- [3. Configuration](#3-configuration)
+	- [3.1. Problems](#31-problems)
+	- [3.2. PoblemsLimit](#32-poblemslimit)
+	- [3.3. MainFile](#33-mainfile)
+	- [3.4. ProcessesLimit](#34-processeslimit)
+	- [3.5. Implementations](#35-implementations)
+	- [3.6. Completion](#36-completion)
+	- [3.7. Types](#37-types)
+	- [3.8. Server (NEW)](#38-server-new)
+	- [3.9. LogLevel](#39-loglevel)
+- [4. Messages](#4-messages)
+- [5. Know issues](#5-know-issues)
+- [6. More Screenshots](#6-more-screenshots)
+	- [6.1. Increment and decrement identation](#61-increment-and-decrement-identation)
+	- [6.2. Formatting code support](#62-formatting-code-support)
+	- [6.3. Syntax highlighting](#63-syntax-highlighting)
+	- [6.4. Snippets](#64-snippets)
+	- [6.5. Symbols](#65-symbols)
+	- [6.6. Code Outline (NEW)](#66-code-outline-new)
+	- [6.7. Debugging](#67-debugging)
+	- [6.8. Icon theme](#68-icon-theme)
+- [7. Roadmap](#7-roadmap)
+- [8. Release Notes](#8-release-notes)
+- [9. Contributing](#9-contributing)
+- [10. Contributors](#10-contributors)
+
+## 1. Features
 
 * Snippets
 * Formatting
@@ -16,13 +44,13 @@ This extension provides support for The [Crystal](https://github.com/crystal-lan
 * Increment and decrements indentation
 * Method completion for Literals and Symbols
 
-## Requirements
+## 2. Requirements
 
 You need [Crystal](https://github.com/crystal-lang) installed in your system to get compiler features like goTo implementation and diagnostics.
 
 Other features like _syntax highlighting_, _snippets_, _symbols_ and _basic completion_ work without Crystal compiler.
 
-## Configuration
+## 3. Configuration
 
 `crystal-lang` provides some useful configuration inside `settings.json`:
 
@@ -42,7 +70,7 @@ Other features like _syntax highlighting_, _snippets_, _symbols_ and _basic comp
 
 > On Windows the document must use `LF` instead of `CRLF` to allow symbols completion.
 
-### Problems
+### 3.1. Problems
 
 `crystal-lang.problems` allow setting different error levels. By default, the problem finder just check syntax errors. The options are:
 
@@ -64,13 +92,13 @@ Syntax checking is activated on type allowing live diagnostics.
 
 > Features like **implementations** and **show type on hover** can find errors.
 
-### PoblemsLimit
+### 3.2. PoblemsLimit
 
 `crystal-lang.maxNumberOfProblems` allow to limit the amount of problems that appears in problems view.
 
 The default value is 20.
 
-### MainFile
+### 3.3. MainFile
 
 `crystal-lang.mainFile` says to the compiler which file should analyze.
 
@@ -86,7 +114,7 @@ Also is used by features like **implementations** and show **type on hover** to 
 }
 ```
 
-### ProcessesLimit
+### 3.4. ProcessesLimit
 
 This extension block the amout of crystal processes executing in parallel to reduce resources usage.
 
@@ -100,13 +128,13 @@ Commonly crystal takes milliseconds to do something like formatting, but in some
 
 > By default, is 3. In my computer each crystal process uses almost 50 MB and less than 1 second.
 
-### Implementations
+### 3.5. Implementations
 
 You can use this feature to peek or go to implementation of a method.
 
 ![implementations](https://i.imgur.com/CQtzPLQ.gif)
 
-### Completion
+### 3.6. Completion
 
 This setting ensure to enable instance method completion using crystal tool context.
 
@@ -134,13 +162,13 @@ However, you can totally disable completions in `settings.json`:
 }
 ```
 
-### Types
+### 3.7. Types
 
 Show type information for variables only. This feature uses `crystal tool context` to get types. Information is recalculated when the cursor changes line position.
 
 ![types on hover](https://i.imgur.com/5COCsQX.gif)
 
-### Server (NEW)
+### 3.8. Server (NEW)
 
 It's **Experimental** feature using Scry and Language Server Protocol.
 
@@ -163,7 +191,7 @@ The following features are implemented:
 }
 ```
 
-### LogLevel
+### 3.9. LogLevel
 
 Controls the amount of data logged by Scry server.
 
@@ -185,7 +213,7 @@ Levels avaliables:
 }
 ```
 
-## Messages
+## 4. Messages
 
 Sometimes in some projects, `crystal tool` turns heavy, in this case you can check error and info messages.
 
@@ -203,7 +231,7 @@ The following images show crystal status bar messages:
 
 ![crystal tool implementations](https://i.imgur.com/7qImusH.png)
 
-## Know issues
+## 5. Know issues
 
 - Linter and formatter are implemented using Node.js `child_process`, so perfomance could be affected. You can use a different problem level.
 
@@ -223,37 +251,37 @@ The following images show crystal status bar messages:
 
 - Scry server is experimental, some bug can appear. Scry is a bit heavy, it uses from 5 Mb until 500Mb of RAM in my computer.
 
-## More Screenshots
+## 6. More Screenshots
 
-### Increment and decrement identation
+### 6.1. Increment and decrement identation
 
 ![identation](https://i.imgur.com/V15TxFb.gif)
 
 > Decrement `end` keyword on type is now avaliable in vscode [1.14](https://code.visualstudio.com/updates/v1_14#_auto-indent-on-type-move-lines-and-paste).
 
-### Formatting code support
+### 6.2. Formatting code support
 
 ![formatting](https://i.imgur.com/VTeOkOm.gif)
 
-### Syntax highlighting
+### 6.3. Syntax highlighting
 
 ![ecr](https://i.imgur.com/w9aBlIH.gif)
 
-### Snippets
+### 6.4. Snippets
 
 ![snippets](https://i.imgur.com/GNICZSH.gif)
 
-### Symbols
+### 6.5. Symbols
 
 ![symbols](https://i.imgur.com/6cqcXD3.gif)
 
-### Code Outline (NEW)
+### 6.6. Code Outline (NEW)
 
 Recent version of VSCode (1.13.1) allow to extensions creators show symbols in tree view. You can use the awesome [Code Outline](https://marketplace.visualstudio.com/items?itemName=patrys.vscode-code-outline) extension to see code tree of crystal document.
 
 ![code outline](https://i.imgur.com/guRDY0T.png)
 
-### Debugging
+### 6.7. Debugging
 
 [Native Debug](https://marketplace.visualstudio.com/items?itemName=webfreak.debug) is an excelent extension that allow you to debug crystal and other languages that compile to binary.
 
@@ -261,22 +289,22 @@ Recent version of VSCode (1.13.1) allow to extensions creators show symbols in t
 
 ![Native Debug extension](https://i.imgur.com/mrJzrxI.png)
 
-### Icon theme
+### 6.8. Icon theme
 
 You can use the wonderful [Nomo Dark icon theme](https://marketplace.visualstudio.com/items?itemName=be5invis.vscode-icontheme-nomo-dark) to see crystal icon.
 
 ![Nomo Dark icon theme](https://i.imgur.com/6QxIyWV.png)
 
-## Roadmap
+## 7. Roadmap
 
 - Translate Crystal syntax from `.tmLanguage` to `.json`.
 - Full Support for Language Server Protocol, see [Scry](https://github.com/kofno/scry)
 
-## Release Notes
+## 8. Release Notes
 
 See [Changelog](https://github.com/faustinoaq/vscode-crystal-lang/blob/master/CHANGELOG.md)
 
-## Contributing
+## 9. Contributing
 
 1. Fork it https://github.com/faustinoaq/vscode-crystal-lang/fork
 2. Create your feature branch `git checkout -b my-new-feature`
@@ -284,6 +312,6 @@ See [Changelog](https://github.com/faustinoaq/vscode-crystal-lang/blob/master/CH
 4. Push to the branch `git push origin my-new-feature`
 5. Create a new Pull Request
 
-## Contributors
+## 10. Contributors
 
 - [@faustinoaq](https://github.com/faustinoaq) Faustino Aguilar - creator, maintainer
