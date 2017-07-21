@@ -32,9 +32,9 @@ Other features like _syntax highlighting_, _snippets_, _symbols_ and _basic comp
   "crystal-lang.maxNumberOfProblems": 10,
   "crystal-lang.mainFile": "",
   "crystal-lang.processesLimit": 3,
-  "crystal-lang.implementations": false,
-  "crystal-lang.completion": false,
-  "crystal-lang.types": false,
+  "crystal-lang.implementations": true,
+  "crystal-lang.completion": true,
+  "crystal-lang.types": true,
   "crystal-lang.server": "",
   "crystal-lang.logLevel": "error"
 }
@@ -100,7 +100,7 @@ Commonly crystal takes milliseconds to do something like formatting, but in some
 
 ### Implementations
 
-You can use this feature to peek or go to implementation of a method. It works per document only, full workspace navigation isn't available yet. However, you can try multiple files implementation setting mainFile in `settings.json`.
+You can use this feature to peek or go to implementation of a method.
 
 ![implementations](https://i.imgur.com/CQtzPLQ.gif)
 
