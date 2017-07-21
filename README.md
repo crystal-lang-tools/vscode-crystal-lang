@@ -20,7 +20,7 @@ This extension provides support for The [Crystal](https://github.com/crystal-lan
 
 You need [Crystal](https://github.com/crystal-lang) installed in your system to get compiler features like goTo implementation and diagnostics.
 
-Some features like _syntax highlighting_, _snippets_ and _symbols_ work without Crystal compiler, so you can code Crystal on Windows if you want :smile:
+Some features like _syntax highlighting_, _snippets_, _symbols_ and _basic completion_ work without Crystal compiler.
 
 ## Configuration
 
@@ -58,11 +58,11 @@ Some features like _syntax highlighting_, _snippets_ and _symbols_ work without 
 }
 ```
 
-Problems are checked when a crystal document is opened or saved. If you wish you can add your customized keybinding for `Crystal Run Diagnostic` to run problem finder whenever you want.
+Problems are checked when a crystal document is opened or saved.
 
-![run diagnostic](https://i.imgur.com/bLRgbdC.png)
+Syntax checking is activated on type allowing live diagnostics.
 
-> Some features like **implementations** and **show type on hover** can show their own errors.
+> Features like **implementations** and **show type on hover** can find errors.
 
 ### PoblemsLimit
 
