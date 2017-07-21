@@ -66,7 +66,9 @@ Syntax checking is activated on type allowing live diagnostics.
 
 ### PoblemsLimit
 
-`crystal-lang.maxNumberOfProblems` allow to limit the amount of problems that appears in problems view. The default value is 20.
+`crystal-lang.maxNumberOfProblems` allow to limit the amount of problems that appears in problems view.
+
+The default value is 20.
 
 ### MainFile
 
