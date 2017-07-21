@@ -88,7 +88,7 @@ Also is used by features like **implementations** and show **type on hover** to 
 
 ### ProcessesLimit
 
-This extension block the amout of crystal processes executing in parallel because it doesn't use a language server yet, see [Scry](https://github.com/kofno/scry).
+This extension block the amout of crystal processes executing in parallel to reduce resources usage.
 
 Commonly crystal takes milliseconds to do something like formatting, but in some projects other features like implementations or completion can take a moment. To prevent using too many resources you can set the amount of processes with:
 
