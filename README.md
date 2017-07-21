@@ -110,17 +110,17 @@ You can use this feature to peek or go to implementation of a method.
 
 This setting ensure to enable instance method completion using crystal tool context.
 
-![File methods](https://i.imgur.com/THctqVu.png)
-
-![String methods](https://i.imgur.com/ZQZm9eU.png)
-
 Suggestion of methods and subtypes while typing is not supported. You need to type `.` (dot) or `::` (colons) and then press `CTRL + SPACE` or `CMD + SPACE` to call method suggestion.
 
 ![instance method completion](https://i.imgur.com/3Peiizd.gif)
 
+![String methods](https://i.imgur.com/ZQZm9eU.png)
+
 Basic code completion is always enabled. (Top Level, Symbols and Snippets)
 
 ![subtypes completion](https://i.imgur.com/qC9UBzC.gif)
+
+![File methods](https://i.imgur.com/THctqVu.png)
 
 However, you can totally disable completions in `settings.json`:
 
