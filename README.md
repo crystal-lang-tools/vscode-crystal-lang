@@ -20,7 +20,7 @@ This extension provides support for The [Crystal](https://github.com/crystal-lan
 
 You need [Crystal](https://github.com/crystal-lang) installed in your system to get compiler features like goTo implementation and diagnostics.
 
-Some features like _syntax highlighting_, _snippets_, _symbols_ and _basic completion_ work without Crystal compiler.
+Other features like _syntax highlighting_, _snippets_, _symbols_ and _basic completion_ work without Crystal compiler.
 
 ## Configuration
 
