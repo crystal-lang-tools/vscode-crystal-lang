@@ -14,6 +14,7 @@
 - Replace implementation provider by definition provider.
 - Check that crystal exists on path.
 - Update README.
+- Enable features by default.
 
 ## [0.2.3] - 2017-07-10
 ### Change
