@@ -6,6 +6,15 @@
 - Full Support for Language Server Protocol.
 - Complete TODO's comments inside this source code.
 
+## [0.2.4] - 2017-07-20
+### Change
+- Remove scry binary.
+- Remove node-7z package.
+- Now server path is needed to activate Scry.
+- Replace implementation provider by definition provider.
+- Check that crystal exists on path.
+- Update README.
+
 ## [0.2.3] - 2017-07-10
 ### Change
 - Update scry.
