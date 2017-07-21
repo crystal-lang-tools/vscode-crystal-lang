@@ -74,7 +74,7 @@ The default value is 20.
 
 `crystal-lang.mainFile` says to the compiler which file should analyze.
 
-It is useful when `"crystal-lang.problems" = "build"` in project where a main file do `require "/**"`
+It is useful when `"crystal-lang.problems" = "build"` in projects where a main file do `require "/**"`
 
 Also is used by features like **implementations** and show **type on hover** to specify the tool scope.
 
