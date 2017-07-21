@@ -1,7 +1,9 @@
 import * as vscode from 'vscode'
 import * as TDATA from './crystalCompletionData'
-import { CrystalContext } from './crystalContext'
 import { platform } from "os"
+
+import { crystalCheck } from './crystalConfiguration'
+import { CrystalContext } from './crystalContext'
 
 export class crystalCompletionItemProvider extends CrystalContext implements vscode.CompletionItemProvider {
 
@@ -112,7 +114,7 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 
 					// Add instance methods to variables (Don't works on windows yet)
 					if (!staticFound) {
-						if (platform() != 'win32') {
+						if (platform() != 'win32' && crystalCheck()) {
 							let crystalOutput = await this.crystalContext(document, position, 'completion')
 							let crystalMessageObject = JSON.parse(crystalOutput.toString())
 							if (crystalMessageObject.status == "ok") {
@@ -172,7 +174,7 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 								// console.info('INFO: crystal instance method completion is disabled')
 							}
 						} else {
-							// console.info("INFO: instance method completion isn't avaliable on Windows yet")
+							// console.info("INFO: instance method completion isn't avaliable")
 						}
 					}
 				} catch (err) {

@@ -35,7 +35,7 @@ Some features like _syntax highlighting_, _snippets_ and _symbols_ work without 
   "crystal-lang.implementations": false,
   "crystal-lang.completion": false,
   "crystal-lang.types": false,
-  "crystal-lang.server": false,
+  "crystal-lang.server": "",
   "crystal-lang.logLevel": "error"
 }
 ```
@@ -78,6 +78,12 @@ Also is used by features like **implementations** and show **type on hover** to 
 
 > Be sure that mainFile is a valid **absolute** filepath.
 
+```json
+{
+  "crystal-lang.mainFile": "/absolute/path/src/main.cr",
+}
+```
+
 ### ProcessesLimit
 
 This extension block the amout of crystal processes executing in parallel because it doesn't use a language server yet, see [Scry](https://github.com/kofno/scry).
@@ -96,11 +102,15 @@ Commonly crystal takes milliseconds to do something like formatting, but in some
 
 You can use this feature to peek or go to implementation of a method. It works per document only, full workspace navigation isn't available yet. However, you can try multiple files implementation setting mainFile in `settings.json`.
 
-![implementations](https://i.imgur.com/Fb0HVc6.gif)
+![implementations](https://i.imgur.com/CQtzPLQ.gif)
 
 ### Completion
 
 This setting ensure to enable instance method completion using crystal tool context.
+
+![File methods](https://i.imgur.com/THctqVu.png)
+
+![String methods](https://i.imgur.com/ZQZm9eU.png)
 
 Suggestion of methods and subtypes while typing is not supported. You need to type `.` (dot) or `::` (colons) and then press `CTRL + SPACE` or `CMD + SPACE` to call method suggestion.
 
@@ -143,16 +153,13 @@ The following features are implemented:
 - GoTo Definition
 - Peek Definition
 
-> Win32 and Mac aren't supported yet.
+> Scry server isn't distributed with this extension. You need to compile it from [scry-vscode-crystal-lang](https://github.com/faustinoaq/scry/tree/scry-vscode-crystal-lang) and configure on `settings.json`
 
-Scry server is distributed and auto installed with this extension.
-
-Checksums for `scry.7z` version `0.5.0~3`
-
-OS	| SHA-1 Checksum
-------- | -------
-**Linux** | `d61881c9307fd42a796974611de9d9b9d28d8fd9`
-
+```json
+{
+  "crystal-lang.server": "/absolute/path/bin/scry",
+}
+```
 
 ### LogLevel
 
@@ -177,8 +184,6 @@ Levels avaliables:
 ```
 
 ## Messages
-
-> **show types**, **peek implementations** and **complete instance methods** tools check code errors, if errors exists they wait until they are fixed.
 
 Sometimes in some projects, `crystal tool` turns heavy, in this case you can check error and info messages.
 
@@ -215,8 +220,6 @@ The following images show crystal status bar messages:
 - In some big projects like [crystal compiler](https://github.com/crystal-lang) itself, the setting `"crystal-lang.problems" = "build"` could be very unresponsible, use `"syntax"` instead.
 
 - Scry server is experimental, some bug can appear. Scry is a bit heavy, it uses from 5 Mb until 500Mb of RAM in my computer.
-
-- Also, you can disable _peek implementations, instance method completions and types on hover_ to free resources. (**Formatting** and **symbols completion** are **lightweight** features).
 
 ## More Screenshots
 

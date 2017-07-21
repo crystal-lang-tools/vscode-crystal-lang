@@ -37,7 +37,7 @@ export class CrystalHoverProvider extends CrystalContext implements vscode.Hover
 				}
 			}
 		} else if (this.crystalMessageObject.status == 'blocked') {
-			console.info('INFO: crystal is taking a moment to check context when hover')
+			// console.info('INFO: crystal is taking a moment to check type on hover')
 		} else if (this.crystalMessageObject.status == 'disabled') {
 			// console.info('INFO: crystal context on hover is disabled')
 		}

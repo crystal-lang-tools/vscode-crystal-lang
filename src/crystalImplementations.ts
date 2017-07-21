@@ -7,7 +7,7 @@ import { CrystalProblemsFinder } from './crystalProblemsFinder'
 import { ENV, CrystalLimit } from './crystalConfiguration'
 import { statusBarItem } from './crystalStatusBar'
 
-export class CrystalImplementationsProvider extends CrystalProblemsFinder implements vscode.ImplementationProvider {
+export class CrystalImplementationsProvider extends CrystalProblemsFinder implements vscode.DefinitionProvider {
 
 	/**
 	 * Execute crystal tool context for current file:position
@@ -62,7 +62,7 @@ export class CrystalImplementationsProvider extends CrystalProblemsFinder implem
 		})
 	}
 
-	async provideImplementation(document: vscode.TextDocument, position: vscode.Position) {
+	async provideDefinition(document: vscode.TextDocument, position: vscode.Position) {
 		let crystalOutput = await this.crystalImplementations(document, position)
 		let locations: vscode.Location[] = []
 		if (crystalOutput.toString().startsWith('{"status":"')) {

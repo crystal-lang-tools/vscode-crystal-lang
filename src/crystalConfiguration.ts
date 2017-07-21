@@ -1,5 +1,6 @@
 'use strict'
 import * as vscode from "vscode"
+import { execSync } from 'child_process'
 
 // Add crystal process limit
 export class CrystalLimit {
@@ -7,6 +8,16 @@ export class CrystalLimit {
 	static limit() {
 		let config = vscode.workspace.getConfiguration('crystal-lang')
 		return config['processesLimit']
+	}
+}
+
+// Check if crystal command exists
+export function crystalCheck() {
+	try {
+		execSync('crystal')
+		return true
+	} catch (ex) {
+		return false
 	}
 }
 

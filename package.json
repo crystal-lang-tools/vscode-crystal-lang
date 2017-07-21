@@ -133,9 +133,9 @@
 					"description": "Crystal processes running in background.\nSome files need more resources to check."
 				},
 				"crystal-lang.server": {
-					"type": "boolean",
-					"default": false,
-					"description": "[Experimental]\nEnable Scry server\n(Language Server Protocol for Crystal)."
+					"type": "string",
+					"default": "",
+					"description": "[Experimental]\nPath for Scry server binary\n(Language Server Protocol for Crystal)."
 				},
 				"crystal-lang.logLevel": {
 					"type": "string",
@@ -166,7 +166,6 @@
 		"@types/mocha": "^2.2.32"
 	},
 	"dependencies": {
-		"node-7z": "^0.4.0",
 		"vscode-languageclient": "^2.6.0"
 	}
 }

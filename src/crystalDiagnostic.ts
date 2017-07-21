@@ -11,10 +11,10 @@ export class CrystalDiagnostic extends CrystalProblemsFinder {
 	/**
 	 * Execute crystal build to check problems.
 	 */
-	crystalDoDiagnostic(document: vscode.TextDocument) {
+	crystalDoDiagnostic(document: vscode.TextDocument, onType) {
 		let config = vscode.workspace.getConfiguration('crystal-lang')
 		let response = ''
-		if (config['problems'] == 'syntax') {
+		if (config['problems'] == 'syntax' || onType) {
 			let child = spawn('crystal', ['tool', 'format', '--check', '--no-color', '-f', 'json', '-'])
 			child.stdin.write(document.getText())
 			child.stdin.end()
