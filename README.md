@@ -229,7 +229,7 @@ The following images show crystal status bar messages:
 
 ![identation](https://i.imgur.com/V15TxFb.gif)
 
-> Decrement `end` keyword on type is now avaliable in vscode insiders [#2262](https://github.com/Microsoft/vscode/issues/2262#issuecomment-309485218).
+> Decrement `end` keyword on type is now avaliable in vscode [1.14](https://code.visualstudio.com/updates/v1_14#_auto-indent-on-type-move-lines-and-paste).
 
 ### Formatting code support
 
