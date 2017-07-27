@@ -61,9 +61,9 @@ export async function activate(context: vscode.ExtensionContext) {
 			vscode.languages.registerDefinitionProvider(CRYSTAL_MODE, new CrystalImplementationsProvider()),
 			vscode.workspace.onDidOpenTextDocument(crystalOnDidEvent),
 			vscode.workspace.onDidSaveTextDocument(crystalOnDidEvent),
-			vscode.workspace.onDidChangeTextDocument((changes: vscode.TextDocumentChangeEvent) => {
-				crystalOnDidEvent(changes.document, true)
-			})
+      // vscode.workspace.onDidChangeTextDocument((changes: vscode.TextDocumentChangeEvent) => {
+      //	crystalOnDidEvent(changes.document, true)
+      // })
 		)
 	}
 
