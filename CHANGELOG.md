@@ -5,6 +5,11 @@
 - Translate Crystal syntax from `.tmLanguage` to `.json`.
 - Full Support for Language Server Protocol.
 - Complete TODO's comments inside this source code.
+- Solve issues in Github repo.
+
+## [0.2.5] - 2017-07-27
+### Change
+- Disable onDidChangeTextDocument to improve performance.
 
 ## [0.2.4] - 2017-07-20
 ### Change
