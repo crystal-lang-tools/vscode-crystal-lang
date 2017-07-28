@@ -11,7 +11,7 @@
 			"patterns": [
 				{
 					"begin": "<%(=|-)?",
-					"end": "-?%>",
+					"end": "%>",
 					"name": "source.embed.crystal",
 					"patterns": [
 						{

@@ -32,7 +32,7 @@
 		"description": "Rescue any exception and access the rescued exception using exception variable in the rescue clause."
 	},
 	"Exception block with ensure": {
-		"prefix": "begin ensure",
+		"prefix": "beginen",
 		"body": [
 			"begin",
 			"\t$1",
@@ -45,7 +45,7 @@
 		"description": "Rescue with ensure clause executed at the end, expression regardless of whether an exception was raised or not."
 	},
 	"Exception block with else": {
-		"prefix": "begin else",
+		"prefix": "beginel",
 		"body": [
 			"begin",
 			"\t$1",
@@ -58,7 +58,7 @@
 		"description": "An else clause is executed only if no exceptions were rescued."
 	},
 	"Exception block with else and ensure": {
-		"prefix": "begin else ensure",
+		"prefix": "beginelen",
 		"body": [
 			"begin",
 			"\t$1",
@@ -91,7 +91,7 @@
 		"description": "A class is a blueprint from which individual objects are created. Class names, and indeed all type names, begin with a capital letter in Crystal."
 	},
 	"Class definition with initialize": {
-		"prefix": "class init",
+		"prefix": "classi",
 		"body": [
 			"class ${1:ClassName}",
 			"\tdef initialize",
@@ -183,7 +183,7 @@
 		"description": "An if evaluates the given branch if its condition is truthy."
 	},
 	"if else": {
-		"prefix": "if else",
+		"prefix": "ife",
 		"body": [
 			"if ${1:foo}",
 			"\t$0",
@@ -194,7 +194,7 @@
 		"description": "It evaluates if when condition is true and the else branch when condition is false."
 	},
 	"if elsif": {
-		"prefix": "if elsif",
+		"prefix": "ifei",
 		"body": [
 			"if ${1:foo}",
 			"\t$0",
@@ -205,7 +205,7 @@
 		"description": "To write a chain of if-else-if you use elsif."
 	},
 	"if elsif else": {
-		"prefix": "if elsif else",
+		"prefix": "ifeie",
 		"body": [
 			"if ${1:foo}",
 			"\t$0",

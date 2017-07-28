@@ -1,120 +1,89 @@
 {
-	"open": {
-		"prefix": "<%",
-		"body": [
-			"<% $0 %>"
-		],
-		"description": "simple code block."
-	},
-	"open-": {
-		"prefix": "<%-",
-		"body": [
-			"<%- $0 %>"
-		],
-		"description": "code block trim spaces."
-	},
-	"open=": {
-		"prefix": "<%=",
-		"body": [
-			"<%= $0 %>"
-		],
-		"description": "code block print value."
-	},
 	"if": {
 		"prefix": "if",
 		"body": [
-			"<% if ${1:foo} %>",
-			"\t$0",
-			"<% end %>"
+			"- if ${1:foo}",
+			"\t$0"
 		],
 		"description": "An if evaluates the given branch if its condition is truthy."
 	},
 	"if else": {
 		"prefix": "ife",
 		"body": [
-			"<% if ${1:foo} %>",
+			"- if ${1:foo}",
 			"\t$0",
-			"<% else %>",
-			"\t",
-			"<% end %>"
+			"- else",
+			"\t"
 		],
 		"description": "It evaluates if when condition is true and the else branch when condition is false."
 	},
 	"if elsif": {
 		"prefix": "ifei",
 		"body": [
-			"<% if ${1:foo} %>",
+			"- if ${1:foo}",
 			"\t$0",
-			"<% elsif ${2:bar} %>",
-			"\t",
-			"<% end %>"
+			"- elsif ${2:bar}",
+			"\t"
 		],
 		"description": "To write a chain of if-else-if you use elsif."
 	},
 	"if elsif else": {
 		"prefix": "ifeie",
 		"body": [
-			"<% if ${1:foo} %>",
+			"- if ${1:foo}",
 			"\t$0",
-			"<% elsif ${2:bar} %>",
+			"- elsif ${2:bar}",
 			"\t",
-			"<% else %>",
-			"\t",
-			"<% end %>"
+			"- else",
+			"\t"
 		],
 		"description": "Add elif and else to conditional structure."
 	},
 	"unless": {
 		"prefix": "unless",
 		"body": [
-			"<% unless ${1:foo} %>",
-			"\t$0",
-			"<% end %>"
+			"- unless ${1:foo}",
+			"\t$0"
 		],
 		"description": "That is, it behaves in the opposite way of an if."
 	},
 	"until loop": {
 		"prefix": "until",
 		"body": [
-			"<% until ${1:foo} %>",
-			"\t$0",
-			"<% end %>"
+			"- until ${1:foo}",
+			"\t$0"
 		],
 		"description": "An until is just syntax sugar for a while with the condition negate."
 	},
 	"while loop": {
 		"prefix": "while",
 		"body": [
-			"<% while ${1:foo} %>",
-			"\t$0",
-			"<% end %>"
+			"- while ${1:foo}",
+			"\t$0"
 		],
 		"description": "A while executes its body as long as its condition is truthy."
 	},
 	"loop": {
 		"prefix": "loop",
 		"body": [
-			"<% loop do %>",
-			"\t$0",
-			"<% end %>"
+			"- loop do",
+			"\t$0"
 		],
 		"description": "A loop executes its body forever until a break."
 	},
 	"block do": {
 		"prefix": "d",
 		"body": [
-			"<% ${1:array}.each do %>",
-			"\t$0",
-			"<% end %>"
+			"- ${1:array}.each do",
+			"\t$0"
 		],
 		"description": "Create a block without arguments"
 	},
 	"block do with args": {
 		"prefix": "do",
 		"body": [
-			"<% ${1:array}.each do |$2| %>",
-			"\t$0",
-			"<% end %>"
+			"- ${1:array}.each do |$2|",
+			"\t$0"
 		],
 		"description": "Create a block with arguments"
 	}
