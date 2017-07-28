@@ -1,0 +1,538 @@
+{
+	"fileTypes": [
+		"slang"
+	],
+	"foldingStartMarker": "^\\s*([-%#\\:\\.\\w\\=].*)\\s$",
+	"foldingStopMarker": "^\\s*$",
+	"keyEquivalent": "^~S",
+	"name": "Crystal Slang",
+	"patterns": [
+		{
+			"begin": "^(\\s*)(crystal):$",
+			"beginCaptures": {
+				"2": {
+					"name": "constant.language.name.crystal.filter.slang"
+				}
+			},
+			"end": "^(?!(\\1\\s)|\\s*$)",
+			"name": "text.crystal.filter.slang",
+			"patterns": [
+				{
+					"include": "source.crystal"
+				}
+			]
+		},
+		{
+			"begin": "^(\\s*)(javascript):$",
+			"beginCaptures": {
+				"2": {
+					"name": "constant.language.name.javascript.filter.slang"
+				}
+			},
+			"end": "^(?!(\\1\\s)|\\s*$)",
+			"name": "source.js.filter.slang",
+			"patterns": [
+				{
+					"include": "source.js"
+				}
+			]
+		},
+		{
+			"begin": "^(---)\\s*\\n",
+			"beginCaptures": {
+				"1": {
+					"name": "storage.frontmatter.slang"
+				}
+			},
+			"end": "^(---)\\s*\\n",
+			"endCaptures": {
+				"1": {
+					"name": "storage.frontmatter.slang"
+				}
+			},
+			"name": "source.yaml.meta.slang",
+			"patterns": [
+				{
+					"include": "source.yaml"
+				}
+			]
+		},
+		{
+			"begin": "^(\\s*)(coffee):$",
+			"beginCaptures": {
+				"2": {
+					"name": "constant.language.name.coffeescript.filter.slang"
+				}
+			},
+			"end": "^(?!(\\1\\s)|\\s*$)",
+			"name": "text.coffeescript.filter.slang",
+			"patterns": [
+				{
+					"include": "source.coffee"
+				}
+			]
+		},
+		{
+			"begin": "^(\\s*)(markdown):$",
+			"beginCaptures": {
+				"2": {
+					"name": "constant.language.name.markdown.filter.slang"
+				}
+			},
+			"end": "^(?!(\\1\\s)|\\s*$)",
+			"name": "text.markdown.filter.slang",
+			"patterns": [
+				{
+					"include": "source.md"
+				}
+			]
+		},
+		{
+			"begin": "^(\\s*)(css):$",
+			"beginCaptures": {
+				"2": {
+					"name": "constant.language.name.css.filter.slang"
+				}
+			},
+			"end": "^(?!(\\1\\s)|\\s*$)",
+			"name": "text.css.filter.slang",
+			"patterns": [
+				{
+					"include": "source.css"
+				}
+			]
+		},
+		{
+			"begin": "^(\\s*)(sass):$",
+			"beginCaptures": {
+				"2": {
+					"name": "constant.language.name.sass.filter.slang"
+				}
+			},
+			"end": "^(?!(\\1\\s)|\\s*$)",
+			"name": "text.sass.filter.slang",
+			"patterns": [
+				{
+					"include": "source.sass"
+				}
+			]
+		},
+		{
+			"begin": "^(\\s*)(scss):$",
+			"beginCaptures": {
+				"2": {
+					"name": "constant.language.name.scss.filter.slang"
+				}
+			},
+			"end": "^(?!(\\1\\s)|\\s*$)",
+			"name": "text.scss.filter.slang",
+			"patterns": [
+				{
+					"include": "source.scss"
+				}
+			]
+		},
+		{
+			"begin": "^(\\s*)(less):$",
+			"beginCaptures": {
+				"2": {
+					"name": "constant.language.name.less.filter.slang"
+				}
+			},
+			"end": "^(?!(\\1\\s)|\\s*$)",
+			"name": "text.less.filter.slang",
+			"patterns": [
+				{
+					"include": "source.less"
+				}
+			]
+		},
+		{
+			"begin": "^(\\s*)(erb):$",
+			"beginCaptures": {
+				"2": {
+					"name": "constant.language.name.erb.filter.slang"
+				}
+			},
+			"end": "^(?!(\\1\\s)|\\s*$)",
+			"name": "text.erb.filter.slang",
+			"patterns": [
+				{
+					"include": "source.erb"
+				}
+			]
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "punctuation.definition.prolog.slang"
+				}
+			},
+			"match": "^(! )($|\\s.*)",
+			"name": "meta.prolog.slang"
+		},
+		{
+			"begin": "^(\\s*)(\/)\\s*.*$",
+			"beginCaptures": {
+				"1": {
+					"name": "punctuation.section.comment.slang"
+				}
+			},
+			"end": "^(?!\\1  )",
+			"name": "comment.block.slang"
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "punctuation.section.comment.slang"
+				}
+			},
+			"match": "^\\s*(\/)\\s*\\S.*$\\n?",
+			"name": "comment.line.slash.slang"
+		},
+		{
+			"begin": "^\\s*(?=-)",
+			"end": "$",
+			"patterns": [
+				{
+					"include": "#crystalline"
+				}
+			]
+		},
+		{
+			"begin": "(?==+|~)",
+			"end": "$",
+			"patterns": [
+				{
+					"include": "#crystalline"
+				}
+			]
+		},
+		{
+			"include": "#tag-attribute"
+		},
+		{
+			"include": "#embedded-crystal"
+		},
+		{
+			"begin": "^\\s*(\\.|#|[a-zA-Z0-9]+)([\\w-]+)?",
+			"captures": {
+				"1": {
+					"name": "entity.name.tag.slang"
+				},
+				"2": {
+					"name": "entity.other.attribute-name.event.slang"
+				}
+			},
+			"comment": "1 - dot OR hash OR any combination of word, number; 2 - OPTIONAL any combination of word, number, dash or underscore (following a . or",
+			"end": "$|(?!\\.|#|=|:|-|~|\/|\\}|\\]|\\*|\\s?[\\*\\{])",
+			"name": "meta.tag",
+			"patterns": [
+				{
+					"begin": "(:[\\w\\d]+)+",
+					"comment": "XML",
+					"end": "$|\\s",
+					"name": "entity.name.tag.slang"
+				},
+				{
+					"begin": "(:\\s)(\\.|#|[a-zA-Z0-9]+)([\\w-]+)?",
+					"captures": {
+						"1": {
+							"name": "punctuation.definition.tag.end.slang"
+						},
+						"2": {
+							"name": "entity.name.tag.slang"
+						},
+						"3": {
+							"name": "entity.other.attribute-name.event.slang"
+						}
+					},
+					"comment": "Inline HTML \/ 1 - colon; 2 - dot OR hash OR any combination of word, number; 3 - OPTIONAL any combination of word, number, dash or underscore (following a . or",
+					"end": "$|(?!\\.|#|=|-|~|\/|\\}|\\]|\\*|\\s?[\\*\\{])",
+					"patterns": [
+						{
+							"include": "#root-class-id-tag"
+						},
+						{
+							"include": "#tag-attribute"
+						}
+					]
+				},
+				{
+					"begin": "(\\*\\{)(?=.*\\}|.*\\|\\s*$)",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.section.embedded.crystal"
+						}
+					},
+					"comment": "Splat attributes",
+					"end": "(\\})|$|^(?!.*\\|\\s*$)",
+					"endCaptures": {
+						"1": {
+							"name": "punctuation.section.embedded.crystal"
+						}
+					},
+					"name": "source.crystal.embedded.slang",
+					"patterns": [
+						{
+							"include": "#embedded-crystal"
+						}
+					]
+				},
+				{
+					"include": "#root-class-id-tag"
+				},
+				{
+					"include": "#crystalline"
+				},
+				{
+					"match": "\/",
+					"name": "punctuation.terminator.tag.slang"
+				}
+			]
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "meta.escape.slang"
+				}
+			},
+			"match": "^\\s*(\\\\.)"
+		},
+		{
+			"begin": "^\\s*(?=\\||')",
+			"end": "$",
+			"patterns": [
+				{
+					"include": "#embedded-crystal"
+				},
+				{
+					"include": "text.html.basic"
+				}
+			]
+		},
+		{
+			"begin": "(?=<[\\w\\d\\:]+)",
+			"comment": "Inline and root-level HTML tags",
+			"end": "$|\\\/\\>",
+			"patterns": [
+				{
+					"include": "text.html.basic"
+				}
+			]
+		}
+	],
+	"repository": {
+		"continuation": {
+			"captures": {
+				"1": {
+					"name": "punctuation.separator.continuation.slang"
+				}
+			},
+			"match": "([\\\\,])\\s*\\n"
+		},
+		"delimited-crystal-a": {
+			"begin": "=\\(",
+			"end": "\\)(?=( \\w|$))",
+			"name": "source.crystal.embedded.slang",
+			"patterns": [
+				{
+					"include": "source.crystal"
+				}
+			]
+		},
+		"delimited-crystal-b": {
+			"begin": "=\\[",
+			"end": "\\](?=( \\w|$))",
+			"name": "source.crystal.embedded.slang",
+			"patterns": [
+				{
+					"include": "source.crystal"
+				}
+			]
+		},
+		"delimited-crystal-c": {
+			"begin": "=\\{",
+			"end": "\\}(?=( \\w|$))",
+			"name": "source.crystal.embedded.slang",
+			"patterns": [
+				{
+					"include": "source.crystal"
+				}
+			]
+		},
+		"embedded-crystal": {
+			"begin": "(?<!\\\\)#\\{{1,2}",
+			"beginCaptures": [
+				{
+					"name": "punctuation.section.embedded.crystal"
+				}
+			],
+			"end": "\\}{1,2}",
+			"endCaptures": [
+				{
+					"name": "punctuation.section.embedded.crystal"
+				}
+			],
+			"name": "source.crystal.embedded.html",
+			"patterns": [
+				{
+					"include": "source.crystal"
+				}
+			]
+		},
+		"entities": {
+			"patterns": [
+				{
+					"captures": {
+						"1": {
+							"name": "punctuation.definition.entity.html"
+						},
+						"3": {
+							"name": "punctuation.definition.entity.html"
+						}
+					},
+					"match": "(&)([a-zA-Z0-9]+|#[0-9]+|#x[0-9a-fA-F]+)(;)",
+					"name": "constant.character.entity.html"
+				},
+				{
+					"match": "&",
+					"name": "invalid.illegal.bad-ampersand.html"
+				}
+			]
+		},
+		"interpolated-crystal": {
+			"begin": "=(?=\\b)",
+			"end": "\\s|\\w$",
+			"name": "source.crystal.embedded.html"
+		},
+		"root-class-id-tag": {
+			"captures": {
+				"1": {
+					"name": "punctuation.separator.key-value.html"
+				},
+				"2": {
+					"name": "entity.other.attribute-name.html"
+				}
+			},
+			"match": "(\\.|#)([\\w\\d\\-]+)"
+		},
+		"crystalline": {
+			"begin": "(==|=)(<>|><|<'|'<|<|>)?|-",
+			"contentName": "source.crystal.embedded.slang",
+			"end": "(?<!\\\\|,|,\\n|\\\\\\n)$",
+			"name": "meta.line.crystal.slang",
+			"patterns": [
+				{
+					"comment": "Hack to let crystal comments work in this context properly",
+					"match": "#.*$",
+					"name": "comment.line.number-sign.crystal"
+				},
+				{
+					"include": "#continuation"
+				},
+				{
+					"include": "source.crystal"
+				}
+			]
+		},
+		"string-double-quoted": {
+			"begin": "(\")(?=.*\")",
+			"beginCaptures": [
+				{
+					"name": "punctuation.definition.string.begin.html"
+				}
+			],
+			"contentName": "meta.toc-list.id.html",
+			"end": "\"",
+			"endCaptures": [
+				{
+					"name": "punctuation.definition.string.end.html"
+				}
+			],
+			"name": "string.quoted.double.html",
+			"patterns": [
+				{
+					"include": "#embedded-crystal"
+				},
+				{
+					"include": "#entities"
+				}
+			]
+		},
+		"string-single-quoted": {
+			"begin": "(')(?=.*')",
+			"beginCaptures": [
+				{
+					"name": "punctuation.definition.string.begin.html"
+				}
+			],
+			"contentName": "meta.toc-list.id.html",
+			"end": "'",
+			"endCaptures": [
+				{
+					"name": "punctuation.definition.string.end.html"
+				}
+			],
+			"name": "string.quoted.single.html",
+			"patterns": [
+				{
+					"include": "#embedded-crystal"
+				},
+				{
+					"include": "#entities"
+				}
+			]
+		},
+		"tag-attribute": {
+			"begin": "([\\w.#_-]+)=(?!\\s)(true|false|nil)?(\\s*\\(|\\{)?",
+			"captures": {
+				"1": {
+					"name": "entity.other.attribute-name.event.slang"
+				},
+				"2": {
+					"name": "constant.language.slang"
+				}
+			},
+			"end": "\\}|\\)|$",
+			"patterns": [
+				{
+					"include": "#tag-stuff"
+				},
+				{
+					"include": "#string-double-quoted"
+				},
+				{
+					"include": "#string-single-quoted"
+				}
+			]
+		},
+		"tag-stuff": {
+			"patterns": [
+				{
+					"include": "#tag-attribute"
+				},
+				{
+					"include": "#interpolated-crystal"
+				},
+				{
+					"include": "#delimited-crystal-a"
+				},
+				{
+					"include": "#delimited-crystal-b"
+				},
+				{
+					"include": "#delimited-crystal-c"
+				},
+				{
+					"include": "#crystalline"
+				},
+				{
+					"include": "#embedded-crystal"
+				}
+			]
+		}
+	},
+	"scopeName": "text.slang",
+	"uuid": "36302CC1-1E76-4910-B7B6-F1915EBBA0D3"
+}

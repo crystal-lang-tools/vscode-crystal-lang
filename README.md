@@ -115,7 +115,9 @@ Commonly crystal takes milliseconds to do something like formatting, but in some
 
 You can use this feature to peek or go to implementation of a method.
 
-![implementations](https://i.imgur.com/CQtzPLQ.gif)
+This extension show implementations and definitions as same thing.
+
+![implementations](https://i.imgur.com/FDrEP7E.gif)
 
 ### 3.6. Completion
 
@@ -157,7 +159,7 @@ It's **Experimental** feature using Scry and Language Server Protocol.
 
 > Reload your editor after enable this feature.
 
-[![Scry](https://i.imgur.com/ticTfT8.png)](https://github.com/faustinoaq/scry)
+[![Scry](https://i.imgur.com/ticTfT8.png)](https://github.com/kofno/scry)
 
 The following features are implemented:
 
@@ -166,7 +168,7 @@ The following features are implemented:
 - GoTo Definition
 - Peek Definition
 
-> Scry server isn't distributed with this extension. You need to compile it from [scry-vscode-crystal-lang](https://github.com/faustinoaq/scry/tree/scry-vscode-crystal-lang) and configure on `settings.json`
+> Scry server isn't distributed with this extension. You need to install it from [scry repo](https://github.com/kofno/scry) and configure on `settings.json`
 
 ```json
 {
@@ -216,11 +218,11 @@ The following images show crystal status bar messages:
 
 ## 5. Know issues
 
-- Linter and formatter are implemented using Node.js `child_process`, so perfomance could be affected. You can use a different problem level.
+- Linter and formatter are implemented using Node.js `child_process`, so performance could be affected.
 
-- `macros` can produce some unwanted behaviors, disable _peek implementations, instance method completions and types on hover_ to hide errors.
+- `macros` can produce some unwanted behaviors.
 
-- ECR syntax is very basic. You can use vscode `text.html` instead or enable emmet for `text.ecr` in your `settings.json`:
+- ECR syntax doesn't have emmet support. You can use vscode `text.html` instead or enable emmet for `text.ecr` in your `settings.json`:
 
 ```json
 {
@@ -230,9 +232,9 @@ The following images show crystal status bar messages:
 }
 ```
 
-- In some big projects like [crystal compiler](https://github.com/crystal-lang) itself, the setting `"crystal-lang.problems" = "build"` could be very unresponsible, use `"syntax"` instead.
+- In some big projects like [crystal compiler](https://github.com/crystal-lang) itself, the setting `"crystal-lang.problems" = "build"` could be very unresponsive, use `"syntax"` instead.
 
-- Scry server is experimental, some bug can appear. Scry is a bit heavy, it uses from 5 Mb until 500Mb of RAM in my computer.
+- Scry server is experimental, some bug can appear.
 
 ## 6. More Screenshots
 
@@ -266,21 +268,15 @@ Recent version of VSCode (1.13.1) allow to extensions creators show symbols in t
 
 ### 6.7. Debugging
 
-[Native Debug](https://marketplace.visualstudio.com/items?itemName=webfreak.debug) is an excelent extension that allow you to debug crystal and other languages that compile to binary.
+[Native Debug](https://marketplace.visualstudio.com/items?itemName=webfreak.debug) is an excellent extension that allow you to debug crystal and other languages that compile to binary.
 
 > Be sure of compile your crystal code with `--debug` flag
 
 ![Native Debug extension](https://i.imgur.com/mrJzrxI.png)
 
-### 6.8. Icon theme
-
-You can use the wonderful [Nomo Dark icon theme](https://marketplace.visualstudio.com/items?itemName=be5invis.vscode-icontheme-nomo-dark) to see crystal icon.
-
-![Nomo Dark icon theme](https://i.imgur.com/6QxIyWV.png)
-
 ## 7. Roadmap
 
-- Translate Crystal syntax from `.tmLanguage` to `.json`.
+- Add macro support, see issues [#4](https://github.com/faustinoaq/vscode-crystal-lang/issues/4) and [#5](https://github.com/faustinoaq/vscode-crystal-lang/issues/5).
 - Full Support for Language Server Protocol, see [Scry](https://github.com/kofno/scry)
 
 ## 8. Release Notes
