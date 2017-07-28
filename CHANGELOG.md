@@ -2,10 +2,20 @@
 
 ## [Unreleased]
 ### Todo
-- Translate Crystal syntax from `.tmLanguage` to `.json`.
 - Full Support for Language Server Protocol.
 - Complete TODO's comments inside this source code.
 - Solve issues in Github repo.
+
+## [0.2.6] - 2017-07-28
+### Change
+- Translate Crystal syntax from `.tmLanguage` to `.json`.
+- Update README.
+
+### Add
+- Slang syntax and snippets.
+
+### Fix
+- Snippets.
 
 ## [0.2.5] - 2017-07-27
 ### Change

@@ -2,7 +2,7 @@
 	"name": "crystal-lang",
 	"displayName": "Crystal Language",
 	"description": "The Crystal Programming Language",
-	"version": "0.2.5",
+	"version": "0.2.6",
 	"publisher": "faustinoaq",
 	"icon": "images/icon.png",
 	"license": "MIT",
@@ -52,18 +52,33 @@
 					".ecr"
 				],
 				"configuration": "./ecr-configuration.json"
+			},
+			{
+				"id": "slang",
+				"aliases": [
+					"Crystal Slang"
+				],
+				"extensions": [
+					".slang"
+				],
+				"configuration": "./slang-configuration.json"
 			}
 		],
 		"grammars": [
 			{
 				"language": "crystal",
 				"scopeName": "source.crystal",
-				"path": "./syntaxes/crystal.tmLanguage"
+				"path": "./syntaxes/crystal.json"
 			},
 			{
 				"language": "ecr",
 				"scopeName": "text.ecr",
 				"path": "./syntaxes/ecr.json"
+			},
+			{
+				"language": "slang",
+				"scopeName": "text.slang",
+				"path": "./syntaxes/slang.json"
 			}
 		],
 		"snippets": [
@@ -74,6 +89,10 @@
 			{
 				"language": "ecr",
 				"path": "./snippets/ecr.json"
+			},
+			{
+				"language": "slang",
+				"path": "./snippets/slang.json"
 			}
 		],
 		"keybindings": [
