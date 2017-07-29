@@ -3,8 +3,8 @@
 		"cr"
 	],
 	"firstLineMatch": "^#!\/.*\\bcrystal",
-	"foldingStartMarker": "(?x)^\n\t    (\\s*+\n\t        (module|class|def(?!.*\\bend\\s*$)\n\t        |unless|if\n\t        |case\n\t        |begin\n\t        |for|while|until\n\t         |^=begin\n\t        |(  \"(\\\\.|[^\"])*+\"         # eat a double quoted string\n\t         | '(\\\\.|[^'])*+'          # eat a single quoted string\n\t         |   [^#\"']                # eat all but comments and strings\n\t         )*\n\t         (                        \\s   (do|begin|case)\n\t         | (?<!\\$)[-+=&|*\/~%^<>~] \\s*+ (if|unless)\n\t         )\n\t        )\\b\n\t        (?! [^;]*+ ; .*? \\bend\\b )\n\t    |(  \"(\\\\.|[^\"])*+\"             # eat a double quoted string\n\t     | '(\\\\.|[^'])*+'              # eat a single quoted string\n\t     |   [^#\"']                    # eat all but comments and strings\n\t     )*\n\t     ( \\{ (?!  [^}]*+ \\} )\n\t     | \\[ (?! [^\\]]*+ \\] )\n\t     )\n\t    ).*$\n\t|   [#] .*? \\(fold\\) \\s*+ $        # Sune\u2019s special marker\n\t",
-	"foldingStopMarker": "(?x)\n\t\t(   (^|;) \\s*+ end   \\s*+ ([#].*)? $\n\t\t|   (^|;) \\s*+ end \\. .* $\n\t\t|   ^     \\s*+ [}\\]] ,? \\s*+ ([#].*)? $\n\t\t|   [#] .*? \\(end\\) \\s*+ $       # Sune\u2019s special marker\n\t\t|   ^=end\n\t\t)",
+	"foldingStartMarker": "(?x)^(\\s*+(module|class|def(?!.*\\bend\\s*$)|unless|if|case|begin|for|while|until|^=begin|(  \"(\\\\.|[^\"])*+\"| '(\\\\.|[^'])*+'|   [^#\"'])*(\\s   (do|begin|case)| (?<!\\$)[-+=&|*\/~%^<>~] \\s*+ (if|unless)))\\b(?! [^;]*+ ; .*? \\bend\\b )|(  \"(\\\\.|[^\"])*+\"| '(\\\\.|[^'])*+'|   [^#\"'])*( \\{ (?!  [^}]*+ \\} )| \\[ (?! [^\\]]*+ \\] ))).*$|   [#] .*? \\(fold\\) \\s*+ $",
+	"foldingStopMarker": "(?x)(   (^|;) \\s*+ end   \\s*+ ([#].*)? $|   (^|;) \\s*+ end \\. .* $|   ^     \\s*+ [}\\]] ,? \\s*+ ([#].*)? $|   [#] .*? \\(end\\) \\s*+ $|   ^=end)",
 	"keyEquivalent": "^~R",
 	"name": "Crystal",
 	"patterns": [
@@ -41,7 +41,7 @@
 					"name": "punctuation.definition.variable.crystal"
 				}
 			},
-			"match": "(?x)\n\t\t\t\t^\n\t\t\t\t\\s*\n\t\t\t\t(abstract)?\n\t\t\t\t\\s*\n\t\t\t\t(class|struct|union)\n\t\t\t\t\\s+\n\t\t\t\t(\n\t\t\t\t\t(\n\t\t\t\t\t\t[.A-Z_:\\x{80}-\\x{10FFFF}][.\\w:\\x{80}-\\x{10FFFF}]*\n\t\t\t\t\t\t(\\(([,\\s.a-zA-Z0-9_:\\x{80}-\\x{10FFFF}]+)\\))?\n\t\t\t\t\t\t(\n\t\t\t\t\t\t\t\\s*(<)\\s*\n\t\t\t\t\t\t\t[.:A-Z\\x{80}-\\x{10FFFF}][.:\\w\\x{80}-\\x{10FFFF}]*\n\t\t\t\t\t\t\t(\\(([.a-zA-Z0-9_:]+\\s,)\\))?\n\t\t\t\t\t\t)?\n\t\t\t\t\t)|(\n\t\t\t\t\t\t(<<)\n\t\t\t\t\t\t\\s*\n\t\t\t\t\t\t[.A-Z0-9_:\\x{80}-\\x{10FFFF}]+\n\t\t\t\t\t)\n\t\t\t\t)\n\t\t\t",
+			"match": "(?x)^\\s*(abstract)?\\s*(class|struct|union)\\s+(([.A-Z_:\\x{80}-\\x{10FFFF}][.\\w:\\x{80}-\\x{10FFFF}]*(\\(([,\\s.a-zA-Z0-9_:\\x{80}-\\x{10FFFF}]+)\\))?(\\s*(<)\\s*[.:A-Z\\x{80}-\\x{10FFFF}][.:\\w\\x{80}-\\x{10FFFF}]*(\\(([.a-zA-Z0-9_:]+\\s,)\\))?)?)|((<<)\\s*[.A-Z0-9_:\\x{80}-\\x{10FFFF}]+))",
 			"name": "meta.class.crystal"
 		},
 		{
@@ -232,7 +232,7 @@
 			"name": "variable.other.constant.crystal"
 		},
 		{
-			"begin": "(?x)\n\t\t\t         (?=def\\b)                                                      # an optimization to help Oniguruma fail fast\n\t\t\t         (?<=^|\\s)(def|fun)\\s+                                       # the def keyword\n\t\t\t         ( (?>[a-zA-Z_\\x{80}-\\x{10FFFF}][\\x{80}-\\x{10FFFF}\\w]*(?>\\.|::))?               # a method name prefix\n\t\t\t           (?>[a-zA-Z_\\x{80}-\\x{10FFFF}][\\x{80}-\\x{10FFFF}\\w]*(?>[?!]|=(?!>))?       # the method name\n\t\t\t           |===?|>[>=]?|<=>|<[<=]?|[%&`\/\\|]|\\*\\*?|=?~|[-+]@?|\\[\\]=?) )  # \u2026or an operator method\n\t\t\t         \\s*(\\()                                                        # the openning parenthesis for arguments\n\t\t\t        ",
+			"begin": "(?x) (?=def\\b)(?<=^|\\s)(def|fun)\\s+( (?>[a-zA-Z_\\x{80}-\\x{10FFFF}][\\x{80}-\\x{10FFFF}\\w]*(?>\\.|::))?(?>[a-zA-Z_\\x{80}-\\x{10FFFF}][\\x{80}-\\x{10FFFF}\\w]*(?>[?!]|=(?!>))?|===?|>[>=]?|<=>|<[<=]?|[%&`\/\\|]|\\*\\*?|=?~|[-+]@?|\\[\\]=?) )\\s*(\\()",
 			"beginCaptures": {
 				"1": {
 					"name": "keyword.control.def.crystal"
@@ -244,34 +244,14 @@
 					"name": "punctuation.definition.parameters.crystal"
 				}
 			},
-			"comment": "the method pattern comes from the symbol pattern, see there for a explaination",
+			"comment": "Parentesis on Crystal are mandatory. The method pattern comes from the symbol pattern, see there for a explaination",
 			"contentName": "variable.parameter.function.crystal",
-			"end": "\\)",
+			"end": "\\)\\s*$|\\)\\s*:",
 			"endCaptures": [
 				{
 					"name": "punctuation.definition.parameters.crystal"
 				}
 			],
-			"name": "meta.function.method.with-arguments.crystal",
-			"patterns": [
-				{
-					"include": "$self"
-				}
-			]
-		},
-		{
-			"begin": "(?x)\n\t\t\t         (?=def\\b)                                                      # an optimization to help Oniguruma fail fast\n\t\t\t         (?<=^|\\s)(def|fun)\\s+                                       # the def keyword\n\t\t\t         ( (?>[a-zA-Z_\\x{80}-\\x{10FFFF}][\\w\\x{80}-\\x{10FFFF}]*(?>\\.|::))?               # a method name prefix\n\t\t\t           (?>[a-zA-Z_\\x{80}-\\x{10FFFF}][\\w\\x{80}-\\x{10FFFF}]*(?>[?!]|=(?!>))?       # the method name\n\t\t\t           |===?|>[>=]?|<=>|<[<=]?|[%&`\/\\|]|\\*\\*?|=?~|[-+]@?|\\[\\]=?) )  # \u2026or an operator method\n\t\t\t         [ \\t]                                                          # the space separating the arguments\n\t\t\t         (?=[ \\t]*[^\\s#;])                                              # make sure arguments and not a comment follow\n\t\t\t        ",
-			"beginCaptures": {
-				"1": {
-					"name": "keyword.control.def.crystal"
-				},
-				"2": {
-					"name": "entity.name.function.crystal"
-				}
-			},
-			"comment": "same as the previous rule, but without parentheses around the arguments",
-			"contentName": "variable.parameter.function.crystal",
-			"end": "$",
 			"name": "meta.function.method.with-arguments.crystal",
 			"patterns": [
 				{
@@ -288,8 +268,8 @@
 					"name": "entity.name.function.crystal"
 				}
 			},
-			"comment": " the optional name is just to catch the def also without a method-name",
-			"match": "(?x)\n\t\t\t         (?=def\\b)                                                           # an optimization to help Oniguruma fail fast\n\t\t\t         (?<=^|\\s)(def|fun)\\b                                             # the def keyword\n\t\t\t         ( \\s+                                                               # an optional group of whitespace followed by\u2026\n\t\t\t           ( (?>[a-zA-Z_\\x{80}-\\x{10FFFF}][\\w\\x{80}-\\x{10FFFF}]*(?>\\.|::))?                  # a method name prefix\n\t\t\t             (?>[a-zA-Z_\\x{80}-\\x{10FFFF}][\\w\\x{80}-\\x{10FFFF}]*(?>[?!]|=(?!>))?          # the method name\n\t\t\t             |===?|>[>=]?|<=>|<[<=]?|[%&`\/\\|]|\\*\\*?|=?~|[-+]@?|\\[\\]=?) ) )?  # \u2026or an operator method\n\t\t\t        ",
+			"comment": "The optional name is just to catch the def also without a method-name",
+			"match": "(?x) (?=def\\b)(?<=^|\\s)(def|fun)\\b( \\s+( (?>[a-zA-Z_\\x{80}-\\x{10FFFF}][\\w\\x{80}-\\x{10FFFF}]*(?>\\.|::))?(?>[a-zA-Z_\\x{80}-\\x{10FFFF}][\\w\\x{80}-\\x{10FFFF}]*(?>[?!]|=(?!>))?|===?|>[>=]?|<=>|<[<=]?|[%&`\/\\|]|\\*\\*?|=?~|[-+]@?|\\[\\]=?) ) )?",
 			"name": "meta.function.method.without-arguments.crystal"
 		},
 		{
@@ -538,7 +518,7 @@
 			]
 		},
 		{
-			"begin": "(?x)\n\t\t\t   (?:\n\t\t\t     ^                       # beginning of line\n\t\t\t   | (?<=                 # or look-behind on:\n\t\t\t       [=>~(?:\\[,|&;]\n\t\t\t     | [\\s;]if\\s\t\t\t       # keywords\n\t\t\t     | [\\s;]elsif\\s\n\t\t\t     | [\\s;]while\\s\n\t\t\t     | [\\s;]unless\\s\n\t\t\t     | [\\s;]when\\s\n\t\t\t     | [\\s;]assert_match\\s\n\t\t\t     | [\\s;]or\\s\t\t\t       # boolean opperators\n\t\t\t     | [\\s;]and\\s\n\t\t\t     | [\\s;]not\\s\n\t\t\t     | [\\s.]index\\s\t\t\t     # methods\n\t\t\t     | [\\s.]scan\\s\n\t\t\t     | [\\s.]sub\\s\n\t\t\t     | [\\s.]sub!\\s\n\t\t\t     | [\\s.]gsub\\s\n\t\t\t     | [\\s.]gsub!\\s\n\t\t\t     | [\\s.]match\\s\n\t\t\t     )\n\t\t\t   | (?<=                 # or a look-behind with line anchor:\n\t\t\t        ^when\\s              # duplication necessary due to limits of regex\n\t\t\t      | ^if\\s\n\t\t\t      | ^elsif\\s\n\t\t\t      | ^while\\s\n\t\t\t      | ^unless\\s\n\t\t\t      )\n\t\t\t   )\n\t\t\t   \\s*((\/))(?![*+{}?])\n\t\t\t",
+			"begin": "(?x) (?: ^| (?<=[=>~(?:\\[,|&;] | [\\s;]if\\s| [\\s;]elsif\\s | [\\s;]while\\s | [\\s;]unless\\s | [\\s;]when\\s | [\\s;]assert_match\\s | [\\s;]or\\s| [\\s;]and\\s | [\\s;]not\\s | [\\s.]index\\s| [\\s.]scan\\s | [\\s.]sub\\s | [\\s.]sub!\\s | [\\s.]gsub\\s | [\\s.]gsub!\\s | [\\s.]match\\s ) | (?<=^when\\s| ^if\\s | ^elsif\\s | ^while\\s | ^unless\\s ) ) \\s*((\/))(?![*+{}?])",
 			"captures": {
 				"1": {
 					"name": "string.regexp.classic.crystal"
@@ -547,7 +527,7 @@
 					"name": "punctuation.definition.string.crystal"
 				}
 			},
-			"comment": "regular expressions (normal)\n\t\t\twe only start a regexp if the character before it (excluding whitespace)\n\t\t\tis what we think is before a regexp\n\t\t\t",
+			"comment": "regular expressions (normal) we only start a regexp if the character before it (excluding whitespace) is what we think is before a regexp",
 			"contentName": "string.regexp.classic.crystal",
 			"end": "((\/[eimnosux]*))",
 			"patterns": [
