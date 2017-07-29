@@ -21,11 +21,11 @@ This extension provides support for The [Crystal](https://github.com/crystal-lan
 * Formatting
 * Problems finder
 * Document Symbols
-* Syntax highlighting
 * Show variable type on Hover
 * Show and Peek Implementations
 * Increment and decrements indentation
 * Method completion for Literals and Symbols
+* Syntax highlighting for Crystal, [ECR](https://crystal-lang.org/api/latest/ECR.html) and [Slang](https://github.com/jeromegn/slang)
 
 ## 2. Requirements
 
@@ -273,6 +273,13 @@ Recent version of VSCode (1.13.1) allow to extensions creators show symbols in t
 > Be sure of compile your crystal code with `--debug` flag
 
 ![Native Debug extension](https://i.imgur.com/mrJzrxI.png)
+
+
+### 6.8 Icon theme (NEW)
+
+[Simple icons](https://marketplace.visualstudio.com/items?itemName=LaurentTreguier.vscode-simple-icons) theme has beautiful icons for Crystal and common languages.
+
+![simple icons](https://i.imgur.com/oC3rzox.png)
 
 ## 7. Roadmap
 
