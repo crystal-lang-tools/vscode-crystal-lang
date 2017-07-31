@@ -85,15 +85,15 @@ The default value is 20.
 
 `crystal-lang.mainFile` says to the compiler which file should analyze.
 
-It is useful when `"crystal-lang.problems" = "build"` in projects where a main file do `require "/**"`
+It is useful when `"crystal-lang.problems" = "build"` in projects where a main file do `require "./**"`
 
 Also is used by features like **implementations** and show **type on hover** to specify the tool scope.
 
-> Be sure that mainFile is a valid **absolute** filepath.
+> You should use workspaceRoot to get absolute filepath.
 
 ```json
 {
-  "crystal-lang.mainFile": "/absolute/path/src/main.cr",
+  "crystal-lang.mainFile": "${workspaceRoot}/src/main.cr",
 }
 ```
 
@@ -149,7 +149,7 @@ However, you can totally disable completions in `settings.json`:
 
 ### 3.7. Types
 
-Show type information for variables only. This feature uses `crystal tool context` to get types. Information is recalculated when the cursor changes line position.
+Show type information for variables only. This feature uses `crystal tool context` to get types.
 
 ![types on hover](https://i.imgur.com/5COCsQX.gif)
 

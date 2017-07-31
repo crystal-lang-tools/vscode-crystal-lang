@@ -2,7 +2,7 @@ import * as vscode from 'vscode'
 import { spawn } from 'child_process'
 import { statusBarItem } from "./crystalStatusBar"
 
-import { ENV, CrystalLimit } from "./crystalConfiguration"
+import { ENV, ROOT, Concurrent, Config, mainFile, isNotLib } from "./crystalConfiguration"
 import { CrystalProblemsFinder } from "./crystalProblemsFinder"
 
 export class CrystalContext extends CrystalProblemsFinder {
@@ -15,14 +15,9 @@ export class CrystalContext extends CrystalProblemsFinder {
 		return new Promise(function (resolve, reject) {
 			let config = vscode.workspace.getConfiguration('crystal-lang')
 			let response = ''
-			if (CrystalLimit.processes < CrystalLimit.limit() && config[mode]) {
-				let scope: string
-				if (config['mainFile'] == '') {
-					scope = document.fileName
-				} else {
-					scope = config['mainFile']
-				}
-				CrystalLimit.processes += 1
+			if (Concurrent.counter < Concurrent.limit() && Config[mode]) {
+				let scope = mainFile(document.fileName)
+				Concurrent.counter += 1
 				statusBarItem.text = 'crystal tool context is working...'
 				statusBarItem.show()
 				let child = spawn('crystal', [
@@ -34,13 +29,13 @@ export class CrystalContext extends CrystalProblemsFinder {
 					'--no-color',
 					'-f',
 					'json'
-				], { env: ENV })
+				], { cwd: ROOT, env: ENV })
 				child.stdout.on('data', (data) => {
 					response += data
 				})
 				child.stdout.on('end', () => {
 					self.searchProblems(response.toString(), document.uri)
-					CrystalLimit.processes -= 1
+					Concurrent.counter -= 1
 					statusBarItem.hide()
 					return resolve(response)
 				})
@@ -50,8 +45,8 @@ export class CrystalContext extends CrystalProblemsFinder {
 						// console.info('INFO: code error or crystal bug')
 					}
 				})
-			} else if (config[mode]) {
-				console.error('ERROR: processesLimit has been reached')
+			} else if (Config[mode]) {
+				// console.error('ERROR: processesLimit has been reached')
 				return resolve('{"status":"blocked"}')
 			} else {
 				return resolve('{"status":"disabled"}')

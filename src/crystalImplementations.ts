@@ -4,7 +4,7 @@ import { spawn } from 'child_process'
 import { dirname } from 'path'
 
 import { CrystalProblemsFinder } from './crystalProblemsFinder'
-import { ENV, CrystalLimit } from './crystalConfiguration'
+import { ENV, ROOT, Concurrent, Config, mainFile } from './crystalConfiguration'
 import { statusBarItem } from './crystalStatusBar'
 
 export class CrystalImplementationsProvider extends CrystalProblemsFinder implements vscode.DefinitionProvider {
@@ -18,14 +18,9 @@ export class CrystalImplementationsProvider extends CrystalProblemsFinder implem
 		return new Promise(function (resolve, reject) {
 			let config = vscode.workspace.getConfiguration('crystal-lang')
 			let response = ''
-			if (CrystalLimit.processes < CrystalLimit.limit() && config['implementations']) {
-				let scope: string
-				if (config['mainFile'] == '') {
-					scope = document.fileName
-				} else {
-					scope = config['mainFile']
-				}
-				CrystalLimit.processes += 1
+			if (Concurrent.counter < Concurrent.limit() && Config['implementations']) {
+				let scope = mainFile(document.fileName)
+				Concurrent.counter += 1
 				statusBarItem.text = 'crystal tool implemetations is working...'
 				statusBarItem.show()
 				let child = spawn('crystal', [
@@ -37,13 +32,13 @@ export class CrystalImplementationsProvider extends CrystalProblemsFinder implem
 					'--no-color',
 					'-f',
 					'json'
-				], { env: ENV })
+				], { cwd: ROOT, env: ENV })
 				child.stdout.on('data', (data) => {
 					response += data
 				})
 				child.stdout.on('end', () => {
 					self.searchProblems(response.toString(), document.uri)
-					CrystalLimit.processes -= 1
+					Concurrent.counter -= 1
 					statusBarItem.hide()
 					return resolve(response)
 				})
@@ -54,7 +49,7 @@ export class CrystalImplementationsProvider extends CrystalProblemsFinder implem
 					}
 				})
 			} else if (config['implementations']) {
-				console.error('ERROR: processesLimit has been reached')
+				// console.error('ERROR: processesLimit has been reached')
 				return resolve('{"status":"blocked"}')
 			} else {
 				return resolve('{"status":"disabled"}')
@@ -80,6 +75,7 @@ export class CrystalImplementationsProvider extends CrystalProblemsFinder implem
 					console.info('INFO: crystal is taking a moment to check implementation')
 				}
 			} catch (err) {
+				// console.error(crystalOutput.toString())
 				console.error('ERROR: JSON.parse failed to parse crystal implementations output')
 				throw err
 			}

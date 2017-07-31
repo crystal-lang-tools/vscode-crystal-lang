@@ -1,5 +1,7 @@
 import * as vscode from 'vscode'
 
+import { isNotLib } from "./crystalConfiguration"
+
 /**
  * Error output format by crystal -f json
  */
@@ -27,7 +29,7 @@ export class CrystalProblemsFinder {
 				let maxNumberOfProblems = config['maxNumberOfProblems']
 				let length = Math.min(maxNumberOfProblems, results.length)
 				for (let problem of results) {
-					if (!problem.file.startsWith('/usr/lib') && !problem.file.startsWith(`${vscode.workspace.rootPath}/lib`)) {
+					if (isNotLib(problem.file)) {
 						let range = new vscode.Range(problem.line - 1, problem.column - 1, problem.line - 1, (problem.column + (problem.size || 0) - 1))
 						let diagnostic = new vscode.Diagnostic(range, problem.message, vscode.DiagnosticSeverity.Error)
 						let file: vscode.Uri
@@ -40,6 +42,7 @@ export class CrystalProblemsFinder {
 					}
 				}
 			} catch (err) {
+				// console.error(response)
 				console.error('ERROR: JSON.parse failed to parse crystal output')
 				throw err
 			}

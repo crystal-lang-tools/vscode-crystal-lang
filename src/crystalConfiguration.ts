@@ -1,13 +1,29 @@
-'use strict'
 import * as vscode from "vscode"
 import { execSync } from 'child_process'
 
+const CRENV = Object.create(process.env)
+export const ROOT = vscode.workspace.rootPath
+
+// Add current workspace to crystal path
+CRENV.CRYSTAL_PATH = `${ROOT}/lib:/usr/lib/crystal`
+export const ENV = CRENV
+
+export const Config = vscode.workspace.getConfiguration('crystal-lang')
+
+// Get main file in a project
+export function mainFile(document) {
+	if (Config['mainFile']) {
+		return Config['mainFile'].replace('${workspaceRoot}', ROOT)
+	} else {
+		return document
+	}
+}
+
 // Add crystal process limit
-export class CrystalLimit {
-	static processes = 0
+export class Concurrent {
+	static counter = 0
 	static limit() {
-		let config = vscode.workspace.getConfiguration('crystal-lang')
-		return config['processesLimit']
+		return Config['processesLimit']
 	}
 }
 
@@ -21,10 +37,14 @@ export function crystalCheck() {
 	}
 }
 
-// Add current workspace to crystal path
-const CRENV = Object.create(process.env)
-CRENV.CRYSTAL_PATH = `${vscode.workspace.rootPath}/lib:/usr/lib/crystal`
-export const ENV = CRENV
+// Ensure that file is not inside lib folders
+export function isNotLib(file) {
+	if (file.startsWith('/usr/lib') || file.startsWith(`${ROOT}/lib`)) {
+		return false
+	} else {
+		return true
+	}
+}
 
 export const crystalConfiguration = {
 	// Add indentation rules for crystal language

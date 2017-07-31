@@ -85,37 +85,37 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 			var word = document.getText(range)
 			if (word.endsWith('.')) {
 				completionFlag = true
-				try {
-					let container = word.slice(0, -1)
-					// Add Type reflection
-					this.pushCompletionMethods(TDATA.REFLECTION_METHODS)
-					// Add static methods to Types completion
-					let staticFound = false
-					for (let symbol of symbols) {
-						if (symbol.containerName == container) {
-							if (symbol.name.startsWith('self')) {
-								staticFound = true
-								this.createCompletionItem(symbol.name.slice(5), symbol.containerName, `Belongs to ${word}`, symbol.kind)
-							} else if (symbol.name == 'initialize') {
-								staticFound = true
-								this.createCompletionItem("new", "(class method) new(*args)", `Create a new instance of an Object`, vscode.SymbolKind.Method)
-							}
-						}
-					}
-					// ----------------------------------------
-					// TODO: Add standard lib method completion
-					// ----------------------------------------
-					if (!staticFound) {
-						if (container == 'File') {
-							this.pushCompletionMethods(TDATA.FILE_METHODS)
+				let container = word.slice(0, -1)
+				// Add Type reflection
+				this.pushCompletionMethods(TDATA.REFLECTION_METHODS)
+				// Add static methods to Types completion
+				let staticFound = false
+				for (let symbol of symbols) {
+					if (symbol.containerName == container) {
+						if (symbol.name.startsWith('self')) {
 							staticFound = true
+							this.createCompletionItem(symbol.name.slice(5), symbol.containerName, `Belongs to ${word}`, symbol.kind)
+						} else if (symbol.name == 'initialize') {
+							staticFound = true
+							this.createCompletionItem("new", "(class method) new(*args)", `Create a new instance of an Object`, vscode.SymbolKind.Method)
 						}
 					}
+				}
+				// ----------------------------------------
+				// TODO: Add standard lib method completion
+				// ----------------------------------------
+				if (!staticFound) {
+					if (container == 'File') {
+						this.pushCompletionMethods(TDATA.FILE_METHODS)
+						staticFound = true
+					}
+				}
 
-					// Add instance methods to variables (Don't works on windows yet)
-					if (!staticFound) {
-						if (platform() != 'win32' && crystalCheck()) {
-							let crystalOutput = await this.crystalContext(document, position, 'completion')
+				// Add instance methods to variables (Don't works on windows yet)
+				if (!staticFound) {
+					if (platform() != 'win32' && crystalCheck()) {
+						let crystalOutput = await this.crystalContext(document, position, 'completion')
+						try {
 							let crystalMessageObject = JSON.parse(crystalOutput.toString())
 							if (crystalMessageObject.status == "ok") {
 								for (let context of crystalMessageObject.contexts) {
@@ -173,13 +173,14 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 							} else if (crystalMessageObject.status == 'disabled') {
 								// console.info('INFO: crystal instance method completion is disabled')
 							}
-						} else {
-							// console.info("INFO: instance method completion isn't avaliable")
+						} catch (err) {
+							// console.error(crystalOutput.toString())
+							console.error('ERROR: JSON.parse failed to parse crystal context output when completion')
+							throw err
 						}
+					} else {
+						// console.info("INFO: instance method completion isn't avaliable")
 					}
-				} catch (err) {
-					console.error('ERROR: JSON.parse failed to parse crystal context output when completion')
-					throw err
 				}
 			} else {
 				range = new vscode.Range(wordRange.start.line, wordRange.start.character, wordRange.end.line, wordRange.end.character + 2)
@@ -224,7 +225,7 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 							this.createCompletionItem(symbol.name, symbol.containerName, '', symbol.kind)
 						}
 					} else {
-							this.createCompletionItem(symbol.name, symbol.containerName, '', symbol.kind)
+						this.createCompletionItem(symbol.name, symbol.containerName, '', symbol.kind)
 					}
 				}
 				if (!wordRange) {

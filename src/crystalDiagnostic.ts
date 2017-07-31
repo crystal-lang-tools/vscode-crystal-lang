@@ -3,7 +3,7 @@ import * as vscode from 'vscode'
 import { spawn } from 'child_process'
 
 import { statusBarItem } from "./crystalStatusBar";
-import { ENV, CrystalLimit } from "./crystalConfiguration";
+import { ENV, Concurrent, Config, mainFile, isNotLib } from "./crystalConfiguration";
 import { CrystalProblemsFinder } from "./crystalProblemsFinder";
 
 export class CrystalDiagnostic extends CrystalProblemsFinder {
@@ -11,10 +11,10 @@ export class CrystalDiagnostic extends CrystalProblemsFinder {
 	/**
 	 * Execute crystal build to check problems.
 	 */
-	crystalDoDiagnostic(document: vscode.TextDocument, onType) {
+	crystalDoDiagnostic(document: vscode.TextDocument) {
 		let config = vscode.workspace.getConfiguration('crystal-lang')
 		let response = ''
-		if (config['problems'] == 'syntax' || onType) {
+		if (config['problems'] == 'syntax') {
 			let child = spawn('crystal', ['tool', 'format', '--check', '--no-color', '-f', 'json', '-'])
 			child.stdin.write(document.getText())
 			child.stdin.end()
@@ -30,14 +30,9 @@ export class CrystalDiagnostic extends CrystalProblemsFinder {
 					// console.info('INFO: not formatted or syntax error or crystal bug')
 				}
 			})
-		} else if (CrystalLimit.processes < CrystalLimit.limit() && config['problems'] == 'build') {
-			let scope: string
-			if (config['mainFile'] == '') {
-				scope = document.fileName
-			} else {
-				scope = config['mainFile']
-			}
-			CrystalLimit.processes += 1
+		} else if (Concurrent.counter < Concurrent.limit() && Config['problems'] == 'build' && isNotLib(document.fileName)) {
+			let scope = mainFile(document.fileName)
+			Concurrent.counter += 1
 			statusBarItem.text = 'crystal build --no-codegen is working...'
 			statusBarItem.show()
 			let child = spawn('crystal', [
@@ -54,7 +49,7 @@ export class CrystalDiagnostic extends CrystalProblemsFinder {
 			})
 			child.stdout.on('end', () => {
 				this.searchProblems(response.toString(), document.uri)
-				CrystalLimit.processes -= 1
+				Concurrent.counter -= 1
 				statusBarItem.hide()
 			})
 			child.on('exit', (exitCode) => {
@@ -64,7 +59,7 @@ export class CrystalDiagnostic extends CrystalProblemsFinder {
 				}
 			})
 		} else if (config['problems'] != 'none') {
-			console.error('ERROR: processesLimit has been reached')
+			// console.error('ERROR: processesLimit has been reached')
 			console.info('INFO: crystal is taking a moment to build')
 		}
 	}

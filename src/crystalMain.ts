@@ -17,10 +17,10 @@ const CRYSTAL_MODE: vscode.DocumentFilter = { language: 'crystal', scheme: 'file
 
 const crystalDiagnostic = new CrystalDiagnostic()
 
-function crystalOnDidEvent(document, onType = false) {
+function crystalOnDidEvent(document) {
 	if (document.languageId == 'crystal') {
 		if (platform() !== 'win32') {
-			crystalDiagnostic.crystalDoDiagnostic(document, onType)
+			crystalDiagnostic.crystalDoDiagnostic(document)
 		} else {
 			console.info('INFO: some crystal features are not supported on Windows yet')
 		}
@@ -60,10 +60,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			vscode.languages.registerDocumentFormattingEditProvider('crystal', new CrystalFormattingProvider()),
 			vscode.languages.registerDefinitionProvider(CRYSTAL_MODE, new CrystalImplementationsProvider()),
 			vscode.workspace.onDidOpenTextDocument(crystalOnDidEvent),
-			vscode.workspace.onDidSaveTextDocument(crystalOnDidEvent),
-      // vscode.workspace.onDidChangeTextDocument((changes: vscode.TextDocumentChangeEvent) => {
-      //	crystalOnDidEvent(changes.document, true)
-      // })
+			vscode.workspace.onDidSaveTextDocument(crystalOnDidEvent)
 		)
 	}
 

@@ -100,6 +100,16 @@
 		],
 		"description": "A loop executes its body forever until a break."
 	},
+	"case": {
+		"prefix": "case",
+		"body": [
+			"<% case ${1:exp} %>",
+			"<% when ${2:value} %>",
+			"<%= \t$0 %>",
+			"<% end %>"
+		],
+		"description": "A case is a control expression which functions a bit like pattern matching."
+	},
 	"block do": {
 		"prefix": "d",
 		"body": [
