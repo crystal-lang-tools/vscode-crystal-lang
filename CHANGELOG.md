@@ -6,9 +6,16 @@
 - Complete TODO's comments inside this source code.
 - Solve issues in Github repo.
 
+## [0.2.8] - 2017-07-31
+### Fix
+- Macro issue [#5](https://github.com/faustinoaq/vscode-crystal-lang/issues/5).
+
+### Add
+- Allow to use `${workspaceRoot}` on `mainFile`.
+
 ## [0.2.7] - 2017-07-29
 ### Fix
-- Syntax issues [#7](https://github.com/faustinoaq/vscode-crystal-lang/issues/7), [#8](https://github.com/faustinoaq/vscode-crystal-lang/issues/8), [#9](https://github.com/faustinoaq/vscode-crystal-lang/pull/9)
+- Syntax issues [#7](https://github.com/faustinoaq/vscode-crystal-lang/issues/7), [#8](https://github.com/faustinoaq/vscode-crystal-lang/issues/8), [#9](https://github.com/faustinoaq/vscode-crystal-lang/pull/9).
 
 ## [0.2.6] - 2017-07-28
 ### Change
