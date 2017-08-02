@@ -3,7 +3,7 @@ import * as vscode from 'vscode'
 import { spawn } from 'child_process'
 
 import { statusBarItem } from "./crystalStatusBar";
-import { ENV, Concurrent, Config, mainFile, isNotLib } from "./crystalConfiguration";
+import { ENV, Concurrent, Config, mainFile, isNotLib, ROOT } from "./crystalConfiguration";
 import { CrystalProblemsFinder } from "./crystalProblemsFinder";
 
 export class CrystalDiagnostic extends CrystalProblemsFinder {
@@ -43,7 +43,7 @@ export class CrystalDiagnostic extends CrystalProblemsFinder {
 				`${scope}`,
 				'-f',
 				'json'
-			], { env: ENV })
+			], { cwd: ROOT, env: ENV })
 			child.stdout.on('data', (data) => {
 				response += data
 			})
