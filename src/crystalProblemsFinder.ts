@@ -34,7 +34,11 @@ export class CrystalProblemsFinder {
 						let diagnostic = new vscode.Diagnostic(range, problem.message, vscode.DiagnosticSeverity.Error)
 						let file: vscode.Uri
 						if (problem.file.length > 0) {
-							file = vscode.Uri.file(problem.file)
+							if (!problem.file.endsWith('.cr')) {
+								file = vscode.Uri.file(vscode.workspace.rootPath + '/' + problem.file)
+							} else {
+								file = vscode.Uri.file(problem.file)
+							}
 						} else {
 							file = uri
 						}
