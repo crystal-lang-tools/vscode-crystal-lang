@@ -6,6 +6,10 @@
 - Complete TODO's comments inside this source code.
 - Solve issues in Github repo.
 
+## [0.2.10] - 2017-08-02
+### Fix
+- Problem locations on templates [#11](https://github.com/faustinoaq/vscode-crystal-lang/pull/11)
+
 ## [0.2.9] - 2017-08-02
 ### Fix
 - Macro issue [#10](https://github.com/faustinoaq/vscode-crystal-lang/pull/10)
