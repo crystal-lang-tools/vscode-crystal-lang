@@ -283,7 +283,7 @@ Recent version of VSCode (1.13.1) allow to extensions creators show symbols in t
 
 ## 7. Roadmap
 
-- Add macro support, see issues [#4](https://github.com/faustinoaq/vscode-crystal-lang/issues/4) and [#5](https://github.com/faustinoaq/vscode-crystal-lang/issues/5).
+- Add macro support, see issue [#4](https://github.com/faustinoaq/vscode-crystal-lang/issues/4).
 - Full Support for Language Server Protocol, see [Scry](https://github.com/kofno/scry)
 
 ## 8. Release Notes
