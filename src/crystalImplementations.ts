@@ -1,4 +1,3 @@
-'use strict'
 import * as vscode from 'vscode'
 import { spawn } from 'child_process'
 import { dirname } from 'path'

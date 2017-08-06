@@ -1,6 +1,4 @@
-'use strict'
 import * as vscode from 'vscode'
-import { platform, arch } from 'os'
 import * as fs from 'fs'
 import * as client from 'vscode-languageclient'
 
@@ -19,11 +17,7 @@ const crystalDiagnostic = new CrystalDiagnostic()
 
 function crystalOnDidEvent(document) {
 	if (document.languageId == 'crystal') {
-		if (platform() !== 'win32') {
-			crystalDiagnostic.crystalDoDiagnostic(document)
-		} else {
-			console.info('INFO: some crystal features are not supported on Windows yet')
-		}
+		crystalDiagnostic.crystalDoDiagnostic(document)
 	}
 }
 

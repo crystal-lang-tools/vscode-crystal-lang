@@ -1,6 +1,5 @@
 import * as vscode from 'vscode'
 import * as TDATA from './crystalCompletionData'
-import { platform } from "os"
 
 import { crystalCheck } from './crystalConfiguration'
 import { CrystalContext } from './crystalContext'
@@ -111,9 +110,9 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 					}
 				}
 
-				// Add instance methods to variables (Don't works on windows yet)
+				// Add instance methods to variables
 				if (!staticFound) {
-					if (platform() != 'win32' && crystalCheck()) {
+					if (crystalCheck()) {
 						let crystalOutput = await this.crystalContext(document, position, 'completion')
 						try {
 							let crystalMessageObject = JSON.parse(crystalOutput.toString())
