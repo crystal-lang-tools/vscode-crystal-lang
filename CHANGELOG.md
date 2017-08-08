@@ -8,7 +8,7 @@
 - Autogenerate completion data.
 - Rewrite/Improve completion algorithm.
 
-## [0.2.12] - 2017-08-08
+## [0.2.13] - 2017-08-08
 ### Change
 - Refactoring hover provider.
 - Settings descriptions.
