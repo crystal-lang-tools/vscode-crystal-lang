@@ -94,9 +94,12 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 						if (symbol.name.startsWith('self')) {
 							staticFound = true
 							this.createCompletionItem(symbol.name.slice(5), symbol.containerName, `Belongs to ${word}`, symbol.kind)
-						} else if (symbol.name == 'initialize') {
+						}
+					}
+					if (container == symbol.name) {
+						if (symbol.kind == vscode.SymbolKind.Class || symbol.kind == vscode.SymbolKind.Struct) {
 							staticFound = true
-							this.createCompletionItem("new", "(class method) new(*args)", `Create a new instance of an Object`, vscode.SymbolKind.Method)
+							this.createCompletionItem("new", "new(*args)", `Create a new instance of an Object`, vscode.SymbolKind.Method)
 						}
 					}
 				}
@@ -114,68 +117,71 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 				if (!staticFound) {
 					if (crystalCheck()) {
 						let crystalOutput = await this.crystalContext(document, position, 'completion')
-						try {
-							let crystalMessageObject = JSON.parse(crystalOutput.toString())
-							if (crystalMessageObject.status == "ok") {
-								for (let context of crystalMessageObject.contexts) {
-									let type = context[container]
-									if (type) {
-										if (type.endsWith('Nil')) {
-											this.pushCompletionMethods(TDATA.NIL_METHODS)
-										} else if (type == 'Bool') {
-											this.pushCompletionMethods(TDATA.BOOL_METHODS)
-										} else if (type.startsWith('Int') || type.startsWith('UInt')) {
-											this.pushCompletionMethods(TDATA.INT_METHODS)
-										} else if (type == 'Float32' || type == 'Float64') {
-											this.pushCompletionMethods(TDATA.FLOAT_METHODS)
-										} else if (type == 'Char') {
-											this.pushCompletionMethods(TDATA.CHAR_METHODS)
-										} else if (type == 'String') {
-											this.pushCompletionMethods(TDATA.STRING_METHODS)
-										} else if (type == 'Symbol') {
-											this.pushCompletionMethods(TDATA.SYMBOLS_METHODS)
-										} else if (type.startsWith('Array')) {
-											this.pushCompletionMethods(TDATA.ARRAY_METHODS)
-										} else if (type.startsWith('Hash')) {
-											this.pushCompletionMethods(TDATA.HASH_METHODS)
-										} else if (type.startsWith('Range')) {
-											this.pushCompletionMethods(TDATA.RANGE_METHODS)
-										} else if (type == 'Regex') {
-											this.pushCompletionMethods(TDATA.REGEX_METHODS)
-										} else if (type.startsWith('Tuple')) {
-											this.pushCompletionMethods(TDATA.TUPLE_METHODS)
-										} else if (type.startsWith('NamedTuple')) {
-											this.pushCompletionMethods(TDATA.NAMEDTUPLE_METHODS)
-										} else if (type.startsWith('Proc')) {
-											this.pushCompletionMethods(TDATA.PROC_METHODS)
-										}
-										// Complete instance methods of Type
-										// class String
-										//   def tortilla?
-										//     self == "tortilla"
-										//   end
-										// end
-										// a = "arepas"
-										// a.tortilla?
-										let types = type.split('::')
-										let symbolType = types.pop()
-										for (let symbol of symbols) {
-											if (symbol.containerName == symbolType && !symbol.name.startsWith('self.') && !(symbol.name == 'initialize')) {
-												this.createCompletionItem(symbol.name, symbol.containerName, `Instance method of ${type}`, symbol.kind)
+						if (crystalOutput.toString().startsWith('{"status":"')) {
+							try {
+								let crystalMessageObject = JSON.parse(crystalOutput.toString())
+								if (crystalMessageObject.status == "ok") {
+									for (let context of crystalMessageObject.contexts) {
+										let type = context[container]
+										if (type) {
+											if (type.endsWith('Nil')) {
+												this.pushCompletionMethods(TDATA.NIL_METHODS)
+											} else if (type == 'Bool') {
+												this.pushCompletionMethods(TDATA.BOOL_METHODS)
+											} else if (type.startsWith('Int') || type.startsWith('UInt')) {
+												this.pushCompletionMethods(TDATA.INT_METHODS)
+											} else if (type == 'Float32' || type == 'Float64') {
+												this.pushCompletionMethods(TDATA.FLOAT_METHODS)
+											} else if (type == 'Char') {
+												this.pushCompletionMethods(TDATA.CHAR_METHODS)
+											} else if (type == 'String') {
+												this.pushCompletionMethods(TDATA.STRING_METHODS)
+											} else if (type == 'Symbol') {
+												this.pushCompletionMethods(TDATA.SYMBOLS_METHODS)
+											} else if (type.startsWith('Array')) {
+												this.pushCompletionMethods(TDATA.ARRAY_METHODS)
+											} else if (type.startsWith('Hash')) {
+												this.pushCompletionMethods(TDATA.HASH_METHODS)
+											} else if (type.startsWith('Range')) {
+												this.pushCompletionMethods(TDATA.RANGE_METHODS)
+											} else if (type == 'Regex') {
+												this.pushCompletionMethods(TDATA.REGEX_METHODS)
+											} else if (type.startsWith('Tuple')) {
+												this.pushCompletionMethods(TDATA.TUPLE_METHODS)
+											} else if (type.startsWith('NamedTuple')) {
+												this.pushCompletionMethods(TDATA.NAMEDTUPLE_METHODS)
+											} else if (type.startsWith('Proc')) {
+												this.pushCompletionMethods(TDATA.PROC_METHODS)
 											}
+											// Complete instance methods of Type
+											// class String
+											//   def tortilla?
+											//     self == "tortilla"
+											//   end
+											// end
+											// a = "arepas"
+											// a.tortilla?
+											let types = type.split('::')
+											let symbolType = types.pop()
+											for (let symbol of symbols) {
+												if (symbol.containerName == symbolType && !symbol.name.startsWith('self.') && !(symbol.name == 'initialize')) {
+													this.createCompletionItem(symbol.name, symbol.containerName, `Instance method of ${type}`, symbol.kind)
+												}
+											}
+											break
 										}
-										break
 									}
+								} else if (crystalMessageObject.status == 'blocked') {
+									// console.info('INFO: crystal is taking a moment to check context when completion')
+								} else if (crystalMessageObject.status == 'disabled') {
+									// console.info('INFO: crystal instance method completion is disabled')
+									return new vscode.CompletionList
 								}
-							} else if (crystalMessageObject.status == 'blocked') {
-								// console.info('INFO: crystal is taking a moment to check context when completion')
-							} else if (crystalMessageObject.status == 'disabled') {
-								// console.info('INFO: crystal instance method completion is disabled')
+							} catch (err) {
+								// console.error(crystalOutput.toString())
+								console.error('ERROR: JSON.parse failed to parse crystal context output when completion')
+								throw err
 							}
-						} catch (err) {
-							// console.error(crystalOutput.toString())
-							console.error('ERROR: JSON.parse failed to parse crystal context output when completion')
-							throw err
 						}
 					} else {
 						// console.info("INFO: instance method completion isn't avaliable")

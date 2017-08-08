@@ -22,28 +22,28 @@ export class CrystalProblemsFinder {
 	 */
 	searchProblems(response: string, uri: vscode.Uri) {
 		let diagnostics = []
-		let config = vscode.workspace.getConfiguration('crystal-lang')
-		if (response.startsWith('[{"file":"') && config['problems'] !== 'none') {
+		const config = vscode.workspace.getConfiguration('crystal-lang')
+		if (response.startsWith('[{"file":"')) {
 			try {
 				let results: CrystalError[] = JSON.parse(response)
 				let maxNumberOfProblems = config['maxNumberOfProblems']
-				let length = Math.min(maxNumberOfProblems, results.length)
-				for (let problem of results) {
-					if (isNotLib(problem.file)) {
-						let range = new vscode.Range(problem.line - 1, problem.column - 1, problem.line - 1, (problem.column + (problem.size || 0) - 1))
-						let diagnostic = new vscode.Diagnostic(range, problem.message, vscode.DiagnosticSeverity.Error)
-						let file: vscode.Uri
-						if (problem.file.length > 0) {
-							if (!problem.file.endsWith('.cr')) {
-								file = vscode.Uri.file(vscode.workspace.rootPath + '/' + problem.file)
-							} else {
-								file = vscode.Uri.file(problem.file)
-							}
-						} else {
-							file = uri
-						}
-						diagnostics.push([file, [diagnostic]])
+				for (let [index, problem] of results.entries()) {
+					if (index >= maxNumberOfProblems) {
+						break
 					}
+					let range = new vscode.Range(problem.line - 1, problem.column - 1, problem.line - 1, (problem.column + (problem.size || 0) - 1))
+					let diagnostic = new vscode.Diagnostic(range, problem.message, vscode.DiagnosticSeverity.Error)
+					let file: vscode.Uri
+					if (problem.file.length > 0) {
+						if (!problem.file.endsWith('.cr')) {
+							file = vscode.Uri.file(vscode.workspace.rootPath + '/' + problem.file)
+						} else {
+							file = vscode.Uri.file(problem.file)
+						}
+					} else {
+						file = uri
+					}
+					diagnostics.push([file, [diagnostic]])
 				}
 			} catch (err) {
 				// console.error(response)
@@ -53,7 +53,9 @@ export class CrystalProblemsFinder {
 		} else {
 			diagnosticCollection.clear()
 		}
-		diagnosticCollection.set(diagnostics)
+		if (config['problems'] !== 'none') {
+			diagnosticCollection.set(diagnostics)
+		}
 		return diagnostics
 	}
 }
