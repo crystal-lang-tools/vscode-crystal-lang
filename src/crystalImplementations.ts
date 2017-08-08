@@ -3,7 +3,7 @@ import { spawn } from 'child_process'
 import { dirname } from 'path'
 
 import { CrystalProblemsFinder } from './crystalProblemsFinder'
-import { ENV, ROOT, Concurrent, Config, mainFile } from './crystalConfiguration'
+import { ENV, ROOT, Concurrent, mainFile } from './crystalConfiguration'
 import { statusBarItem } from './crystalStatusBar'
 
 export class CrystalImplementationsProvider extends CrystalProblemsFinder implements vscode.DefinitionProvider {
@@ -15,20 +15,21 @@ export class CrystalImplementationsProvider extends CrystalProblemsFinder implem
 	crystalImplementations(document: vscode.TextDocument, position: vscode.Position) {
 		let self = this
 		return new Promise(function (resolve, reject) {
-			let config = vscode.workspace.getConfiguration('crystal-lang')
 			let response = ''
-			if (Concurrent.counter < Concurrent.limit() && Config['implementations']) {
+			const config = vscode.workspace.getConfiguration('crystal-lang')
+			if (Concurrent.counter < Concurrent.limit() && config['implementations']) {
 				let scope = mainFile(document.fileName)
 				Concurrent.counter += 1
-				statusBarItem.text = 'crystal tool implemetations is working...'
+				statusBarItem.text = `${config['compiler']} tool implemetations is working...`
 				statusBarItem.show()
-				let child = spawn('crystal', [
+				let child = spawn(`${config['compiler']}`, [
 					'tool',
 					'implementations',
 					'-c',
 					`${document.fileName}:${position.line + 1}:${position.character + 1}`,
 					`${scope}`,
 					'--no-color',
+					'--error-trace',
 					'-f',
 					'json'
 				], { cwd: ROOT, env: ENV })
@@ -40,6 +41,10 @@ export class CrystalImplementationsProvider extends CrystalProblemsFinder implem
 					Concurrent.counter -= 1
 					statusBarItem.hide()
 					return resolve(response)
+				})
+				child.on('error', (err) => {
+					vscode.window.showErrorMessage('Crystal compiler not found. ' + err.message)
+					console.error(err.message)
 				})
 				child.on('exit', (exitCode) => {
 					if (exitCode != 0) {

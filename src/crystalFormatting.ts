@@ -10,7 +10,8 @@ export class CrystalFormattingProvider extends CrystalProblemsFinder implements 
 	execFormat(document: vscode.TextDocument) {
 		return new Promise(function (resolve, reject) {
 			let response = ''
-			let child = spawn('crystal', ['tool', 'format', '--no-color', '-f', 'json', '-'])
+			const config = vscode.workspace.getConfiguration('crystal-lang')
+			let child = spawn(`${config['compiler']}`, ['tool', 'format', '--no-color', '-f', 'json', '-'])
 			child.stdin.write(document.getText())
 			child.stdin.end()
 			child.stdout.on('data', (data) => {
@@ -18,6 +19,10 @@ export class CrystalFormattingProvider extends CrystalProblemsFinder implements 
 			})
 			child.stdout.on('end', () => {
 				return resolve(response)
+			})
+			child.on('error', (err) => {
+				vscode.window.showErrorMessage('Crystal compiler not found. ' + err.message)
+				console.error(err.message)
 			})
 			child.on('exit', (exitCode) => {
 				if (exitCode != 0) {

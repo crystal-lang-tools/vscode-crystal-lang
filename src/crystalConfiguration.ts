@@ -1,6 +1,16 @@
 import * as vscode from "vscode"
 import { execSync } from 'child_process'
 
+// Crystal keywords used by context tool
+export const KEYWORDS = [
+	'begin', 'class', 'def', 'do', 'else',
+	'elsif', 'end', 'ensure', 'fun', 'if',
+	'lib', 'macro', 'module', 'rescue', 'struct',
+	'loop', 'case', 'select', 'then', 'when',
+	'while', 'for', 'return', 'macro', 'require',
+	'private', 'protected', 'yield'
+]
+
 const CRENV = Object.create(process.env)
 export const ROOT = vscode.workspace.rootPath
 
@@ -30,9 +40,11 @@ export class Concurrent {
 // Check if crystal command exists
 export function crystalCheck() {
 	try {
-		execSync('crystal')
+		execSync(`${Config['compiler']}`)
 		return true
 	} catch (ex) {
+		vscode.window.showErrorMessage('Crystal compiler not found. ' + ex.message)
+		console.error(ex)
 		return false
 	}
 }

@@ -2,7 +2,7 @@ import * as vscode from 'vscode'
 import * as fs from 'fs'
 import * as client from 'vscode-languageclient'
 
-import { crystalConfiguration, crystalCheck } from './crystalConfiguration'
+import { crystalConfiguration, crystalCheck, Config } from './crystalConfiguration'
 import { CrystalImplementationsProvider } from './crystalImplementations'
 import { crystalCompletionItemProvider } from "./crystalCompletion"
 import { CrystalDocumentSymbolProvider } from './crystalSymbols'
@@ -29,8 +29,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.languages.registerCompletionItemProvider(CRYSTAL_MODE, new crystalCompletionItemProvider())
 	)
 
-	let config = vscode.workspace.getConfiguration('crystal-lang')
-	let scry = config['server']
+	let scry = Config['server']
 
 	// Experimental Server using Language Server Protocol
 	if (fs.existsSync(scry)) {
