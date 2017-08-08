@@ -5,6 +5,23 @@
 - Full Support for Language Server Protocol.
 - Complete TODO's comments inside this source code.
 - Solve issues in Github repo.
+- Autogenerate completion data.
+- Rewrite/Improve completion algorithm.
+
+## [0.2.12] - 2017-08-08
+### Change
+- Refactoring hover provider.
+- Settings descriptions.
+- Clean completion data.
+
+## Add
+- Option to configure compiler path.
+- Error messages.
+- New Gif on README showing hover feature.
+- Add --error-trace flag.
+
+# Fix
+- Allow to disable features completely.
 
 ## [0.2.11] - 2017-08-06
 ### Change

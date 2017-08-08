@@ -45,7 +45,7 @@ Other features like _syntax highlighting_, _snippets_, _symbols_ and _basic comp
   "crystal-lang.processesLimit": 3,
   "crystal-lang.implementations": true,
   "crystal-lang.completion": true,
-  "crystal-lang.types": true,
+  "crystal-lang.hover": true,
   "crystal-lang.server": "",
   "crystal-lang.logLevel": "error"
 }
@@ -129,7 +129,7 @@ Suggestion of methods and subtypes while typing is not supported. You need to ty
 
 ![String methods](https://i.imgur.com/ZQZm9eU.png)
 
-Basic code completion is always enabled. (Top Level, Symbols and Snippets)
+Basic code completion is available. (Top Level, Symbols and Snippets)
 
 ![subtypes completion](https://i.imgur.com/qC9UBzC.gif)
 
@@ -147,11 +147,13 @@ However, you can totally disable completions in `settings.json`:
 }
 ```
 
-### 3.7. Types
+### 3.7. Hover
 
-Show type information for variables only. This feature uses `crystal tool context` to get types.
+Show symbols information on hover.
 
-![types on hover](https://i.imgur.com/5COCsQX.gif)
+This feature uses `crystal tool context` to get types.
+
+![hover](https://i.imgur.com/wvZyoMf.gif)
 
 ### 3.8. Server (NEW)
 
