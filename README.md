@@ -212,6 +212,7 @@ Levels avaliables:
 Allow to set a custom absolute path for Crystal compiler executable.
 
 ```json
+{
   "crystal-lang.compiler": "/usr/bin/crystal"
 }
 ```
