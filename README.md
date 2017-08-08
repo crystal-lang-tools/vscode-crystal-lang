@@ -47,7 +47,8 @@ Other features like _syntax highlighting_, _snippets_, _symbols_ and _basic comp
   "crystal-lang.completion": true,
   "crystal-lang.hover": true,
   "crystal-lang.server": "",
-  "crystal-lang.logLevel": "error"
+  "crystal-lang.logLevel": "error",
+  "crystal-lang.compiler": "crystal"
 }
 ```
 
@@ -83,9 +84,11 @@ The default value is 20.
 
 ### 3.3. MainFile
 
+Note: reload VSCode to apply this setting.
+
 `crystal-lang.mainFile` says to the compiler which file should analyze.
 
-It is useful when `"crystal-lang.problems" = "build"` in projects where a main file do `require "./**"`
+It is useful with `"crystal-lang.problems" = "build"` in projects where a main file do `require "./**"`
 
 Also is used by features like **implementations** and show **type on hover** to specify the tool scope.
 
@@ -98,6 +101,8 @@ Also is used by features like **implementations** and show **type on hover** to 
 ```
 
 ### 3.4. ProcessesLimit
+
+Note: reload VSCode to apply this setting.
 
 This extension block the amout of crystal processes executing in parallel to reduce resources usage.
 
@@ -197,6 +202,17 @@ Levels avaliables:
     "error",
     "fatal"
   ]
+}
+```
+
+### 3.10. Compiler
+
+> Note: reload VSCode to apply this setting.
+
+Allow to set a custom absolute path for Crystal compiler executable.
+
+```json
+  "crystal-lang.compiler": "/usr/bin/crystal"
 }
 ```
 
