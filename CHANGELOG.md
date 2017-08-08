@@ -14,13 +14,13 @@
 - Settings descriptions.
 - Clean completion data.
 
-## Add
+### Add
 - Option to configure compiler path.
 - Error messages.
 - New Gif on README showing hover feature.
 - Add --error-trace flag.
 
-# Fix
+### Fix
 - Allow to disable features completely.
 
 ## [0.2.11] - 2017-08-06
