@@ -1,6 +1,7 @@
 import * as vscode from 'vscode'
 import { spawn } from 'child_process'
-import { CrystalProblemsFinder } from "./crystalProblemsFinder"
+
+import { CrystalProblemsFinder } from './crystalProblemsFinder'
 
 export class CrystalFormattingProvider extends CrystalProblemsFinder implements vscode.DocumentFormattingEditProvider {
 

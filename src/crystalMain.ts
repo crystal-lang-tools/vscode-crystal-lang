@@ -2,12 +2,12 @@ import * as vscode from 'vscode'
 import * as fs from 'fs'
 import * as client from 'vscode-languageclient'
 
-import { crystalConfiguration, Config } from './crystalConfiguration'
 import { CrystalImplementationsProvider } from './crystalImplementations'
 import { crystalCompletionItemProvider } from "./crystalCompletion"
 import { CrystalDocumentSymbolProvider } from './crystalSymbols'
 import { CrystalFormattingProvider } from './crystalFormatting'
 import { diagnosticCollection } from './crystalProblemsFinder'
+import { crystalConfiguration } from './crystalUtils'
 import { CrystalDiagnostic } from './crystalDiagnostic'
 import { CrystalHoverProvider } from './crystalHover'
 
@@ -31,7 +31,8 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.languages.registerHoverProvider(CRYSTAL_MODE, new CrystalHoverProvider())
 	)
 
-	let scry = Config['server']
+	const config = vscode.workspace.getConfiguration('crystal-lang')
+	let scry = config['server']
 
 	// Experimental Server using Language Server Protocol
 	if (fs.existsSync(scry)) {

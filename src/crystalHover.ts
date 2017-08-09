@@ -1,7 +1,7 @@
 import * as vscode from 'vscode'
 import * as TDATA from './crystalCompletionData'
 import { CrystalContext } from './crystalContext'
-import { KEYWORDS, isNotLib } from "./crystalConfiguration"
+import { isNotKeyword, isNotLib, getSymbols } from "./crystalUtils"
 
 const TYPES = [
 	TDATA.REFLECTION_METHODS, TDATA.NIL_METHODS, TDATA.BOOL_METHODS, TDATA.INT_METHODS,
@@ -31,7 +31,7 @@ export class CrystalHoverProvider extends CrystalContext implements vscode.Hover
 			let range = document.getWordRangeAtPosition(new vscode.Position(position.line, position.character))
 			if (range) {
 				let word = document.getText(range)
-				if (KEYWORDS.indexOf(word) < 0 && word.toLowerCase() == word && !parseInt(word)) {
+				if (isNotKeyword(word) && word.toLowerCase() == word && !parseInt(word)) {
 					// Checks for variables using context tool
 					let crystalOutput = await this.crystalContext(document, position, 'hover')
 					if (crystalOutput.toString().startsWith('{"status":"')) {
@@ -54,12 +54,23 @@ export class CrystalHoverProvider extends CrystalContext implements vscode.Hover
 						}
 					}
 				}
-				if (KEYWORDS.indexOf(word) < 0 && !parseInt(word) && !stop) {
-					// Checks for documentation on Completion data
+				if (isNotKeyword(word) && !parseInt(word) && !stop) {
+					// Checks Symbols
+					let symbols = await getSymbols(document.uri)
+					for (let symbol of symbols) {
+						if (symbol.name == word) {
+							let container = symbol.containerName ? ` of ${symbol.containerName}` : ''
+							return new vscode.Hover({
+								language: 'plaintext',
+								value: `${vscode.SymbolKind[symbol.kind]} ${symbol.name}${container}`
+							})
+						}
+					}
+					// Checks Completion data
 					let hoverTexts = []
 					for (let type of TYPES) {
 						for (let element of type) {
-							if (element[0] == word || element[0] == `${word}?` || element[0] == `${word}!`) {
+							if (element[0] == word) {
 								hoverTexts.push({
 									language: 'crystal',
 									value: `${element[1]}`
@@ -73,9 +84,9 @@ export class CrystalHoverProvider extends CrystalContext implements vscode.Hover
 							}
 						}
 					}
-					// ----------------------------------------
-					// TODO: Add symbols to hover information
-					// ----------------------------------------
+					// -------------------------------
+					// TODO: Improve hover information
+					// -------------------------------
 					return new vscode.Hover(this.filter(hoverTexts))
 				}
 			}

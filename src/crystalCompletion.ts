@@ -2,43 +2,35 @@ import * as vscode from 'vscode'
 import * as TDATA from './crystalCompletionData'
 
 import { CrystalContext } from './crystalContext'
+import { getSymbols } from "./crystalUtils"
 
 export class crystalCompletionItemProvider extends CrystalContext implements vscode.CompletionItemProvider {
 
 	private completions: vscode.CompletionList
 
 	private getItemKindFromSymbolKind(kind) {
-		let itemKind = 0
 		switch (kind) {
 			case 4:
-				itemKind = vscode.CompletionItemKind.Class
-				break
+				return vscode.CompletionItemKind.Class
 			case 11:
-				itemKind = vscode.CompletionItemKind.Function
-				break
+				return vscode.CompletionItemKind.Function
 			case 6:
-				itemKind = vscode.CompletionItemKind.Property
-				break
+				return vscode.CompletionItemKind.Property
 			case 22:
-				itemKind = vscode.CompletionItemKind.Struct
-				break
+				return vscode.CompletionItemKind.Struct
 			case 1:
-				itemKind = vscode.CompletionItemKind.Module
-				break
+				return vscode.CompletionItemKind.Module
 			case 9:
-				itemKind = vscode.CompletionItemKind.Enum
-				break
+				return vscode.CompletionItemKind.Enum
 			case 13:
-				itemKind = vscode.CompletionItemKind.Constant
-				break
+				return vscode.CompletionItemKind.Constant
 			case 12:
-				itemKind = vscode.CompletionItemKind.Variable
-				break
+				return vscode.CompletionItemKind.Variable
 			case 5:
-				itemKind = vscode.CompletionItemKind.Method
-				break
+				return vscode.CompletionItemKind.Method
+			default:
+				return 0
 		}
-		return itemKind
 	}
 
 	private pushCompletionMethods(completions) {
@@ -57,12 +49,8 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 		let completion = new vscode.CompletionItem(`${name}`, this.getItemKindFromSymbolKind(kind))
 		completion.documentation = documentation
 		completion.detail = detail
-		completion.sortText = ('0000' + this.completions.items.length).slice(-4)  // <-- Taked from vscode-nim
+		completion.sortText = ('0000' + this.completions.items.length).slice(-4)  // <-- from vscode-nim
 		this.completions.items.push(completion)
-	}
-
-	private getSymbols(uri): Thenable<vscode.SymbolInformation[]> {
-		return vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', uri)
 	}
 
 	async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position) {
@@ -79,7 +67,7 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 		let posDot = new vscode.Position(position.line, column + 1)
 		let posColons = new vscode.Position(position.line, column)
 		let wordRange = document.getWordRangeAtPosition(posDot) || document.getWordRangeAtPosition(posColons)
-		let symbols = await this.getSymbols(document.uri)
+		let symbols = await getSymbols(document.uri)
 		let completionFlag = false
 		if (wordRange) {
 			// Check if a call token (.|::) follow the word for a method call

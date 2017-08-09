@@ -82,8 +82,6 @@ The default value is 100.
 
 ### 3.3. MainFile
 
-> Reload VSCode to apply this setting.
-
 `crystal-lang.mainFile` says to the compiler which file should analyze.
 
 It is useful with `"crystal-lang.problems" = "build"` in projects where a main file do `require "./app/*"`
@@ -200,8 +198,6 @@ Levels avaliables:
 ```
 
 ### 3.10. Compiler
-
-> Reload VSCode to apply this setting.
 
 Allow to set a custom absolute path for Crystal compiler executable.
 

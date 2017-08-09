@@ -1,10 +1,8 @@
 import * as vscode from 'vscode'
-import { spawn } from 'child_process'
 import { dirname } from 'path'
 
 import { CrystalProblemsFinder } from './crystalProblemsFinder'
-import { ENV, ROOT, Concurrent, mainFile } from './crystalConfiguration'
-import { statusBarItem } from './crystalStatusBar'
+import { spawnPromise } from './crystalUtils'
 
 export class CrystalImplementationsProvider extends CrystalProblemsFinder implements vscode.DefinitionProvider {
 
@@ -13,45 +11,7 @@ export class CrystalImplementationsProvider extends CrystalProblemsFinder implem
 	 * and do syntax checking too if enabled.
 	 */
 	crystalImplementations(document: vscode.TextDocument, position: vscode.Position) {
-		let self = this
-		return new Promise(function (resolve, reject) {
-			let response = ''
-			const config = vscode.workspace.getConfiguration('crystal-lang')
-			if (Concurrent.counter < Concurrent.limit() && config['implementations']) {
-				let scope = mainFile(document.fileName)
-				Concurrent.counter += 1
-				statusBarItem.text = `${config['compiler']} tool implemetations is working...`
-				statusBarItem.show()
-				let child = spawn(`${config['compiler']}`, [
-					'tool',
-					'implementations',
-					'-c',
-					`${document.fileName}:${position.line + 1}:${position.character + 1}`,
-					`${scope}`,
-					'--no-color',
-					'--error-trace',
-					'-f',
-					'json'
-				], { cwd: ROOT, env: ENV })
-				child.stdout.on('data', (data) => {
-					response += data
-				})
-				child.stdout.on('end', () => {
-					self.searchProblems(response.toString(), document.uri)
-					Concurrent.counter -= 1
-					statusBarItem.hide()
-					return resolve(response)
-				})
-				child.on('error', (err) => {
-					vscode.window.showErrorMessage('Crystal compiler not found. ' + err.message)
-					console.error(err.message)
-				})
-			} else if (config['implementations']) {
-				return resolve('{"status":"blocked"}')
-			} else {
-				return resolve('')
-			}
-		})
+		return spawnPromise(document, position, 'impl', 'implementations', this.searchProblems)
 	}
 
 	async provideDefinition(document: vscode.TextDocument, position: vscode.Position) {

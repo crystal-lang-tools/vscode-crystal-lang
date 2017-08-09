@@ -133,7 +133,7 @@
 				"crystal-lang.mainFile": {
 					"type": "string",
 					"default": "",
-					"description": "Check main file instead of current file.\nBy example: ${workspaceRoot}/src/main.cr\nNote: reload VSCode to apply this setting."
+					"description": "Check main file instead of current file.\nBy example: ${workspaceRoot}/src/main.cr."
 				},
 				"crystal-lang.maxNumberOfProblems": {
 					"type": "number",
@@ -148,7 +148,7 @@
 				"crystal-lang.compiler": {
 					"type": "string",
 					"default": "crystal",
-					"description": "Absolute path for Crystal compiler executable.\nNote: reload VSCode to apply this setting."
+					"description": "Absolute path for Crystal compiler executable."
 				},
 				"crystal-lang.server": {
 					"type": "string",

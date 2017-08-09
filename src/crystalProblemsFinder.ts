@@ -1,7 +1,5 @@
 import * as vscode from 'vscode'
 
-import { isNotLib } from "./crystalConfiguration"
-
 /**
  * Error output format by crystal -f json
  */

@@ -46,17 +46,17 @@ export class CrystalDocumentSymbolProvider implements vscode.DocumentSymbolProvi
 				} else if (matchData = element.match(/^\s*(private\s+)?(macro) ([^\s\(\)\:]+).*$/)) {
 					newSymbol(matchData[3], vscode.SymbolKind.Function, Containers[countEnds - 1], index, matchData.index)
 					countEnds += 1
-				} else if (matchData = element.match(/^\s*(abstract\s+)?(private\s+)?(class) ([A-Z][^\s\(\)\:]*).*$/)) {
+				} else if (matchData = element.match(/^\s*(abstract\s+)?(private\s+)?(class) ([A-Z][^\s\(\)]*).*$/)) {
 					newSymbol(matchData[4], vscode.SymbolKind.Class, Containers[countEnds - 1], index, matchData.index)
 					setContainer(matchData[4])
 				} else if (matchData = element.match(/^\s*(private\s+|protected\s+)?(class_)?(property|getter|setter)(!|\?)? ([^\s\(\)\:]+).*$/)) {
 					newSymbol(matchData[5], vscode.SymbolKind.Property, Containers[countEnds - 1], index, matchData.index)
-				} else if (matchData = element.match(/^\s*(abstract\s+)?(private\s+)?(struct|record) ([A-Z][^\s\(\)\:]*).*$/)) {
+				} else if (matchData = element.match(/^\s*(abstract\s+)?(private\s+)?(struct|record) ([A-Z][^\s\(\)]*).*$/)) {
 					newSymbol(matchData[4], vscode.SymbolKind.Struct, Containers[countEnds - 1], index, matchData.index)
 					if (matchData[1] === undefined && matchData[3] !== 'record') {
 						setContainer(matchData[4])
 					}
-				} else if (matchData = element.match(/^\s*(private\s+)?(module) ([A-Z][^\s\(\)\:]*).*$/)) {
+				} else if (matchData = element.match(/^\s*(private\s+)?(module) ([A-Z][^\s\(\)]*).*$/)) {
 					newSymbol(matchData[3], vscode.SymbolKind.Module, Containers[countEnds - 1], index, matchData.index)
 					setContainer(matchData[3])
 				} else if (matchData = element.match(/^\s*(private\s+)?(lib) ([A-Z][^\s\(\)\:]*).*$/)) {
