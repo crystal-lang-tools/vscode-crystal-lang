@@ -10,6 +10,13 @@
 - Task provider.
 - Debugger, depends on issue [#4457](https://github.com/crystal-lang/crystal/issues/4457).
 
+## [0.2.15] - 2017-08-09
+### Change
+- Update README.
+
+### Fix
+- Allow to disable completion.
+
 ## [0.2.14] - 2017-08-09
 ### Fix
 - Issue [#15](https://github.com/faustinoaq/vscode-crystal-lang/issues/15).
