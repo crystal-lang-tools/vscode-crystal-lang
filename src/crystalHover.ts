@@ -14,6 +14,10 @@ const TYPES = [
 export class CrystalHoverProvider extends CrystalContext implements vscode.HoverProvider {
 
 	async provideHover(document: vscode.TextDocument, position: vscode.Position, token) {
+		const config = vscode.workspace.getConfiguration('crystal-lang')
+		if (!config['hover']) {
+				return
+		}
 		let line = document.getText(new vscode.Range(position.line, 0, position.line, position.character))
 		// Check if line isn't a comment or string
 		let quotes = null
