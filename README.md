@@ -21,19 +21,19 @@ This extension provides support for The [Crystal](https://github.com/crystal-lan
 * Formatting
 * Problems finder
 * Document Symbols
-* Show variable type on Hover
-* Show and Peek Implementations
+* Peek and go to definition
+* Show symbol information on Hover
 * Increment and decrements indentation
 * Method completion for Literals and Symbols
 * Syntax highlighting for Crystal, [ECR](https://crystal-lang.org/api/latest/ECR.html) and [Slang](https://github.com/jeromegn/slang)
 
 ## 2. Requirements
 
-![install](http://i.imgur.com/5iWVs6Z.gif)
+![install](https://i.imgur.com/5iWVs6Z.gif)
 
-You need [Crystal](https://github.com/crystal-lang) installed in your system to get compiler features like goTo implementation and diagnostics.
+You need [Crystal](https://github.com/crystal-lang) installed in your system to get compiler features like formatting, variables types on hover, implementations and diagnostics.
 
-Other features like _syntax highlighting_, _snippets_, _symbols_ and _basic completion_ work without Crystal compiler.
+Other features like syntax highlighting, symbol info on hover, symbol list, basic completion for top level methods and snippets work without Crystal compiler.
 
 ## 3. Configuration
 
@@ -42,7 +42,7 @@ Other features like _syntax highlighting_, _snippets_, _symbols_ and _basic comp
 ```json
 {
   "crystal-lang.problems": "syntax",
-  "crystal-lang.maxNumberOfProblems": 10,
+  "crystal-lang.maxNumberOfProblems": 100,
   "crystal-lang.mainFile": "",
   "crystal-lang.processesLimit": 3,
   "crystal-lang.implementations": true,
@@ -54,7 +54,7 @@ Other features like _syntax highlighting_, _snippets_, _symbols_ and _basic comp
 }
 ```
 
-> On Windows the document must use `LF` instead of `CRLF` to allow symbols completion.
+> On Windows the document must use `LF` instead of `CRLF` to detect symbols.
 
 ### 3.1. Problems
 
@@ -68,29 +68,25 @@ Other features like _syntax highlighting_, _snippets_, _symbols_ and _basic comp
 
 ```json
 {
-  "crystal-lang.problems": "syntax | build | none",
+  "crystal-lang.problems": "syntax | build | none"
 }
 ```
 
-Problems are checked when a crystal document is opened or saved.
-
-Syntax checking is activated on type allowing live diagnostics.
-
-> Features like **implementations** and **show type on hover** can find errors.
+Problems are checked on open and on save.
 
 ### 3.2. PoblemsLimit
 
 `crystal-lang.maxNumberOfProblems` allow to limit the amount of problems that appears in problems view.
 
-The default value is 20.
+The default value is 100.
 
 ### 3.3. MainFile
 
-Note: reload VSCode to apply this setting.
+> Reload VSCode to apply this setting.
 
 `crystal-lang.mainFile` says to the compiler which file should analyze.
 
-It is useful with `"crystal-lang.problems" = "build"` in projects where a main file do `require "./**"`
+It is useful with `"crystal-lang.problems" = "build"` in projects where a main file do `require "./app/*"`
 
 Also is used by features like **implementations** and show **type on hover** to specify the tool scope.
 
@@ -98,13 +94,13 @@ Also is used by features like **implementations** and show **type on hover** to 
 
 ```json
 {
-  "crystal-lang.mainFile": "${workspaceRoot}/src/main.cr",
+  "crystal-lang.mainFile": "${workspaceRoot}/src/main.cr"
 }
 ```
 
 ### 3.4. ProcessesLimit
 
-Note: reload VSCode to apply this setting.
+> Reload VSCode to apply this setting.
 
 This extension block the amout of crystal processes executing in parallel to reduce resources usage.
 
@@ -112,7 +108,7 @@ Commonly crystal takes milliseconds to do something like formatting, but in some
 
 ```json
 {
-  "crystal-lang.processesLimit": 3,
+  "crystal-lang.processesLimit": 3
 }
 ```
 
@@ -136,21 +132,17 @@ Suggestion of methods and subtypes while typing is not supported. You need to ty
 
 ![String methods](https://i.imgur.com/ZQZm9eU.png)
 
-Basic code completion is available. (Top Level, Symbols and Snippets)
+Basic code completion for Top Level, Symbols and Snippets works even without crystal compiler.
 
 ![subtypes completion](https://i.imgur.com/qC9UBzC.gif)
 
 ![File methods](https://i.imgur.com/THctqVu.png)
 
-However, you can totally disable completions in `settings.json`:
+You can totally disable completions in `settings.json`:
 
 ```json
 {
-  "editor.quickSuggestions": {
-    "other": true,
-    "comments": false,
-    "strings": false
-  }
+  "crystal-lang.completion": false
 }
 ```
 
@@ -181,7 +173,7 @@ The following features are implemented:
 
 ```json
 {
-  "crystal-lang.server": "/absolute/path/bin/scry",
+  "crystal-lang.server": "/absolute/path/bin/scry"
 }
 ```
 
@@ -189,7 +181,7 @@ The following features are implemented:
 
 Controls the amount of data logged by Scry server.
 
-> You can see logs in `.scry.out` located in your home directory or your workspace.
+> You can see logs in `scry.out` file.
 
 Levels avaliables:
 
@@ -209,7 +201,7 @@ Levels avaliables:
 
 ### 3.10. Compiler
 
-> Note: reload VSCode to apply this setting.
+> Reload VSCode to apply this setting.
 
 Allow to set a custom absolute path for Crystal compiler executable.
 
@@ -221,13 +213,13 @@ Allow to set a custom absolute path for Crystal compiler executable.
 
 ## 4. Messages
 
-Sometimes in some projects, `crystal tool` turns heavy, in this case you can check error and info messages.
+Sometimes in some projects, this extension can fail, in that case you can check error and info messages.
 
 Errors and info messages are shown in developer tools:
 
 - `ERROR: spawn`: when crystal program not exist in path or `mainFile` is wrong.
 - `ERROR: JSON parse`: when crystal output is different of JSON.
-- `INFO: crystal is taking a moment to check`: processesLimit has been reached.
+- `INFO: crystal is taking a moment to check`: processes limit has been reached.
 
 A warning message is shown when crystal compiler isn't found.
 
@@ -241,7 +233,7 @@ To hide error messages use:
 
 ```json
 {
-  "crystal-lang.problems": "none",
+  "crystal-lang.problems": "none"
 }
 ```
 
@@ -261,7 +253,7 @@ The following images show crystal status bar messages:
 
 - `macros` can produce some unwanted behaviors.
 
-- ECR syntax doesn't have emmet support. You can use vscode `text.html` instead or enable emmet for `text.ecr` in your `settings.json`:
+- ECR syntax doesn't have emmet support. You can use vscode `text.html` instead or enable emmet for `.ecr` in your `settings.json`:
 
 ```json
 {
@@ -271,7 +263,7 @@ The following images show crystal status bar messages:
 }
 ```
 
-- In some big projects like [crystal compiler](https://github.com/crystal-lang) itself, the setting `"crystal-lang.problems" = "build"` could be very unresponsive, use `"syntax"` instead.
+- In some big projects like [crystal compiler](https://github.com/crystal-lang) itself, the setting `"crystal-lang.problems" = "build"` could be very unresponsive, use `"crystal-lang.problems" = "syntax"` instead.
 
 - Scry server is experimental, some bug can appear.
 
@@ -322,7 +314,7 @@ Recent version of VSCode (1.13.1) allow to extensions creators show symbols in t
 
 ## 7. Roadmap
 
-- Add macro support, see issue [#4](https://github.com/faustinoaq/vscode-crystal-lang/issues/4).
+- Support macro diagnostics and debugging, see issue [#4](https://github.com/faustinoaq/vscode-crystal-lang/issues/4).
 - Full Support for Language Server Protocol, see [Scry](https://github.com/kofno/scry)
 
 ## 8. Release Notes
