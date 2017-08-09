@@ -55,7 +55,7 @@ export class CrystalDiagnostic extends CrystalProblemsFinder {
 				vscode.window.showErrorMessage('Crystal compiler not found. ' + err.message)
 				console.error(err.message)
 			})
-		} else if (Concurrent.counter < Concurrent.limit()) {
+		} else if (Concurrent.counter >= Concurrent.limit()) {
 			console.info('INFO: crystal is taking a moment to build')
 		}
 	}
