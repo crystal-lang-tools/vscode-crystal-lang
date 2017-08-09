@@ -28,12 +28,6 @@ export class CrystalDiagnostic extends CrystalProblemsFinder {
 				vscode.window.showErrorMessage('Crystal compiler not found. ' + err.message)
 				console.error(err.message)
 			})
-			child.on('exit', (exitCode) => {
-				if (exitCode != 0) {
-					// console.error('ERROR: crystal tool format --check exit with code ' + exitCode)
-					// console.info('INFO: not formatted or syntax error or crystal bug')
-				}
-			})
 		} else if (Concurrent.counter < Concurrent.limit() && config['problems'] == 'build' && isNotLib(document.fileName)) {
 			let scope = mainFile(document.fileName)
 			Concurrent.counter += 1
@@ -61,14 +55,7 @@ export class CrystalDiagnostic extends CrystalProblemsFinder {
 				vscode.window.showErrorMessage('Crystal compiler not found. ' + err.message)
 				console.error(err.message)
 			})
-			child.on('exit', (exitCode) => {
-				if (exitCode != 0) {
-					// console.error('ERROR: crystal build exit with code ' + exitCode)
-					// console.info('INFO: file not found or build error or crystal bug')
-				}
-			})
 		} else if (config['problems'] != 'none') {
-			// console.error('ERROR: processesLimit has been reached')
 			console.info('INFO: crystal is taking a moment to build')
 		}
 	}

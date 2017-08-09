@@ -2,7 +2,7 @@ import * as vscode from 'vscode'
 import * as fs from 'fs'
 import * as client from 'vscode-languageclient'
 
-import { crystalConfiguration, crystalCheck, Config } from './crystalConfiguration'
+import { crystalConfiguration, Config } from './crystalConfiguration'
 import { CrystalImplementationsProvider } from './crystalImplementations'
 import { crystalCompletionItemProvider } from "./crystalCompletion"
 import { CrystalDocumentSymbolProvider } from './crystalSymbols'
@@ -23,10 +23,12 @@ function crystalOnDidEvent(document) {
 
 export async function activate(context: vscode.ExtensionContext) {
 
+	// Not implemented on server yet.
 	context.subscriptions.push(
 		vscode.languages.setLanguageConfiguration('crystal', crystalConfiguration),
 		vscode.languages.registerDocumentSymbolProvider('crystal', new CrystalDocumentSymbolProvider()),
-		vscode.languages.registerCompletionItemProvider(CRYSTAL_MODE, new crystalCompletionItemProvider())
+		vscode.languages.registerCompletionItemProvider(CRYSTAL_MODE, new crystalCompletionItemProvider()),
+		vscode.languages.registerHoverProvider(CRYSTAL_MODE, new CrystalHoverProvider())
 	)
 
 	let scry = Config['server']
@@ -34,7 +36,6 @@ export async function activate(context: vscode.ExtensionContext) {
 	// Experimental Server using Language Server Protocol
 	if (fs.existsSync(scry)) {
 		let serverOptions = { command: scry, args: [] }
-
 		let clientOptions: client.LanguageClientOptions = {
 			documentSelector: ['crystal'],
 			synchronize: {
@@ -44,9 +45,9 @@ export async function activate(context: vscode.ExtensionContext) {
 		}
 
 		let disposable = new client.LanguageClient('Crystal Language', serverOptions, clientOptions).start()
-
 		context.subscriptions.push(disposable)
-	} else if (crystalCheck()) {
+
+	} else {
 		// If server is disabled use client implementation instead.
 		context.subscriptions.push(
 			diagnosticCollection,
@@ -54,13 +55,6 @@ export async function activate(context: vscode.ExtensionContext) {
 			vscode.languages.registerDefinitionProvider(CRYSTAL_MODE, new CrystalImplementationsProvider()),
 			vscode.workspace.onDidOpenTextDocument(crystalOnDidEvent),
 			vscode.workspace.onDidSaveTextDocument(crystalOnDidEvent)
-		)
-	}
-
-	if (crystalCheck()) {
-		// Not implemented on server yet.
-		context.subscriptions.push(
-			vscode.languages.registerHoverProvider(CRYSTAL_MODE, new CrystalHoverProvider()),
 		)
 	}
 }

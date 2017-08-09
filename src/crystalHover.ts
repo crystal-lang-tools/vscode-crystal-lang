@@ -40,17 +40,10 @@ export class CrystalHoverProvider extends CrystalContext implements vscode.Hover
 										return new vscode.Hover(`${word} : ${type}`)
 									}
 								}
-							} else if (crystalMessageObject.status == 'blocked') {
-								// console.info('INFO: crystal is taking a moment to check type on hover')
-							} else if (crystalMessageObject.status == 'disabled') {
-								stop = true
-							} else if (crystalMessageObject.status == 'failed') {
-								// console.info('INFO: not context information found')
-							} else {
+							} else if (crystalMessageObject.status != 'failed') {
 								stop = true
 							}
 						} catch (err) {
-							// console.error(crystalOutput.toString())
 							stop = true
 							console.error('ERROR: JSON.parse failed to parse crystal context output when hover')
 							throw err
