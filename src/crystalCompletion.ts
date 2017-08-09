@@ -70,6 +70,10 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 		// TODO: improve Type completion algorithm (again)
 		// -----------------------------------------------
 		this.completions = new vscode.CompletionList
+		const config = vscode.workspace.getConfiguration('crystal-lang')
+		if (!config['completion']) {
+			return this.completions
+		}
 		// Remove dot or colons and search for a word
 		let column = (position.character > 2) ? (position.character - 2) : 0
 		let posDot = new vscode.Position(position.line, column + 1)
@@ -169,8 +173,6 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 										break
 									}
 								}
-							} else if (crystalMessageObject.status == 'disabled') {
-								return new vscode.CompletionList
 							}
 						} catch (err) {
 							console.error('ERROR: JSON.parse failed to parse crystal context output when completion')
