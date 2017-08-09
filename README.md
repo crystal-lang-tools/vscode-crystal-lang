@@ -225,9 +225,27 @@ Errors and info messages are shown in developer tools:
 
 - `ERROR: spawn`: when crystal program not exist in path or `mainFile` is wrong.
 - `ERROR: JSON parse`: when crystal output is different of JSON.
-- `INFO: processesLimit has been reached`: your project is taking too much time to analyze.
+- `INFO: crystal is taking a moment to check`: processesLimit has been reached.
+
+A warning message is shown when crystal compiler isn't found.
+
+![warning](https://i.imgur.com/X81qgp9.png)
+
+A error message is shown when try to execute a non existent crystal compiler.
+
+![error](https://i.imgur.com/RHWqlOz.png)
+
+To hide error messages use:
+
+```json
+{
+  "crystal-lang.problems": "none",
+}
+```
 
 The following images show crystal status bar messages:
+
+> Configured compiler is shown in status bar messages.
 
 ![crystal build](https://i.imgur.com/9nRIO5o.png)
 
