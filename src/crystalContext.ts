@@ -48,7 +48,7 @@ export class CrystalContext extends CrystalProblemsFinder {
 				console.info('INFO: crystal is taking a moment to check context')
 				return resolve('{"status":"blocked"}')
 			} else {
-				return resolve('{"status":"disabled"}')
+				return resolve('')
 			}
 		})
 	}

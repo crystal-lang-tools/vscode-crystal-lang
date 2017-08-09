@@ -49,7 +49,7 @@ export class CrystalImplementationsProvider extends CrystalProblemsFinder implem
 			} else if (config['implementations']) {
 				return resolve('{"status":"blocked"}')
 			} else {
-				return resolve('{"status":"disabled"}')
+				return resolve('')
 			}
 		})
 	}
