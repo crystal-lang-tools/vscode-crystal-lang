@@ -8,7 +8,7 @@
 - Autogenerate completion data.
 - Rewrite/Improve completion algorithm.
 - Task provider.
-- Adds debugger depends on issue [#4457](https://github.com/crystal-lang/crystal/issues/4457).
+- Debugger, depends on issue [#4457](https://github.com/crystal-lang/crystal/issues/4457).
 
 ## [0.2.14] - 2017-08-09
 ### Fix
