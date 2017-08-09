@@ -46,14 +46,7 @@ export class CrystalImplementationsProvider extends CrystalProblemsFinder implem
 					vscode.window.showErrorMessage('Crystal compiler not found. ' + err.message)
 					console.error(err.message)
 				})
-				child.on('exit', (exitCode) => {
-					if (exitCode != 0) {
-						// console.error('ERROR: crystal tool implementations exit with code ' + exitCode)
-						// console.info('INFO: code error or crystal bug')
-					}
-				})
 			} else if (config['implementations']) {
-				// console.error('ERROR: processesLimit has been reached')
 				return resolve('{"status":"blocked"}')
 			} else {
 				return resolve('{"status":"disabled"}')
@@ -73,13 +66,10 @@ export class CrystalImplementationsProvider extends CrystalProblemsFinder implem
 						let location = new vscode.Location(vscode.Uri.file(element.filename), position)
 						locations.push(location)
 					}
-				} else if (crystalMessageObject.status == 'disabled') {
-					// console.info('INFO: crystal implementations are disabled')
 				} else if (crystalMessageObject.status == 'blocked') {
 					console.info('INFO: crystal is taking a moment to check implementation')
 				}
 			} catch (err) {
-				// console.error(crystalOutput.toString())
 				console.error('ERROR: JSON.parse failed to parse crystal implementations output')
 				throw err
 			}

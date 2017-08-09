@@ -44,14 +44,7 @@ export class CrystalContext extends CrystalProblemsFinder {
 					vscode.window.showErrorMessage('Crystal compiler not found. ' + err.message)
 					console.error(err.message)
 				})
-				child.on('exit', (exitCode) => {
-					if (exitCode != 0) {
-						// console.error('ERROR: crystal tool context exit with code ' + exitCode)
-						// console.info('INFO: code error or crystal bug')
-					}
-				})
 			} else if (config[mode]) {
-				// console.error('ERROR: processesLimit has been reached')
 				return resolve('{"status":"blocked"}')
 			} else {
 				return resolve('{"status":"disabled"}')

@@ -11,14 +11,29 @@ export const KEYWORDS = [
 	'private', 'protected', 'yield'
 ]
 
+export const Config = vscode.workspace.getConfiguration('crystal-lang')
+
 const CRENV = Object.create(process.env)
 export const ROOT = vscode.workspace.rootPath
 
-// Add current workspace to crystal path
-CRENV.CRYSTAL_PATH = `${ROOT}/lib:/usr/lib/crystal`
-export const ENV = CRENV
+// Check if crystal command exists
+const STDLIB = () => {
+	try {
+		let out = execSync(`${Config['compiler']} env`)
+		return out
+			.toString().split('\n')[1]
+			.split('=')[1]
+			.slice(1, -1)
+	} catch (ex) {
+		vscode.window.showWarningMessage('Crystal compiler not found. Some features can throw errors.')
+		console.error(ex)
+		return "lib"
+	}
+}
 
-export const Config = vscode.workspace.getConfiguration('crystal-lang')
+// Add current workspace to crystal path
+CRENV.CRYSTAL_PATH = `${ROOT}/lib:${STDLIB()}`
+export const ENV = CRENV
 
 // Get main file in a project
 export function mainFile(document) {
@@ -34,18 +49,6 @@ export class Concurrent {
 	static counter = 0
 	static limit() {
 		return Config['processesLimit']
-	}
-}
-
-// Check if crystal command exists
-export function crystalCheck() {
-	try {
-		execSync(`${Config['compiler']}`)
-		return true
-	} catch (ex) {
-		vscode.window.showErrorMessage('Crystal compiler not found. ' + ex.message)
-		console.error(ex)
-		return false
 	}
 }
 

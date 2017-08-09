@@ -46,7 +46,6 @@ export class CrystalProblemsFinder {
 					diagnostics.push([file, [diagnostic]])
 				}
 			} catch (err) {
-				// console.error(response)
 				console.error('ERROR: JSON.parse failed to parse crystal output')
 				throw err
 			}
