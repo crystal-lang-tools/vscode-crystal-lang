@@ -10,6 +10,13 @@
 - Task provider.
 - Debugger, depends on issue [#4457](https://github.com/crystal-lang/crystal/issues/4457).
 
+## [0.2.17] - 2017-08-10
+### Change
+- Adds more info on hover.
+- Clean code.
+- Update README.
+- Rename crystalConfiguration.ts to crystalUtils.ts
+
 ## [0.2.16] - 2017-08-09
 ### Change
 - Update README.
