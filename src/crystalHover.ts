@@ -1,6 +1,6 @@
-import * as vscode from 'vscode'
-import * as TDATA from './crystalCompletionData'
-import { CrystalContext } from './crystalContext'
+import * as vscode from "vscode"
+import * as TDATA from "./crystalCompletionData"
+import { CrystalContext } from "./crystalContext"
 import { isNotKeyword, isNotLib, getSymbols } from "./crystalUtils"
 
 const TYPES = [
@@ -14,12 +14,12 @@ const TYPES = [
 export class CrystalHoverProvider extends CrystalContext implements vscode.HoverProvider {
 
 	async provideHover(document: vscode.TextDocument, position: vscode.Position, token) {
-		const config = vscode.workspace.getConfiguration('crystal-lang')
-		if (!config['hover']) {
+		const config = vscode.workspace.getConfiguration("crystal-lang")
+		if (!config["hover"]) {
 				return
 		}
 		let line = document.getText(new vscode.Range(position.line, 0, position.line, position.character))
-		// Check if line isn't a comment or string
+		// Check if line isn"t a comment or string
 		let quotes = null
 		let comment = null
 		if (line) {
@@ -33,23 +33,23 @@ export class CrystalHoverProvider extends CrystalContext implements vscode.Hover
 				let word = document.getText(range)
 				if (isNotKeyword(word) && word.toLowerCase() == word && !parseInt(word)) {
 					// Checks for variables using context tool
-					let crystalOutput = await this.crystalContext(document, position, 'hover')
-					if (crystalOutput.toString().startsWith('{"status":"')) {
+					let crystalOutput = await this.crystalContext(document, position, "hover")
+					if (crystalOutput.toString().startsWith(`{"status":"`)) {
 						try {
 							let crystalMessageObject = JSON.parse(crystalOutput.toString())
-							if (crystalMessageObject.status == 'ok') {
+							if (crystalMessageObject.status == "ok") {
 								for (let element of crystalMessageObject.contexts) {
 									let type = element[word]
 									if (type) {
 										return new vscode.Hover(`${word} : ${type}`)
 									}
 								}
-							} else if (crystalMessageObject.status != 'failed') {
+							} else if (crystalMessageObject.status != "failed") {
 								stop = true
 							}
 						} catch (err) {
 							stop = true
-							console.error('ERROR: JSON.parse failed to parse crystal context output when hover')
+							console.error("ERROR: JSON.parse failed to parse crystal context output when hover")
 							throw err
 						}
 					}
@@ -59,9 +59,9 @@ export class CrystalHoverProvider extends CrystalContext implements vscode.Hover
 					let symbols = await getSymbols(document.uri)
 					for (let symbol of symbols) {
 						if (symbol.name == word) {
-							let container = symbol.containerName ? ` of ${symbol.containerName}` : ''
+							let container = symbol.containerName ? ` of ${symbol.containerName}` : ""
 							return new vscode.Hover({
-								language: 'plaintext',
+								language: "plaintext",
 								value: `${vscode.SymbolKind[symbol.kind]} ${symbol.name}${container}`
 							})
 						}
@@ -72,12 +72,12 @@ export class CrystalHoverProvider extends CrystalContext implements vscode.Hover
 						for (let element of type) {
 							if (element[0] == word) {
 								hoverTexts.push({
-									language: 'crystal',
+									language: "crystal",
 									value: `${element[1]}`
 								})
 								if (element[2] !== "") {
 									hoverTexts.push({
-										language: 'plaintext',
+										language: "plaintext",
 										value: `${element[2]}`
 									})
 								}

@@ -1,4 +1,4 @@
-import * as vscode from 'vscode'
+import * as vscode from "vscode"
 
 export class CrystalDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 
@@ -7,7 +7,7 @@ export class CrystalDocumentSymbolProvider implements vscode.DocumentSymbolProvi
 	 */
 	async provideDocumentSymbols(document: vscode.TextDocument) {
 		let symbols: vscode.SymbolInformation[] = []
-		let matrixText = document.getText().split('\n')
+		let matrixText = document.getText().split("\n")
 		function newSymbol(name, kind, container, line, matchData) {
 			// -------------------
 			// TODO: count columns
@@ -25,7 +25,7 @@ export class CrystalDocumentSymbolProvider implements vscode.DocumentSymbolProvi
 			Containers.push(matchData)
 			countEnds += 1
 		}
-		let varKeywords = ['begin', 'if', 'case', 'unless']
+		let varKeywords = ["begin", "if", "case", "unless"]
 		function incrementEndsCountIfKeywordIn(element) {
 			for (let keyword of varKeywords) {
 				if (element.endsWith(keyword)) {
@@ -37,7 +37,7 @@ export class CrystalDocumentSymbolProvider implements vscode.DocumentSymbolProvi
 		for (let [index, element] of matrixText.entries()) {
 			let matchData: RegExpMatchArray
 			let comment = element.match(/^\s*#.*$/)
-			if (comment == null && element != '') {
+			if (comment == null && element != "") {
 				if (matchData = element.match(/^\s*(abstract\s+)?(private\s+|protected\s+)?(def|fun) ([^\s\(\)\:]+).*$/)) {
 					newSymbol(matchData[4], vscode.SymbolKind.Function, Containers[countEnds - 1], index, matchData)
 					if (matchData[1] === undefined) {
@@ -53,7 +53,7 @@ export class CrystalDocumentSymbolProvider implements vscode.DocumentSymbolProvi
 					newSymbol(matchData[5], vscode.SymbolKind.Property, Containers[countEnds - 1], index, matchData.index)
 				} else if (matchData = element.match(/^\s*(abstract\s+)?(private\s+)?(struct|record) ([A-Z][^\s\(\)]*).*$/)) {
 					newSymbol(matchData[4], vscode.SymbolKind.Struct, Containers[countEnds - 1], index, matchData.index)
-					if (matchData[1] === undefined && matchData[3] !== 'record') {
+					if (matchData[1] === undefined && matchData[3] !== "record") {
 						setContainer(matchData[4])
 					}
 				} else if (matchData = element.match(/^\s*(private\s+)?(module) ([A-Z][^\s\(\)]*).*$/)) {

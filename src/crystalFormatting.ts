@@ -1,7 +1,7 @@
-import * as vscode from 'vscode'
-import { spawn } from 'child_process'
+import * as vscode from "vscode"
+import { spawn } from "child_process"
 
-import { CrystalProblemsFinder } from './crystalProblemsFinder'
+import { CrystalProblemsFinder } from "./crystalProblemsFinder"
 
 export class CrystalFormattingProvider extends CrystalProblemsFinder implements vscode.DocumentFormattingEditProvider {
 
@@ -10,24 +10,24 @@ export class CrystalFormattingProvider extends CrystalProblemsFinder implements 
 	 */
 	execFormat(document: vscode.TextDocument) {
 		return new Promise(function (resolve, reject) {
-			let response = ''
-			const config = vscode.workspace.getConfiguration('crystal-lang')
-			let child = spawn(`${config['compiler']}`, ['tool', 'format', '--no-color', '-f', 'json', '-'])
+			let response = ""
+			const config = vscode.workspace.getConfiguration("crystal-lang")
+			let child = spawn(`${config["compiler"]}`, ["tool", "format", "--no-color", "-f", "json", "-"])
 			child.stdin.write(document.getText())
 			child.stdin.end()
-			child.stdout.on('data', (data) => {
+			child.stdout.on("data", (data) => {
 				response += data
 			})
-			child.stdout.on('end', () => {
+			child.stdout.on("end", () => {
 				return resolve(response)
 			})
-			child.on('error', (err) => {
-				vscode.window.showErrorMessage('Crystal compiler not found. ' + err.message)
+			child.on("error", (err) => {
+				vscode.window.showErrorMessage("Crystal compiler not found. " + err.message)
 				console.error(err.message)
 			})
-			child.on('exit', (exitCode) => {
+			child.on("exit", (exitCode) => {
 				if (exitCode != 0) {
-					return resolve('')
+					return resolve("")
 				}
 			})
 		})

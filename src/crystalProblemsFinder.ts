@@ -1,4 +1,4 @@
-import * as vscode from 'vscode'
+import * as vscode from "vscode"
 
 /**
  * Error output format by crystal -f json
@@ -11,7 +11,7 @@ interface CrystalError {
 	message: string
 }
 
-export const diagnosticCollection = vscode.languages.createDiagnosticCollection('crystal')
+export const diagnosticCollection = vscode.languages.createDiagnosticCollection("crystal")
 
 export class CrystalProblemsFinder {
 
@@ -20,11 +20,11 @@ export class CrystalProblemsFinder {
 	 */
 	searchProblems(response: string, uri: vscode.Uri) {
 		let diagnostics = []
-		const config = vscode.workspace.getConfiguration('crystal-lang')
-		if (response.startsWith('[{"file":"')) {
+		const config = vscode.workspace.getConfiguration("crystal-lang")
+		if (response.startsWith(`[{"file":"`)) {
 			try {
 				let results: CrystalError[] = JSON.parse(response)
-				let maxNumberOfProblems = config['maxNumberOfProblems']
+				let maxNumberOfProblems = config["maxNumberOfProblems"]
 				for (let [index, problem] of results.entries()) {
 					if (index >= maxNumberOfProblems) {
 						break
@@ -33,8 +33,8 @@ export class CrystalProblemsFinder {
 					let diagnostic = new vscode.Diagnostic(range, problem.message, vscode.DiagnosticSeverity.Error)
 					let file: vscode.Uri
 					if (problem.file.length > 0) {
-						if (!problem.file.endsWith('.cr')) {
-							file = vscode.Uri.file(vscode.workspace.rootPath + '/' + problem.file)
+						if (!problem.file.endsWith(".cr")) {
+							file = vscode.Uri.file(vscode.workspace.rootPath + "/" + problem.file)
 						} else {
 							file = vscode.Uri.file(problem.file)
 						}
@@ -44,13 +44,13 @@ export class CrystalProblemsFinder {
 					diagnostics.push([file, [diagnostic]])
 				}
 			} catch (err) {
-				console.error('ERROR: JSON.parse failed to parse crystal output')
+				console.error("ERROR: JSON.parse failed to parse crystal output")
 				throw err
 			}
 		} else {
 			diagnosticCollection.clear()
 		}
-		if (config['problems'] !== 'none') {
+		if (config["problems"] !== "none") {
 			diagnosticCollection.set(diagnostics)
 		}
 		return diagnostics
