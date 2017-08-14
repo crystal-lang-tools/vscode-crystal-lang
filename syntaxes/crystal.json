@@ -3,8 +3,8 @@
 		"cr"
 	],
 	"firstLineMatch": "^#!\/.*\\bcrystal",
-	"foldingStartMarker": "(?x)^(\\s*+(module|class|def(?!.*\\bend\\s*$)|unless|if|case|begin|for|while|until|^=begin|(  \"(\\\\.|[^\"])*+\"| '(\\\\.|[^'])*+'|   [^#\"'])*(\\s   (do|begin|case)| (?<!\\$)[-+=&|*\/~%^<>~] \\s*+ (if|unless)))\\b(?! [^;]*+ ; .*? \\bend\\b )|(  \"(\\\\.|[^\"])*+\"| '(\\\\.|[^'])*+'|   [^#\"'])*( \\{ (?!  [^}]*+ \\} )| \\[ (?! [^\\]]*+ \\] ))).*$|   [#] .*? \\(fold\\) \\s*+ $",
-	"foldingStopMarker": "(?x)(   (^|;) \\s*+ end   \\s*+ ([#].*)? $|   (^|;) \\s*+ end \\. .* $|   ^     \\s*+ [}\\]] ,? \\s*+ ([#].*)? $|   [#] .*? \\(end\\) \\s*+ $|   ^=end)",
+	"foldingStartMarker": "(?x)^(\\s*+(module|class|def(?!.*\\bend\\s*$)|unless|if|case|begin|for|while|until|^=begin|(\"(\\\\.|[^\"])*+\"|'(\\\\.|[^'])*+'|[^#\"'])*(\\s(do|begin|case)|(?<!\\$)[-+=&|*\/~%^<>~]\\s*+(if|unless)))\\b(?![^;]*+;.*?\\bend\\b)|(\"(\\\\.|[^\"])*+\"|'(\\\\.|[^'])*+'|[^#\"'])*(\\{(?![^}]*+\\})|\\[(?![^\\]]*+\\]))).*$|[#].*?\\(fold\\)\\s*+$",
+	"foldingStopMarker": "(?x)((^|;)\\s*+end\\s*+([#].*)?$|(^|;)\\s*+end\\..*$|^\\s*+[}\\]] ,?\\s*+([#].*)?$|[#].*?\\(end\\)\\s*+$|^=end)",
 	"keyEquivalent": "^~R",
 	"name": "Crystal",
 	"patterns": [
@@ -232,7 +232,7 @@
 			"name": "variable.other.constant.crystal"
 		},
 		{
-			"begin": "(?x) (?=def\\b)(?<=^|\\s)(def|fun)\\s+( (?>[a-zA-Z_\\x{80}-\\x{10FFFF}][\\x{80}-\\x{10FFFF}\\w]*(?>\\.|::))?(?>[a-zA-Z_\\x{80}-\\x{10FFFF}][\\x{80}-\\x{10FFFF}\\w]*(?>[?!]|=(?!>))?|===?|>[>=]?|<=>|<[<=]?|[%&`\/\\|]|\\*\\*?|=?~|[-+]@?|\\[\\]=?) )\\s*(\\()",
+			"begin": "(?x)(?=def\\b)(?<=^|\\s)(def|fun)\\s+((?>[a-zA-Z_\\x{80}-\\x{10FFFF}][\\x{80}-\\x{10FFFF}\\w]*(?>\\.|::))?(?>[a-zA-Z_\\x{80}-\\x{10FFFF}][\\x{80}-\\x{10FFFF}\\w]*(?>[?!]|=(?!>))?|===?|>[>=]?|<=>|<[<=]?|[%&`\/\\|]|\\*\\*?|=?~|[-+]@?|\\[\\]=?) )\\s*(\\()",
 			"beginCaptures": {
 				"1": {
 					"name": "keyword.control.def.crystal"
@@ -246,7 +246,7 @@
 			},
 			"comment": "Parentesis on Crystal are mandatory. The method pattern comes from the symbol pattern, see there for a explaination",
 			"contentName": "variable.parameter.function.crystal",
-			"end": "\\)\\s*$|\\)\\s*:",
+			"end": "\\)\\s*$|\\)\\s*:|\\)\\s*;",
 			"endCaptures": [
 				{
 					"name": "punctuation.definition.parameters.crystal"
