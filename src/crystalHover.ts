@@ -3,23 +3,26 @@ import * as TDATA from "./crystalCompletionData"
 import { CrystalContext } from "./crystalContext"
 import { isNotKeyword, isNotLib, getSymbols } from "./crystalUtils"
 
+// Basic Crystal information about types and methods
 const TYPES = [
 	TDATA.REFLECTION_METHODS, TDATA.NIL_METHODS, TDATA.BOOL_METHODS, TDATA.INT_METHODS,
 	TDATA.FLOAT_METHODS, TDATA.CHAR_METHODS, TDATA.STRING_METHODS, TDATA.SYMBOLS_METHODS, TDATA.ARRAY_METHODS,
 	TDATA.HASH_METHODS, TDATA.RANGE_METHODS, TDATA.REGEX_METHODS, TDATA.TUPLE_METHODS, TDATA.NAMEDTUPLE_METHODS,
-	TDATA.PROC_METHODS, TDATA.FILE_METHODS, TDATA.TOP_LEVEL_METHODS, TDATA.STRUCTS, TDATA.CLASSES,
-	TDATA.MODULES, TDATA.ALIAS, TDATA.ENUMS
+	TDATA.PROC_METHODS, TDATA.FILE_METHODS, TDATA.DIR_METHODS, TDATA.CHANNEL_METHODS,
+	TDATA.TOP_LEVEL_METHODS, TDATA.STRUCTS, TDATA.CLASSES, TDATA.MODULES, TDATA.ALIAS, TDATA.ENUMS
 ]
 
+// Get information of hovered method or class
 export class CrystalHoverProvider extends CrystalContext implements vscode.HoverProvider {
 
+	// Return tooltip information to VSCode
 	async provideHover(document: vscode.TextDocument, position: vscode.Position, token) {
 		const config = vscode.workspace.getConfiguration("crystal-lang")
 		if (!config["hover"]) {
 				return
 		}
 		let line = document.getText(new vscode.Range(position.line, 0, position.line, position.character))
-		// Check if line isn"t a comment or string
+		// Check if line isn't a comment or string
 		let quotes = null
 		let comment = null
 		if (line) {
@@ -66,7 +69,7 @@ export class CrystalHoverProvider extends CrystalContext implements vscode.Hover
 							})
 						}
 					}
-					// Checks Completion data
+					// Checks completion data
 					let hoverTexts = []
 					for (let type of TYPES) {
 						for (let element of type) {
@@ -87,35 +90,35 @@ export class CrystalHoverProvider extends CrystalContext implements vscode.Hover
 					// -------------------------------
 					// TODO: Improve hover information
 					// -------------------------------
-					return new vscode.Hover(this.filter(hoverTexts))
+					return new vscode.Hover(filter(hoverTexts))
 				}
 			}
 		}
 	}
+}
 
-	// Remove duplicate methods and descriptions.
-	filter(hoverTexts: any[]) {
-		if (hoverTexts.length <= 1) {
-			return hoverTexts
-		}
-		let prev = false
-		return hoverTexts.filter((item, index, self) => {
-			if (index % 2 == 0) {
-				let objectIndex = self.findIndex((t) => {
-					return t.value == item.value
-				})
-				let nextObjectIndex = self.findIndex((t) => {
-					if (self[index + 1] == undefined) {
-						return false
-					} else {
-						return t.value == self[index + 1].value
-					}
-				})
-				prev = objectIndex == index && nextObjectIndex == index + 1
-				return prev
-			} else {
-				return prev
-			}
-		})
+// Remove duplicate methods and descriptions.
+function filter(hoverTexts: any[]) {
+	if (hoverTexts.length <= 1) {
+		return hoverTexts
 	}
+	let prev = false
+	return hoverTexts.filter((item, index, self) => {
+		if (index % 2 == 0) {
+			let objectIndex = self.findIndex((t) => {
+				return t.value == item.value
+			})
+			let nextObjectIndex = self.findIndex((t) => {
+				if (self[index + 1] == undefined) {
+					return false
+				} else {
+					return t.value == self[index + 1].value
+				}
+			})
+			prev = objectIndex == index && nextObjectIndex == index + 1
+			return prev
+		} else {
+			return prev
+		}
+	})
 }

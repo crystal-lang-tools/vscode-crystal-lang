@@ -4,10 +4,13 @@ import * as TDATA from "./crystalCompletionData"
 import { CrystalContext } from "./crystalContext"
 import { getSymbols } from "./crystalUtils"
 
-export class crystalCompletionItemProvider extends CrystalContext implements vscode.CompletionItemProvider {
+// Completion provider using VSCode module
+export class CrystalCompletionItemProvider extends CrystalContext implements vscode.CompletionItemProvider {
 
+	// Completions attribute
 	private completions: vscode.CompletionList
 
+	// Convert VSCode completion items to symbols
 	private getItemKindFromSymbolKind(kind) {
 		switch (kind) {
 			case 4:
@@ -33,18 +36,21 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 		}
 	}
 
+	// Add a method to completion list
 	private pushCompletionMethods(completions) {
 		for (let method of completions) {
 			this.createCompletionItem(method[0], method[1], method[2], vscode.SymbolKind.Method)
 		}
 	}
 
+	// Add a symbols to completion list (needed by symbol provider)
 	private pushCompletionOther(completions, kind) {
 		for (let completion of completions) {
 			this.createCompletionItem(completion[0], completion[1], completion[2], kind)
 		}
 	}
 
+	// Create a new completion item
 	private createCompletionItem(name, detail, documentation, kind) {
 		let completion = new vscode.CompletionItem(`${name}`, this.getItemKindFromSymbolKind(kind))
 		completion.documentation = documentation
@@ -53,6 +59,7 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 		this.completions.items.push(completion)
 	}
 
+	// Return completion data to VSCode
 	async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position) {
 		// -----------------------------------------------
 		// TODO: improve Type completion algorithm (again)
@@ -62,36 +69,44 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 		if (!config["completion"]) {
 			return this.completions
 		}
-		// Remove dot or colons and search for a word
-		let column = (position.character > 2) ? (position.character - 2) : 0
+		let line = document.getText(new vscode.Range(position.line, 0, position.line, position.character))
+		if (!line) {
+			return this.completions
+		}
+		let comment = line.match(/^[^\"]*#[^\{].*$/)
+		let quotes = line.match(/(\")/g)
+		if (quotes || comment) { // Check if line isn't a comment or string
+			return this.completions
+		}
+		let column = (position.character > 2) ? (position.character - 2) : 0 // Remove dot or colons and search for a word
 		let posDot = new vscode.Position(position.line, column + 1)
 		let posColons = new vscode.Position(position.line, column)
 		let wordRange = document.getWordRangeAtPosition(posDot) || document.getWordRangeAtPosition(posColons)
 		let symbols = await getSymbols(document.uri)
 		let completionFlag = false
 		if (wordRange) {
-			// Check if a call token (.|::) follow the word for a method call
+			// Check if a call token (.|::) following the word for a method call
 			let range = new vscode.Range(wordRange.start.line, wordRange.start.character, wordRange.end.line, wordRange.end.character + 1)
 			var word = document.getText(range)
 			if (word.endsWith(".")) {
 				completionFlag = true
 				let container = word.slice(0, -1)
-				// Add Type reflection
-				this.pushCompletionMethods(TDATA.REFLECTION_METHODS)
-				// Add static methods to Types completion
-				let staticFound = false
-				for (let symbol of symbols) {
-					if (symbol.containerName == container) {
-						if (symbol.name.startsWith("self")) {
+				this.pushCompletionMethods(TDATA.REFLECTION_METHODS) // Add Type reflection
+				let symbolsNames = symbols.map((sym) => { return sym.name }) // Create symbols index array
+				let staticFound = false // Check static methods for class completion
+				let containerIndex = symbolsNames.indexOf(container)
+				if (containerIndex >= 0) {
+					let containerSymbol = symbols[containerIndex]
+					for (let symbol of symbols) {
+						if (symbol.name.startsWith("self") && symbol.containerName == containerSymbol.name) {
 							staticFound = true
 							this.createCompletionItem(symbol.name.slice(5), symbol.containerName, `Belongs to ${word}`, symbol.kind)
 						}
 					}
-					if (container == symbol.name) {
-						if (symbol.kind == vscode.SymbolKind.Class || symbol.kind == vscode.SymbolKind.Struct) {
-							staticFound = true
-							this.createCompletionItem("new", "new(*args)", `Create a new instance of an Object`, vscode.SymbolKind.Method)
-						}
+					let symbol = symbols[containerIndex]
+					if (symbol.kind == vscode.SymbolKind.Class || symbol.kind == vscode.SymbolKind.Struct) {
+						staticFound = true
+						this.createCompletionItem("new", "new(*args)", `Create a new instance of an Object`, vscode.SymbolKind.Method)
 					}
 				}
 				// ----------------------------------------
@@ -101,11 +116,12 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 					if (container == "File") {
 						this.pushCompletionMethods(TDATA.FILE_METHODS)
 						staticFound = true
+					} else if (container == "Dir") {
+						this.pushCompletionMethods(TDATA.DIR_METHODS)
+						staticFound = true
 					}
 				}
-
-				// Add instance methods to variables
-				if (!staticFound) {
+				if (!staticFound) { // Add instance methods to variables
 					let crystalOutput = await this.crystalContext(document, position, "completion")
 					if (crystalOutput.toString().startsWith(`{"status":"`)) {
 						try {
@@ -142,6 +158,8 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 											this.pushCompletionMethods(TDATA.NAMEDTUPLE_METHODS)
 										} else if (type.startsWith("Proc")) {
 											this.pushCompletionMethods(TDATA.PROC_METHODS)
+										} else if (type.startsWith("Channel")) {
+											this.pushCompletionMethods(TDATA.CHANNEL_METHODS)
 										}
 										// Complete instance methods of Type
 										// class String
@@ -154,7 +172,10 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 										let types = type.split("::")
 										let symbolType = types.pop()
 										for (let symbol of symbols) {
-											if (symbol.containerName == symbolType && !symbol.name.startsWith("self.") && !(symbol.name == "initialize")) {
+											if (symbol.containerName == symbolType &&
+												!symbol.name.startsWith("self.") &&
+												!(symbol.name == "initialize") &&
+												symbol.kind == vscode.SymbolKind.Function) {
 												this.createCompletionItem(symbol.name, symbol.containerName, `Instance method of ${type}`, symbol.kind)
 											}
 										}
@@ -167,7 +188,6 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 							throw err
 						}
 					}
-
 				}
 			} else {
 				range = new vscode.Range(wordRange.start.line, wordRange.start.character, wordRange.end.line, wordRange.end.character + 2)
@@ -179,7 +199,7 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 					// TODO: Add standard lib subtypes completion
 					// ------------------------------------------
 					// if (container == "Char") {
-					// 	this.pushCompletionOther(TDATA.CHAR_SUBTYPES, vscode.SymbolKind.Struct)
+					//   this.pushCompletionOther(TDATA.CHAR_SUBTYPES, vscode.SymbolKind.Struct)
 					// }
 					// Add SubTypes completion
 					for (let symbol of symbols) {
@@ -196,39 +216,26 @@ export class crystalCompletionItemProvider extends CrystalContext implements vsc
 			}
 		}
 		if (!completionFlag) {
-			let line = document.getText(new vscode.Range(position.line, 0, position.line, position.character))
-			// Check if line isn"t a comment or string
-			let quotes = null
-			let comment = null
-			if (line) {
-				quotes = line.match(/(\")/g)
-				comment = line.match(/^[^\"]*#.*$/)
-			}
-			if (quotes == null && comment == null) {
-				// Complete document symbols
-				for (let symbol of symbols) {
-					if (word) {
-						if (symbol.name.startsWith(word.replace(")", ""))) {
-							this.createCompletionItem(symbol.name, symbol.containerName, "", symbol.kind)
-						}
-					} else {
+			for (let symbol of symbols) { // Complete document symbols
+				if (word) {
+					if (symbol.name.startsWith(word.replace(")", ""))) {
 						this.createCompletionItem(symbol.name, symbol.containerName, "", symbol.kind)
 					}
-				}
-				if (!wordRange) {
-					// Complete Top Level Methods
-					this.pushCompletionMethods(TDATA.TOP_LEVEL_METHODS)
-					// Complete Standard lib
-					// ------------------------------------------
-					// TODO: Add standard lib types documentation
-					// ------------------------------------------
-					this.pushCompletionOther(TDATA.STRUCTS, vscode.SymbolKind.Struct)
-					this.pushCompletionOther(TDATA.CLASSES, vscode.SymbolKind.Class)
-					this.pushCompletionOther(TDATA.MODULES, vscode.SymbolKind.Module)
-					this.pushCompletionOther(TDATA.ENUMS, vscode.SymbolKind.Enum)
-					this.pushCompletionOther(TDATA.ALIAS, vscode.SymbolKind.Constant)
+				} else {
+					this.createCompletionItem(symbol.name, symbol.containerName, "", symbol.kind)
 				}
 			}
+			// Complete Top Level Methods
+			this.pushCompletionMethods(TDATA.TOP_LEVEL_METHODS)
+			// Complete Standard lib
+			// ------------------------------------------
+			// TODO: Add standard lib types documentation
+			// ------------------------------------------
+			this.pushCompletionOther(TDATA.STRUCTS, vscode.SymbolKind.Struct)
+			this.pushCompletionOther(TDATA.MODULES, vscode.SymbolKind.Module)
+			this.pushCompletionOther(TDATA.CLASSES, vscode.SymbolKind.Class)
+			this.pushCompletionOther(TDATA.ENUMS, vscode.SymbolKind.Enum)
+			this.pushCompletionOther(TDATA.ALIAS, vscode.SymbolKind.Constant)
 		}
 		return this.completions
 	}
