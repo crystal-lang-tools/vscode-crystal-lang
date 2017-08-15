@@ -8,6 +8,10 @@
 - Task provider.
 - Macros.
 
+## [0.3.1] - 2017-08-15
+### Add
+- Channel method completion
+
 ## [0.3.0] - 2017-08-15
 ### Add
 - Update repository links to Crystal Tools organization.
