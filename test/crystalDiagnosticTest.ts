@@ -3,9 +3,7 @@ import { spawn } from 'child_process'
 
 export class CrystalDiagnosticTest {
 
-	/**
-	 * Execute crystal build to check problems.
-	 */
+	// Execute crystal build to check problems.
 	crystalDoDiagnostic(document) {
 		return new Promise((resolve, reject) => {
 			let response = ''

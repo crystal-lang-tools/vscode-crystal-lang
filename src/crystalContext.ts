@@ -1,15 +1,13 @@
-import * as vscode from 'vscode'
-import { spawn } from 'child_process'
+import * as vscode from "vscode"
+import { spawn } from "child_process"
 
-import { spawnPromise } from "./crystalUtils"
-import { CrystalProblemsFinder } from "./crystalProblemsFinder"
+import { spawnTools } from "./crystalUtils"
 
-export class CrystalContext extends CrystalProblemsFinder {
-	/**
-	 * Execute crystal tool context for current file:position
-	 * and do syntax checking too.
-	 */
+// Call tool for get Crystal context
+export class CrystalContext {
+
+	// Execute crystal tool context for current file:position
 	crystalContext(document, position, key) {
-		return spawnPromise(document, position, 'context', key, this.searchProblems)
+		return spawnTools(document, position, "context", key)
 	}
 }

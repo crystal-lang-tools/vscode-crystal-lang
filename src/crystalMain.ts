@@ -1,61 +1,69 @@
-import * as vscode from 'vscode'
-import * as fs from 'fs'
-import * as client from 'vscode-languageclient'
+import * as fs from "fs"
+import * as vscode from "vscode"
+import * as client from "vscode-languageclient"
 
-import { CrystalImplementationsProvider } from './crystalImplementations'
-import { crystalCompletionItemProvider } from "./crystalCompletion"
-import { CrystalDocumentSymbolProvider } from './crystalSymbols'
-import { CrystalFormattingProvider } from './crystalFormatting'
-import { diagnosticCollection } from './crystalProblemsFinder'
-import { crystalConfiguration } from './crystalUtils'
-import { CrystalDiagnostic } from './crystalDiagnostic'
-import { CrystalHoverProvider } from './crystalHover'
+import { diagnosticCollection } from "./crystalUtils"
+import { CrystalHoverProvider } from "./crystalHover"
+import { getDiagnostic } from "./crystalDiagnostic"
+import { CrystalFormattingProvider } from "./crystalFormatting"
+import { CrystalDocumentSymbolProvider } from "./crystalSymbols"
+import { CrystalCompletionItemProvider } from "./crystalCompletion"
+import { CrystalImplementationsProvider } from "./crystalImplementations"
 
-const CRYSTAL_MODE: vscode.DocumentFilter = { language: 'crystal', scheme: 'file' }
+// Language configuration for identation and patterns.
+const crystalConfiguration = {
+	indentationRules: {
+		increaseIndentPattern: /^\s*((begin|class|struct|def|fun|macro|else|elsif|ensure|for|if|module|rescue|unless|until|when|while)|([^#]*\sdo\b))\b[^\{;]*$/,
+		decreaseIndentPattern: /^\s*([}\]]([,)]?\s*(#|$)|\.[a-zA-Z_]\w*\b)|(end|rescue|ensure|else|elsif|when)\b)/
+	},
+	wordPattern: /(-?\d+(?:\.\d+))|(:?[A-Za-z][^-`~@#%^&()=+[{}|;:'",<>/.*\]\s\\!?]*[!?]?)/
+}
 
-const crystalDiagnostic = new CrystalDiagnostic()
+// VSCode identificator for Crystal
+const CRYSTAL_MODE: vscode.DocumentFilter = { language: "crystal", scheme: "file" }
 
-function crystalOnDidEvent(document) {
-	if (document.languageId == 'crystal') {
-		crystalDiagnostic.crystalDoDiagnostic(document)
+// Ensure to analyze only Crystal documents
+function diagnosticDocument(document) {
+	if (document.languageId == "crystal") {
+		getDiagnostic(document)
 	}
 }
 
+// Init function for this extension
 export async function activate(context: vscode.ExtensionContext) {
 
-	// Not implemented on server yet.
+	// Call features not implemented on server yet.
 	context.subscriptions.push(
-		vscode.languages.setLanguageConfiguration('crystal', crystalConfiguration),
-		vscode.languages.registerDocumentSymbolProvider('crystal', new CrystalDocumentSymbolProvider()),
-		vscode.languages.registerCompletionItemProvider(CRYSTAL_MODE, new crystalCompletionItemProvider()),
-		vscode.languages.registerHoverProvider(CRYSTAL_MODE, new CrystalHoverProvider())
+		vscode.languages.setLanguageConfiguration("crystal", crystalConfiguration),
+		vscode.languages.registerHoverProvider(CRYSTAL_MODE, new CrystalHoverProvider()),
+		vscode.languages.registerDocumentSymbolProvider("crystal", new CrystalDocumentSymbolProvider()),
+		vscode.languages.registerCompletionItemProvider(CRYSTAL_MODE, new CrystalCompletionItemProvider())
 	)
 
-	const config = vscode.workspace.getConfiguration('crystal-lang')
-	let scry = config['server']
+	// Extension configuration
+	const config = vscode.workspace.getConfiguration("crystal-lang")
 
-	// Experimental Server using Language Server Protocol
+	// Detect server and set configuration
+	let scry = config["server"]
 	if (fs.existsSync(scry)) {
 		let serverOptions = { command: scry, args: [] }
 		let clientOptions: client.LanguageClientOptions = {
-			documentSelector: ['crystal'],
+			documentSelector: ["crystal"],
 			synchronize: {
-				configurationSection: 'crystal-lang',
-				fileEvents: vscode.workspace.createFileSystemWatcher('**/*.cr')
+				configurationSection: "crystal-lang",
+				fileEvents: vscode.workspace.createFileSystemWatcher("**/*.cr")
 			}
 		}
-
-		let disposable = new client.LanguageClient('Crystal Language', serverOptions, clientOptions).start()
+		let disposable = new client.LanguageClient("Crystal Language", serverOptions, clientOptions).start()
 		context.subscriptions.push(disposable)
-
 	} else {
-		// If server is disabled use client implementation instead.
+		// If server is disabled use Node.js implementation instead.
 		context.subscriptions.push(
 			diagnosticCollection,
-			vscode.languages.registerDocumentFormattingEditProvider('crystal', new CrystalFormattingProvider()),
+			vscode.languages.registerDocumentFormattingEditProvider("crystal", new CrystalFormattingProvider()),
 			vscode.languages.registerDefinitionProvider(CRYSTAL_MODE, new CrystalImplementationsProvider()),
-			vscode.workspace.onDidOpenTextDocument(crystalOnDidEvent),
-			vscode.workspace.onDidSaveTextDocument(crystalOnDidEvent)
+			vscode.workspace.onDidOpenTextDocument(diagnosticDocument),
+			vscode.workspace.onDidSaveTextDocument(diagnosticDocument)
 		)
 	}
 }
