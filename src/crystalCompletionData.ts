@@ -1050,18 +1050,18 @@ export const DIR_METHODS = [
 	["glob", "glob(*patterns, &block)", ""]
 ]
 export const CHANNEL_METHODS = [
-	["close", "#close", ""],
-	["closed?", "#closed?", ""],
-	["inspect", "#inspect(io)", ""],
-	["pretty_print", "#pretty_print(pp)", ""],
-	["receive", "#receive", ""],
-	["receive?", "#receive?", ""],
-	["receive_select_action", "#receive_select_action", ""],
-	["send_select_action", "#send_select_action(value : T)", ""],
-	["unwait_for_receive", "#unwait_for_receive", ""],
-	["unwait_for_send", "#unwait_for_send", ""],
-	["wait_for_receive", "#wait_for_receive", ""],
-	["wait_for_send	", "#wait_for_send	", ""]
+	["close", "close", ""],
+	["closed?", "closed?", ""],
+	["inspect", "inspect(io)", ""],
+	["pretty_print", "pretty_print(pp)", ""],
+	["receive", "receive", ""],
+	["receive?", "receive?", ""],
+	["receive_select_action", "receive_select_action", ""],
+	["send_select_action", "send_select_action(value : T)", ""],
+	["unwait_for_receive", "unwait_for_receive", ""],
+	["unwait_for_send", "unwait_for_send", ""],
+	["wait_for_receive", "wait_for_receive", ""],
+	["wait_for_send	", "wait_for_send	", ""]
 ]
 export const CLASSES = [
 	["Argumenterror", "class ArgumentError", ""],
