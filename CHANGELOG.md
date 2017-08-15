@@ -3,12 +3,17 @@
 ## [Unreleased]
 ### Todo
 - Full Support for Language Server Protocol.
-- Complete TODO's comments inside this source code.
-- Solve issues in Github repo.
-- Autogenerate completion data.
-- Rewrite/Improve completion algorithm.
+- Rewrite completion algorithm.
+- Debugger provider.
 - Task provider.
-- Debugger, depends on issue [#4457](https://github.com/crystal-lang/crystal/issues/4457).
+- Macros.
+
+## [0.3.0] - 2017-08-15
+### Add
+- Update repository links to Crystal Tools organization.
+- Some completion methods for common classes.
+- Bash on Windows support.
+- Wiki.
 
 ## [0.2.17] - 2017-08-10
 ### Change
@@ -27,7 +32,7 @@
 
 ## [0.2.14] - 2017-08-09
 ### Fix
-- Issue [#15](https://github.com/faustinoaq/vscode-crystal-lang/issues/15).
+- Issue [#15](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/15).
 
 ## [0.2.13] - 2017-08-08
 ### Change
@@ -50,22 +55,22 @@
 
 ## [0.2.10] - 2017-08-02
 ### Fix
-- Problem locations on templates [#11](https://github.com/faustinoaq/vscode-crystal-lang/pull/11)
+- Problem locations on templates [#11](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/11)
 
 ## [0.2.9] - 2017-08-02
 ### Fix
-- Macro issue [#10](https://github.com/faustinoaq/vscode-crystal-lang/pull/10)
+- Macro issue [#10](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/10)
 
 ## [0.2.8] - 2017-07-31
 ### Fix
-- Macro issue [#5](https://github.com/faustinoaq/vscode-crystal-lang/issues/5).
+- Macro issue [#5](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/5).
 
 ### Add
 - Allow to use `${workspaceRoot}` on `mainFile`.
 
 ## [0.2.7] - 2017-07-29
 ### Fix
-- Syntax issues [#7](https://github.com/faustinoaq/vscode-crystal-lang/issues/7), [#8](https://github.com/faustinoaq/vscode-crystal-lang/issues/8), [#9](https://github.com/faustinoaq/vscode-crystal-lang/pull/9).
+- Syntax issues [#7](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/7), [#8](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/8), [#9](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/9).
 
 ## [0.2.6] - 2017-07-28
 ### Change
@@ -114,7 +119,7 @@
 
 ## [0.2.0] - 2017-06-30
 ### Add
-- Add experimental support for Language Server Protocol using [Scry](https://github.com/faustinoaq/scry).
+- Add experimental support for Language Server Protocol using [Scry](https://github.com/crystal-lang-tools/scry).
 
 ### Fix
 - Fix Content-Length bug, related [#25](https://github.com/palantir/python-language-server/issues/25)

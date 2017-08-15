@@ -2,15 +2,15 @@
 	"name": "crystal-lang",
 	"displayName": "Crystal Language",
 	"description": "The Crystal Programming Language",
-	"version": "0.2.17",
+	"version": "0.3.0",
 	"publisher": "faustinoaq",
 	"icon": "images/icon.png",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/faustinoaq/vscode-crystal-lang"
+		"url": "https://github.com/crystal-lang-tools/vscode-crystal-lang"
 	},
-	"bugs": "https://github.com/faustinoaq/vscode-crystal-lang/issues",
+	"bugs": "https://github.com/crystal-lang-tools/vscode-crystal-lang/issues",
 	"engines": {
 		"vscode": "^1.12.0"
 	},
@@ -113,7 +113,7 @@
 						"build",
 						"none"
 					],
-					"description": "Allow to check errors.\nsyntax: show syntax errors using format check\nbuild: compile source code without codegen\nnone: disable problems"
+					"description": "Allow to check errors.\n[syntax] show syntax errors using format check\n[build] compile source code without codegen\n[none] disable problems"
 				},
 				"crystal-lang.implementations": {
 					"type": "boolean",
@@ -143,7 +143,7 @@
 				"crystal-lang.processesLimit": {
 					"type": "number",
 					"default": 3,
-					"description": "Crystal processes running in background.\nNote: reload VSCode to apply this setting."
+					"description": "[Reload required]\nCrystal processes running in background."
 				},
 				"crystal-lang.compiler": {
 					"type": "string",
@@ -153,7 +153,7 @@
 				"crystal-lang.server": {
 					"type": "string",
 					"default": "",
-					"description": "[Experimental]\nAbsolute path for Scry server binary\n(Language Server Protocol for Crystal).\nNote: reload VSCode to apply this setting."
+					"description": "[Experimental][Reload required]\nAbsolute path for Scry server binary\n(Language Server Protocol for Crystal)."
 				},
 				"crystal-lang.logLevel": {
 					"type": "string",
@@ -166,6 +166,11 @@
 						"fatal"
 					],
 					"description": "Controls the amount of data logged by Scry server."
+				},
+				"crystal-lang.bashOnWindows": {
+					"type": "boolean",
+					"default": false,
+					"description": "[Reload required]\nEnables support for Windows Subsystem Linux."
 				}
 			}
 		}
