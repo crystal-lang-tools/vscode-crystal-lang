@@ -8,6 +8,10 @@
 - Task provider.
 - Macros.
 
+## [0.3.3] - 2017-08-30
+### Add
+- Gif icon.
+
 ## [0.3.2] - 2017-08-29
 ### Change
 - Default settings.
