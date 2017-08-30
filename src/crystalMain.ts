@@ -61,10 +61,14 @@ export async function activate(context: vscode.ExtensionContext) {
 		context.subscriptions.push(
 			diagnosticCollection,
 			vscode.languages.registerDocumentFormattingEditProvider("crystal", new CrystalFormattingProvider()),
-			vscode.languages.registerDefinitionProvider(CRYSTAL_MODE, new CrystalImplementationsProvider()),
 			vscode.workspace.onDidOpenTextDocument(diagnosticDocument),
 			vscode.workspace.onDidSaveTextDocument(diagnosticDocument)
 		)
+		if (config["implementations"]) {
+			context.subscriptions.push(
+				vscode.languages.registerDefinitionProvider(CRYSTAL_MODE, new CrystalImplementationsProvider()),
+			)
+		}
 	}
 }
 
