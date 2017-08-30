@@ -8,9 +8,15 @@
 - Task provider.
 - Macros.
 
+## [0.3.2] - 2017-08-29
+### Change
+- Default settings.
+- Disable unfinished features.
+- Update dependencies.
+
 ## [0.3.1] - 2017-08-15
 ### Add
-- Channel method completion
+- Channel method completion.
 
 ## [0.3.0] - 2017-08-15
 ### Add
