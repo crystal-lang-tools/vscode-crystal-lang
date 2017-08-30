@@ -2,7 +2,7 @@
 
 This extension provides support for the [Crystal](https://github.com/crystal-lang) programming language.
 
-![crystal icon](https://i.imgur.com/GoiQmzC.gif)
+![vscode-crystal-lang](https://i.imgur.com/w3b53OZ.gif)
 
 ## Wiki
 
