@@ -110,6 +110,24 @@
 		],
 		"description": "Constructor method for an Object."
 	},
+	"protected def": {
+		"prefix": "pro",
+		"body": [
+			"protected def ${1:method_name}",
+			"\t$0",
+			"end"
+		],
+		"description": "Protected method for an Object, can only be referenced inside the namespace where they are defined."
+	},
+	"private def": {
+		"prefix": "pri",
+		"body": [
+			"private def ${1:method_name}",
+			"\t$0",
+			"end"
+		],
+		"description": "Private method for an Object, can only be invoked without a receiver."
+	},
 	"method definition": {
 		"prefix": "def",
 		"body": [
@@ -118,6 +136,13 @@
 			"end"
 		],
 		"description": "Method names begin with a lowercase letter and, as a convention, only use lowercase letters, underscores and numbers."
+	},
+	"delegate": {
+		"prefix": "del",
+		"body": [
+			"delegate ${1:method}, to: ${2:@variable}"
+		],
+		"description": "Delegate methods to to. This is only useful when no captured blocks are involved"
 	},
 	"Struct definition": {
 		"prefix": "struct",
