@@ -13,8 +13,8 @@ import { CrystalImplementationsProvider } from "./crystalImplementations"
 // Language configuration for identation and patterns.
 const crystalConfiguration = {
 	indentationRules: {
-		increaseIndentPattern: /^\s*((begin|class|struct|def|fun|macro|else|elsif|ensure|for|if|module|rescue|unless|until|when|while)|([^#]*\sdo\b))\b[^\{;]*$/,
-		decreaseIndentPattern: /^\s*([}\]]([,)]?\s*(#|$)|\.[a-zA-Z_]\w*\b)|(end|rescue|ensure|else|elsif|when)\b)/
+		increaseIndentPattern: /^\s*((begin|class|struct|private def|protected def|def|fun|macro|else|elsif|ensure|for|if|module|rescue|unless|until|when|while)|([^#]*\sdo\b))\b[^\{;]*$/,
+		decreaseIndentPattern: /^\s*([}\]]([,)]?\s*(#|$)|\.[a-zA-Z_]\w*\b)|(end|rescue|ensure|else|elsif)\b)/
 	},
 	wordPattern: /(-?\d+(?:\.\d+))|(:?[A-Za-z][^-`~@#%^&()=+[{}|;:'",<>/.*\]\s\\!?]*[!?]?)/
 }
