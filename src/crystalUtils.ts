@@ -19,13 +19,15 @@ const ROOT = vscode.workspace.rootPath
 
 // Workspace checker for Bash on Windows
 const WORKSPACE = (() => {
-	let letter = ROOT.slice(0, 1).toLowerCase()
-	if (config["bashOnWindows"]) {
-		return '/mnt/' + letter + '/' + ROOT.slice(3).replace(/\\/g, '/')
-	} else {
-		return ROOT
+	if (ROOT != undefined) {
+		let letter = ROOT.slice(0, 1).toLowerCase()
+		if (config["bashOnWindows"]) {
+			return '/mnt/' + letter + '/' + ROOT.slice(3).replace(/\\/g, '/')
+		} else {
+			return ROOT
+		}
 	}
-})()
+})() || ""
 
 // Get and verify standard library path from Crystal env
 const STDLIB = (() => {
