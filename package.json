@@ -2,7 +2,7 @@
 	"name": "crystal-lang",
 	"displayName": "Crystal Language",
 	"description": "The Crystal Programming Language",
-	"version": "0.3.3",
+	"version": "0.3.4",
 	"publisher": "faustinoaq",
 	"icon": "images/icon.gif",
 	"license": "MIT",
@@ -113,7 +113,7 @@
 						"build",
 						"none"
 					],
-					"description": "Allow to check errors.\n[syntax] show syntax errors using format check\n[build] compile source code without codegen\n[none] disable problems"
+					"description": "Allow to check errors.\n[syntax] show parser errors\n[build] compile without codegen\n[none] disable check."
 				},
 				"crystal-lang.implementations": {
 					"type": "boolean",
@@ -128,7 +128,7 @@
 				"crystal-lang.completion": {
 					"type": "boolean",
 					"default": false,
-					"description": "Basic completion of methods and symbols.\nDoesn't support literals yet."
+					"description": "Basic completion of methods and symbols."
 				},
 				"crystal-lang.mainFile": {
 					"type": "string",
@@ -165,7 +165,7 @@
 						"error",
 						"fatal"
 					],
-					"description": "Controls the amount of data logged by Scry server."
+					"description": "Controls the amount of data logged by crystal-lang.server"
 				},
 				"crystal-lang.bashOnWindows": {
 					"type": "boolean",

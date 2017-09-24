@@ -8,6 +8,16 @@
 - Task provider.
 - Macros.
 
+## [0.3.4] - 2017-09-24
+### Fix
+- Issues [#18](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/21), [#21](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/21).
+
+### Add
+- Snippets [#22](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/22).
+
+### Change
+- Remove variable assignations from symbol list.
+
 ## [0.3.3] - 2017-08-30
 ### Add
 - Gif icon.
