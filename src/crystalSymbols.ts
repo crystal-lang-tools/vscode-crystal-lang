@@ -82,14 +82,8 @@ export class CrystalDocumentSymbolProvider implements vscode.DocumentSymbolProvi
 				} else if (matchData = element.match(/^\s*(alias\s+|type\s+)?([A-Z][^\s\(\)\:]*)\s*=.*$/)) {
 					newSymbol(matchData[2], vscode.SymbolKind.Constant, containers[countEnds - 1], index, matchData.index)
 					incrementEndsCountIfKeywordIn(element)
-				} else if (matchData = element.match(/^\s*(\w[^\s\(\)\:]*)\s*=.*$/)) {
-					newSymbol(matchData[1], vscode.SymbolKind.Variable, containers[countEnds - 1], index, matchData.index)
-					incrementEndsCountIfKeywordIn(element)
 				} else if (matchData = element.match(/^\s*(\w[^\@\s\(\)\:]*)\s+:\s+.*$/)) {
 					newSymbol(matchData[1], vscode.SymbolKind.Variable, containers[countEnds - 1], index, matchData.index)
-				} else if (matchData = element.match(/^\s*(@\w[^\s\(\)\:]*)\s*=.*$/)) {
-					newSymbol(matchData[1], vscode.SymbolKind.Variable, containers[countEnds - 1], index, matchData.index)
-					incrementEndsCountIfKeywordIn(element)
 				} else if (matchData = element.match(/^\s*(@\w[^\s\(\)\:]*)\s+:\s+.*$/)) {
 					newSymbol(matchData[1], vscode.SymbolKind.Variable, containers[countEnds - 1], index, matchData.index)
 				} else if (element.match(/^\s*end(\..*)?$/)) {
