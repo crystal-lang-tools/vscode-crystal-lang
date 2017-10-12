@@ -1216,7 +1216,31 @@
 			]
 		},
 		{
-			"begin": "(?><<-('?)(\\w+)\\b\\1)",
+			"begin": "(?><<-'(\\w+)')",
+			"beginCaptures": [
+				{
+					"name": "punctuation.definition.string.begin.crystal"
+				}
+			],
+			"comment": "heredoc with indented terminator",
+			"end": "\\s*\\1$",
+			"endCaptures": [
+				{
+					"name": "punctuation.definition.string.end.crystal"
+				}
+			],
+			"name": "string.unquoted.heredoc.crystal",
+			"patterns": [
+				{
+					"include": "#heredoc"
+				},
+				{
+					"include": "#escaped_char"
+				}
+			]
+		},
+		{
+			"begin": "(?><<-(\\w+)\\b)",
 			"beginCaptures": [
 				{
 					"name": "punctuation.definition.string.begin.crystal"
