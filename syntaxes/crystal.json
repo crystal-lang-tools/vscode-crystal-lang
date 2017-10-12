@@ -945,7 +945,7 @@
 			],
 			"comment": "heredoc with embedded HTML and indented terminator",
 			"contentName": "text.html.embedded.crystal",
-			"end": "\\s*\\2$",
+			"end": "\\s*\\2\\b",
 			"endCaptures": [
 				{
 					"name": "punctuation.definition.string.end.crystal"
@@ -976,7 +976,7 @@
 			],
 			"comment": "heredoc with embedded SQL and indented terminator",
 			"contentName": "text.sql.embedded.crystal",
-			"end": "\\s*\\2$",
+			"end": "\\s*\\2\\b",
 			"endCaptures": [
 				{
 					"name": "punctuation.definition.string.end.crystal"
@@ -1007,7 +1007,7 @@
 			],
 			"comment": "heredoc with embedded css and intented terminator",
 			"contentName": "text.css.embedded.crystal",
-			"end": "\\s*\\2$",
+			"end": "\\s*\\2\\b",
 			"endCaptures": [
 				{
 					"name": "punctuation.definition.string.end.crystal"
@@ -1038,7 +1038,7 @@
 			],
 			"comment": "heredoc with embedded c++ and intented terminator",
 			"contentName": "text.c++.embedded.crystal",
-			"end": "\\s*\\2$",
+			"end": "\\s*\\2\\b",
 			"endCaptures": [
 				{
 					"name": "punctuation.definition.string.end.crystal"
@@ -1069,7 +1069,7 @@
 			],
 			"comment": "heredoc with embedded c++ and intented terminator",
 			"contentName": "text.c.embedded.crystal",
-			"end": "\\s*\\2$",
+			"end": "\\s*\\2\\b",
 			"endCaptures": [
 				{
 					"name": "punctuation.definition.string.end.crystal"
@@ -1100,7 +1100,7 @@
 			],
 			"comment": "heredoc with embedded javascript and intented terminator",
 			"contentName": "text.js.embedded.crystal",
-			"end": "\\s*\\2$",
+			"end": "\\s*\\2\\b",
 			"endCaptures": [
 				{
 					"name": "punctuation.definition.string.end.crystal"
@@ -1131,7 +1131,7 @@
 			],
 			"comment": "heredoc with embedded javascript and intented terminator",
 			"contentName": "text.js.jquery.embedded.crystal",
-			"end": "\\s*\\2$",
+			"end": "\\s*\\2\\b",
 			"endCaptures": [
 				{
 					"name": "punctuation.definition.string.end.crystal"
@@ -1162,7 +1162,7 @@
 			],
 			"comment": "heredoc with embedded shell and intented terminator",
 			"contentName": "text.shell.embedded.crystal",
-			"end": "\\s*\\2$",
+			"end": "\\s*\\2\\b",
 			"endCaptures": [
 				{
 					"name": "punctuation.definition.string.end.crystal"
@@ -1193,7 +1193,7 @@
 			],
 			"comment": "heredoc with embedded crystal and intented terminator",
 			"contentName": "text.crystal.embedded.crystal",
-			"end": "\\s*\\2$",
+			"end": "\\s*\\2\\b",
 			"endCaptures": [
 				{
 					"name": "punctuation.definition.string.end.crystal"
@@ -1223,7 +1223,7 @@
 				}
 			],
 			"comment": "heredoc with indented terminator",
-			"end": "\\s*\\1$",
+			"end": "\\s*\\1\\b",
 			"endCaptures": [
 				{
 					"name": "punctuation.definition.string.end.crystal"
@@ -1247,7 +1247,7 @@
 				}
 			],
 			"comment": "heredoc with indented terminator",
-			"end": "\\s*\\1$",
+			"end": "\\s*\\1\\b",
 			"endCaptures": [
 				{
 					"name": "punctuation.definition.string.end.crystal"
