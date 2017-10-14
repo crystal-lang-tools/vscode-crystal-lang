@@ -12,7 +12,7 @@
 	},
 	"bugs": "https://github.com/crystal-lang-tools/vscode-crystal-lang/issues",
 	"engines": {
-		"vscode": "^1.12.0"
+		"vscode": "^1.15.0"
 	},
 	"keywords": [
 		"crystal",
@@ -183,7 +183,7 @@
 	},
 	"devDependencies": {
 		"typescript": "^2.4.2",
-		"vscode": "^1.1.5",
+		"vscode": "^1.1.6",
 		"mocha": "^3.5.0",
 		"@types/node": "^8.0.26",
 		"@types/mocha": "^2.2.42"
