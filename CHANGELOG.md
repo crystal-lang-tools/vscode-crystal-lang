@@ -8,6 +8,12 @@
 - Task provider.
 - Macros.
 
+## [0.3.5] - 2017-10-13
+### Changes
+- Update dependencies
+- Add inline block snippets
+- Fix highlighting issues, see [#27](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/27) thanks to [@straight-shoota](https://github.com/straight-shoota)
+
 ## [0.3.4] - 2017-09-24
 ### Fix
 - Issues [#18](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/21), [#21](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/21).
