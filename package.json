@@ -189,6 +189,6 @@
 		"@types/mocha": "^2.2.42"
 	},
 	"dependencies": {
-		"vscode-languageclient": "^3.3.0"
+		"vscode-languageclient": "^3.4.5"
 	}
 }
