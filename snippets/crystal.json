@@ -287,6 +287,13 @@
 		],
 		"description": "A loop executes its body forever until a break."
 	},
+	"inline block": {
+		"prefix": "{",
+		"body": [
+			"{ ${1:|${2:variable}| $0 }"
+		],
+		"description": "Create an inline block"
+	},
 	"block do": {
 		"prefix": "d",
 		"body": [
