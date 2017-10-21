@@ -8,11 +8,20 @@
 - Task provider.
 - Macros.
 
+## [0.3.6] - 2017-10-21
+### Fix
+- Fix [#28](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/28).
+- Fix null line issue and column zero.
+
+### Changes
+- Refactor CrystalDocumentSymbolProvider methods.
+- Update [keywords list](https://github.com/crystal-lang/crystal/wiki/Crystal-for-Rubyists#available-keywords).
+
 ## [0.3.5] - 2017-10-13
 ### Changes
-- Update dependencies
-- Add inline block snippets
-- Fix highlighting issues, see [#27](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/27) thanks to [@straight-shoota](https://github.com/straight-shoota)
+- Update dependencies.
+- Add inline block snippets.
+- Fix highlighting issues, see [#27] (https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/27) thanks to [@straight-shoota](https://github.com/straight-shoota).
 
 ## [0.3.4] - 2017-09-24
 ### Fix
