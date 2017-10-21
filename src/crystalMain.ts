@@ -13,7 +13,7 @@ import { CrystalImplementationsProvider } from "./crystalImplementations"
 // Language configuration for identation and patterns.
 const crystalConfiguration = {
 	indentationRules: {
-		increaseIndentPattern: /^\s*((begin|class|struct|(private|protected)\s+def|def|fun|macro|else|elsif|ensure|for|if|module|rescue|unless|until|when|while)|([^#]*\sdo\b))\b[^\{;]*$/,
+		increaseIndentPattern: /^\s*((begin|(private\s+abstract|private|abstract)\s+(class|struct)|class|struct|(private|protected)\s+def|def|fun|macro|else|elsif|ensure|for|if|module|rescue|unless|until|when|while)|([^#]*\sdo\b))\b[^\{;]*$/,
 		decreaseIndentPattern: /^\s*([}\]]([,)]?\s*(#|$)|\.[a-zA-Z_]\w*\b)|(end|rescue|ensure|else|elsif)\b)/
 	},
 	wordPattern: /(-?\d+(?:\.\d+))|(:?[A-Za-z][^-`~@#%^&()=+[{}|;:'",<>/.*\]\s\\!?]*[!?]?)/
@@ -22,14 +22,18 @@ const crystalConfiguration = {
 // VSCode identificator for Crystal
 const CRYSTAL_MODE: vscode.DocumentFilter = { language: "crystal", scheme: "file" }
 
-// Ensure to analyze only Crystal documents
+/**
+ * Ensure to analyze only Crystal documents
+ */
 function diagnosticDocument(document) {
 	if (document.languageId == "crystal") {
 		getDiagnostic(document)
 	}
 }
 
-// Init function for this extension
+/**
+ * Init function for this extension
+ */
 export async function activate(context: vscode.ExtensionContext) {
 
 	// Call features not implemented on server yet.
