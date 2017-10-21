@@ -154,6 +154,10 @@ export function searchProblems(response: string, uri: vscode.Uri) {
 				if (index >= maxNumberOfProblems) {
 					break
 				}
+				if (problem.line == null) {
+					problem.line = 1
+					problem.column = 1
+				}
 				let range = new vscode.Range(problem.line - 1, problem.column - 1, problem.line - 1, (problem.column + (problem.size || 0) - 1))
 				let diagnostic = new vscode.Diagnostic(range, problem.message, vscode.DiagnosticSeverity.Error)
 				let file: vscode.Uri
