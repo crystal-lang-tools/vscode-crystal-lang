@@ -50,13 +50,14 @@ const STDLIB = (() => {
 CRENV.CRYSTAL_PATH = `${WORKSPACE}/lib:${STDLIB}`
 
 // Crystal keywords to ignore on hover
+// https://github.com/crystal-lang/crystal/wiki/Crystal-for-Rubyists#available-keywords
 const KEYWORDS = [
-	"begin", "class", "def", "do", "else",
-	"elsif", "end", "ensure", "fun", "if",
-	"lib", "macro", "module", "rescue", "struct",
-	"loop", "case", "select", "then", "when",
-	"while", "for", "return", "macro", "require",
-	"private", "protected", "yield"
+	"def", "if", "else", "elsif", "end", "true", "false", "class", "module", "include",
+	"extend", "while", "until", "nil", "do", "yield", "return", "unless", "next", "break",
+	"begin", "lib", "fun", "type", "struct", "union", "enum", "macro", "out", "require",
+	"case", "when", "select", "then", "of", "rescue", "ensure", "is_a?", "alias", "sizeof",
+	"as", "as?", "typeof", "for", "in", "with", "self", "super", "private", "asm",
+	"nil?", "abstract", "pointerof", "protected", "uninitialized", "instance_sizeof"
 ]
 
 /**
