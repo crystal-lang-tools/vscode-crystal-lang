@@ -22,14 +22,18 @@ const crystalConfiguration = {
 // VSCode identificator for Crystal
 const CRYSTAL_MODE: vscode.DocumentFilter = { language: "crystal", scheme: "file" }
 
-// Ensure to analyze only Crystal documents
+/**
+ * Ensure to analyze only Crystal documents
+ */
 function diagnosticDocument(document) {
 	if (document.languageId == "crystal") {
 		getDiagnostic(document)
 	}
 }
 
-// Init function for this extension
+/**
+ * Init function for this extension
+ */
 export async function activate(context: vscode.ExtensionContext) {
 
 	// Call features not implemented on server yet.

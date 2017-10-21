@@ -1,6 +1,8 @@
 import * as vscode from "vscode"
 
-// Search document symbols using VSCode provider
+/**
+ * Search document symbols using VSCode provider
+ */
 export class CrystalDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 
 	// Return symbols result to VSCode

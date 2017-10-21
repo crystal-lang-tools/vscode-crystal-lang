@@ -3,15 +3,21 @@ import { dirname } from "path"
 
 import { spawnTools, tryWindowsPath } from "./crystalUtils"
 
-// Show implementations using VSCode provider
+/**
+ * Show implementations using VSCode provider
+ */
 export class CrystalImplementationsProvider implements vscode.DefinitionProvider {
 
-	// Execute crystal tool context for current file:position
+	/**
+	 * Execute crystal tool context for current file:position
+	 */
 	crystalImplementations(document: vscode.TextDocument, position: vscode.Position) {
 		return spawnTools(document, position, "impl", "implementations")
 	}
 
-	// Search for definitions in a Crystal project
+	/**
+	 * Search for definitions in a Crystal project
+	 */
 	async provideDefinition(document: vscode.TextDocument, position: vscode.Position) {
 		let crystalOutput = await this.crystalImplementations(document, position)
 		let locations: vscode.Location[] = []

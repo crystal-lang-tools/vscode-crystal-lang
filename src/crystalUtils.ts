@@ -59,7 +59,9 @@ const KEYWORDS = [
 	"private", "protected", "yield"
 ]
 
-// Check main file in current workspace
+/**
+ * Check main file in current workspace
+ */
 function mainFile(document) {
 	const config = vscode.workspace.getConfiguration("crystal-lang")
 	if (config["mainFile"]) {
@@ -68,7 +70,9 @@ function mainFile(document) {
 	return document
 }
 
-// Check Linux path for Bash on Windows
+/**
+ * Check Linux path for Bash on Windows
+ */
 function tryLinuxPath(path: string) {
 	if (config["bashOnWindows"]) {
 		let letter = path.slice(0, 1).toLowerCase()
@@ -84,7 +88,9 @@ function tryLinuxPath(path: string) {
 // Diagnostics provider
 export const diagnosticCollection = vscode.languages.createDiagnosticCollection("crystal")
 
-// Counter for Crystal processes
+/**
+ * Counter for Crystal processes
+ */
 export class Concurrent {
 	static counter = 0
 	static limit() {
@@ -92,7 +98,9 @@ export class Concurrent {
 	}
 }
 
-// Check Windows path for Bash on Windows
+/**
+ * Check Windows path for Bash on Windows
+ */
 export function tryWindowsPath(path: string) {
 	if (config["bashOnWindows"]) {
 		let stdlib = STDLIB.split(":")
@@ -106,12 +114,16 @@ export function tryWindowsPath(path: string) {
 	return path
 }
 
-// Check if word is a Crystal keyword
+/**
+ * Check if word is a Crystal keyword
+ */
 export function isNotKeyword(word) {
 	return KEYWORDS.indexOf(word) < 0
 }
 
-// Ensure that file is not inside lib folders
+/**
+ * Ensure that file is not inside lib folders
+ */
 export function isNotLib(file) {
 	let stdlib = STDLIB.split(":")
 	if (file.startsWith(stdlib[0]) || file.startsWith(stdlib[1]) || file.startsWith(`${ROOT}/lib`)) {
@@ -120,12 +132,16 @@ export function isNotLib(file) {
 	return true
 }
 
-// Seach symbols for a crystal document
+/**
+ * Seach symbols for a crystal document
+ */
 export function getSymbols(uri): Thenable<vscode.SymbolInformation[]> {
 	return vscode.commands.executeCommand("vscode.executeDocumentSymbolProvider", uri)
 }
 
-// Parse JSON response and create diagnostics
+/**
+ * Parse JSON response and create diagnostics
+ */
 export function searchProblems(response: string, uri: vscode.Uri) {
 	let diagnostics = []
 	const config = vscode.workspace.getConfiguration("crystal-lang")
@@ -164,7 +180,9 @@ export function searchProblems(response: string, uri: vscode.Uri) {
 	return diagnostics
 }
 
-// Execute Crystal tools context and implementations
+/**
+ * Execute Crystal tools context and implementations
+ */
 export function spawnTools(document, position, command, key) {
 	return new Promise(function (resolve, reject) {
 		let response = ""
@@ -207,7 +225,9 @@ export function spawnTools(document, position, command, key) {
 	})
 }
 
-// Execute Crystal compiler or parser
+/**
+ * Execute Crystal compiler or parser
+ */
 export function spawnCompiler(document, build) {
 	const config = vscode.workspace.getConfiguration("crystal-lang")
 	let file = tryLinuxPath(document.fileName)

@@ -12,10 +12,14 @@ const TYPES = [
 	TDATA.TOP_LEVEL_METHODS, TDATA.STRUCTS, TDATA.CLASSES, TDATA.MODULES, TDATA.ALIAS, TDATA.ENUMS
 ]
 
-// Get information of hovered method or class
+/**
+ * Get information of hovered method or class
+ */
 export class CrystalHoverProvider extends CrystalContext implements vscode.HoverProvider {
 
-	// Return tooltip information to VSCode
+	/**
+	 * Return tooltip information to VSCode
+	 */
 	async provideHover(document: vscode.TextDocument, position: vscode.Position, token) {
 		const config = vscode.workspace.getConfiguration("crystal-lang")
 		if (!config["hover"]) {
@@ -97,7 +101,9 @@ export class CrystalHoverProvider extends CrystalContext implements vscode.Hover
 	}
 }
 
-// Remove duplicate methods and descriptions.
+/**
+ * Remove duplicate methods and descriptions.
+ */
 function filter(hoverTexts: any[]) {
 	if (hoverTexts.length <= 1) {
 		return hoverTexts

@@ -3,10 +3,14 @@ import { spawn } from "child_process"
 
 import { searchProblems } from "./crystalUtils"
 
-// Formatting provider using VSCode module
+/**
+ * Formatting provider using VSCode module
+ */
 export class CrystalFormattingProvider implements vscode.DocumentFormattingEditProvider {
 
-	// Execute crystal tool format and get response.
+	/**
+	 * Execute crystal tool format and get response.
+	 */
 	execFormat(document: vscode.TextDocument) {
 		return new Promise(function (resolve, reject) {
 			let response = ""
@@ -32,7 +36,9 @@ export class CrystalFormattingProvider implements vscode.DocumentFormattingEditP
 		})
 	}
 
-	// Return formatted documment to VSCode
+	/**
+	 * Return formatted documment to VSCode
+	 */
 	async provideDocumentFormattingEdits(document: vscode.TextDocument) {
 		let response = await this.execFormat(document)
 		let textEditData: vscode.TextEdit[] = []

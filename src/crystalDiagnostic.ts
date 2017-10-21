@@ -3,7 +3,9 @@ import { spawn } from "child_process"
 
 import { Concurrent, isNotLib, spawnCompiler } from "./crystalUtils"
 
-// Execute crystal build to check problems.
+/**
+ * Execute crystal build to check problems.
+ */
 export function getDiagnostic(document: vscode.TextDocument) {
 	const config = vscode.workspace.getConfiguration("crystal-lang")
 	if (config["problems"] == "syntax") {

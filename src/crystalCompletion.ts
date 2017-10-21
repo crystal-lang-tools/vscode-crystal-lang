@@ -4,13 +4,17 @@ import * as TDATA from "./crystalCompletionData"
 import { CrystalContext } from "./crystalContext"
 import { getSymbols } from "./crystalUtils"
 
-// Completion provider using VSCode module
+/**
+ * Completion provider using VSCode module
+ */
 export class CrystalCompletionItemProvider extends CrystalContext implements vscode.CompletionItemProvider {
 
 	// Completions attribute
 	private completions: vscode.CompletionList
 
-	// Convert VSCode completion items to symbols
+	/**
+	 * Convert VSCode completion items to symbols
+	 */
 	private getItemKindFromSymbolKind(kind) {
 		switch (kind) {
 			case 4:
@@ -36,21 +40,27 @@ export class CrystalCompletionItemProvider extends CrystalContext implements vsc
 		}
 	}
 
-	// Add a method to completion list
+	/**
+	 * Add a method to completion list
+	 */
 	private pushCompletionMethods(completions) {
 		for (let method of completions) {
 			this.createCompletionItem(method[0], method[1], method[2], vscode.SymbolKind.Method)
 		}
 	}
 
-	// Add a symbols to completion list (needed by symbol provider)
+	/**
+	 * Add a symbols to completion list (needed by symbol provider)
+	 */
 	private pushCompletionOther(completions, kind) {
 		for (let completion of completions) {
 			this.createCompletionItem(completion[0], completion[1], completion[2], kind)
 		}
 	}
 
-	// Create a new completion item
+	/**
+	 * Create a new completion item
+	 */
 	private createCompletionItem(name, detail, documentation, kind) {
 		let completion = new vscode.CompletionItem(`${name}`, this.getItemKindFromSymbolKind(kind))
 		completion.documentation = documentation
@@ -59,7 +69,9 @@ export class CrystalCompletionItemProvider extends CrystalContext implements vsc
 		this.completions.items.push(completion)
 	}
 
-	// Return completion data to VSCode
+	/**
+	 * Return completion data to VSCode
+	 */
 	async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position) {
 		// -----------------------------------------------
 		// TODO: improve Type completion algorithm (again)
