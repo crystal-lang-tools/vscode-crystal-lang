@@ -8,6 +8,13 @@
 - Task provider.
 - Macros.
 
+## [0.3.7] - 2017-10-27
+### Fix
+- Fix octal hightlighting issue [#31](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/31).
+
+### Changes
+- Add new gif demo
+
 ## [0.3.6] - 2017-10-21
 ### Fix
 - Fix [#28](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/28).
