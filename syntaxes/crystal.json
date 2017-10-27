@@ -273,7 +273,7 @@
 			"name": "meta.function.method.without-arguments.crystal"
 		},
 		{
-			"match": "\\b(0[xX]\\h(?>_?\\h)*|\\d(?>_?\\d)*(\\.(?![^[:space:][:digit:]])(?>_?\\d)*)?([eE][-+]?\\d(?>_?\\d)*)?|0[bB][01]+)(_?(u8|u16|u32|u64|i8|i16|i32|i64|f32|f64))?\\b",
+			"match": "\\b(0x\\h(?>_?\\h)*|\\d(?>_?\\d)*(\\.(?![^[:space:][:digit:]])(?>_?\\d)*)?([eE][-+]?\\d(?>_?\\d)*)?|0[b][01]+|0[o][0-7]+)(_?(u8|u16|u32|u64|i8|i16|i32|i64|f32|f64))?\\b",
 			"name": "constant.numeric.crystal"
 		},
 		{
