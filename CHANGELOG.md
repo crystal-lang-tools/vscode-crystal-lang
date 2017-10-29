@@ -2,11 +2,8 @@
 
 ## [Unreleased]
 ### Todo
-- Full Support for Language Server Protocol.
-- Rewrite completion algorithm.
-- Debugger provider.
-- Task provider.
-- Macros.
+
+- See [roadmap](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Roadmap).
 
 ## [0.3.7] - 2017-10-27
 ### Fix
