@@ -111,7 +111,7 @@
 		},
 		{
 			"comment": "everything being a reserved word, not a value and needing a 'end' is a..",
-			"match": "(?<!\\.)\\b(alias|as|begin|case|abstract|class|ensure|for|fun|if|in|lib|module|of|private|protected|rescue|struct|with|union|enum|macro|then|type|unless|until|while|select)\\b(?![?!])",
+			"match": "(?<!\\.)\\b(alias|as|begin|case|abstract|class|ensure|for|fun|if|in|lib|module|of|previous_def|private|protected|rescue|struct|with|union|enum|macro|then|type|unless|until|while|select)\\b(?![?!])",
 			"name": "keyword.control.primary.crystal"
 		},
 		{
