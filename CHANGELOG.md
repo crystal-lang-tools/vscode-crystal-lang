@@ -5,6 +5,11 @@
 
 - See [roadmap](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Roadmap).
 
+## [0.3.8] - 2017-11-11
+### Add
+- Add `previous_def` as a keyword [#36](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/36).
+- New snippets for `uninitilialized` and `previous_def`.
+
 ## [0.3.7] - 2017-10-27
 ### Fix
 - Fix octal hightlighting issue [#31](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/31).
