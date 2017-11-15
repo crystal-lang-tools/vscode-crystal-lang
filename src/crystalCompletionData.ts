@@ -973,7 +973,7 @@ export const STRUCTS = [
 	["Int32", "struct Int32", ""],
 	["Int64", "struct Int64", ""],
 	["Int8", "struct Int8", ""],
-	["Namedtuple", "struct NamedTuple(**T)", ""],
+	["NamedTuple", "struct NamedTuple(**T)", ""],
 	["Nil", "struct Nil", ""],
 	["Number", "abstract struct Number", ""],
 	["Pointer", "struct Pointer(T)", ""],
