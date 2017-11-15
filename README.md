@@ -1,6 +1,6 @@
 # VSCode Extension for Crystal Language
 
-[![Build Status](https://travis-ci.org/crystal-lang-tools/vscode-crystal-lang.svg?branch=add-tests)](https://travis-ci.org/crystal-lang-tools/vscode-crystal-lang)
+[![Build Status](https://travis-ci.org/crystal-lang-tools/vscode-crystal-lang.svg?branch=master)](https://travis-ci.org/crystal-lang-tools/vscode-crystal-lang)
 
 This extension provides support for the [Crystal](https://github.com/crystal-lang) programming language.
 
