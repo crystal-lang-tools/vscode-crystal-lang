@@ -957,10 +957,10 @@ export const TOP_LEVEL_METHODS = [
 ]
 export const STRUCTS = [
 	["Atomic", "struct Atomic(T)", ""],
-	["Bigfloat", "struct BigFloat", ""],
-	["Bigint", "struct BigInt", ""],
-	["Bigrational", "struct BigRational", ""],
-	["Bitarray", "struct BitArray", ""],
+	["BigFloat", "struct BigFloat", ""],
+	["BigInt", "struct BigInt", ""],
+	["BigRational", "struct BigRational", ""],
+	["BitArray", "struct BitArray", ""],
 	["Bool", "struct Bool", ""],
 	["Char", "struct Char", ""],
 	["Complex", "struct Complex", ""],
@@ -982,7 +982,7 @@ export const STRUCTS = [
 	["Reflect", "struct Reflect(X)", ""],
 	["Set", "struct Set(T)", ""],
 	["Slice", "struct Slice(T)", ""],
-	["Staticarray", "struct StaticArray(T, N)", ""],
+	["StaticArray", "struct StaticArray(T, N)", ""],
 	["Struct", "abstract struct Struct", ""],
 	["Symbol", "struct Symbol", ""],
 	["Time", "struct Time", ""],
