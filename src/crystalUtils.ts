@@ -37,12 +37,12 @@ const STDLIB = (() => {
 		const match = regex.exec(output.toString());
 		if (match && match.length === 2) {
 			return match[1]
-		} else {
-			return "lib"
 		}
+		return "lib"
 	} catch (ex) {
 		vscode.window.showWarningMessage("Crystal compiler not found. Some features can throw errors.")
 		console.error(ex)
+		return "lib"
 	}
 })()
 
