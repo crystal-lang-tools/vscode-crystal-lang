@@ -5,6 +5,14 @@
 
 - See [roadmap](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Roadmap).
 
+## [0.3.9] - 2017-11-15
+### Add
+- Test integration [#41](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/41).
+
+### Fix
+- Loading... bug [#38](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/38).
+- Case of NamedTuple suggestion [#37](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/37).
+
 ## [0.3.8] - 2017-11-11
 ### Add
 - Add `previous_def` as a keyword [#36](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/36).
