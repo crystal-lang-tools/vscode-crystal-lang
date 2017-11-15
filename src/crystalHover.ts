@@ -2,6 +2,7 @@ import * as vscode from "vscode"
 import * as TDATA from "./crystalCompletionData"
 import { CrystalContext } from "./crystalContext"
 import { isNotKeyword, isNotLib, getSymbols } from "./crystalUtils"
+import { deepEqual } from "assert";
 
 // Basic Crystal information about types and methods
 const TYPES = [
@@ -17,14 +18,21 @@ const TYPES = [
  */
 export class CrystalHoverProvider extends CrystalContext implements vscode.HoverProvider {
 
+	private position = new vscode.Position(0, 0)
+
+	private equalPositions(stored, current) {
+		return (stored.line == current.line) && (stored.character == current.character)
+	}
+
 	/**
 	 * Return tooltip information to VSCode
 	 */
 	async provideHover(document: vscode.TextDocument, position: vscode.Position, token) {
 		const config = vscode.workspace.getConfiguration("crystal-lang")
-		if (!config["hover"]) {
-				return
+		if (!config["hover"] || this.equalPositions(this.position, position)) {
+			return
 		}
+		this.position = position
 		let line = document.getText(new vscode.Range(position.line, 0, position.line, position.character))
 		// Check if line isn't a comment or string
 		let quotes = null
