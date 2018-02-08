@@ -10,11 +10,11 @@ import { CrystalDocumentSymbolProvider } from "./crystalSymbols"
 import { CrystalCompletionItemProvider } from "./crystalCompletion"
 import { CrystalImplementationsProvider } from "./crystalImplementations"
 
-// Language configuration for identation and patterns.
+// Language configuration for identation and patterns. Based on vscode-ruby
 const crystalConfiguration = {
 	indentationRules: {
-		increaseIndentPattern: /^\s*((begin|(private\s+abstract|private|abstract)\s+(class|struct)|class|struct|(private|protected)\s+def|def|fun|macro|else|elsif|ensure|for|if|module|rescue|unless|until|when|while)|([^#]*\sdo\b))\b[^\{;]*$/,
-		decreaseIndentPattern: /^\s*([}\]]([,)]?\s*(#|$)|\.[a-zA-Z_]\w*\b)|(end|rescue|ensure|else|elsif)\b)/
+		increaseIndentPattern: /^\s*((begin|(private\s+abstract|private|abstract)\s+(class|struct)|class|struct|(private|protected)\s+def|def|fun|macro|else|elsif|ensure|for|if|module|rescue|unless|until|when|while|case)|([^#]*\sdo\b)|([^#]*=\s*(case|if|unless)))\b([^#\{;]|("|'|\/).*\4)*(#.*)?$/,
+		decreaseIndentPattern: /^\s*([}\]]([,)]?\s*(#|$)|\.[a-zA-Z_]\w*\b)|(end|rescue|ensure|else|elsif|when)\b)/
 	},
 	wordPattern: /(-?\d+(?:\.\d+))|(:?[A-Za-z][^-`~@#%^&()=+[{}|;:'",<>/.*\]\s\\!?]*[!?]?)/
 }
