@@ -39,9 +39,6 @@ export async function activate(context: vscode.ExtensionContext) {
 	// Call features not implemented on server yet.
 	context.subscriptions.push(
 		vscode.languages.setLanguageConfiguration("crystal", crystalConfiguration),
-		vscode.languages.registerHoverProvider(CRYSTAL_MODE, new CrystalHoverProvider()),
-		vscode.languages.registerDocumentSymbolProvider("crystal", new CrystalDocumentSymbolProvider()),
-		vscode.languages.registerCompletionItemProvider(CRYSTAL_MODE, new CrystalCompletionItemProvider())
 	)
 
 	// Extension configuration
@@ -66,7 +63,10 @@ export async function activate(context: vscode.ExtensionContext) {
 			diagnosticCollection,
 			vscode.languages.registerDocumentFormattingEditProvider("crystal", new CrystalFormattingProvider()),
 			vscode.workspace.onDidOpenTextDocument(diagnosticDocument),
-			vscode.workspace.onDidSaveTextDocument(diagnosticDocument)
+			vscode.workspace.onDidSaveTextDocument(diagnosticDocument),
+			vscode.languages.registerHoverProvider(CRYSTAL_MODE, new CrystalHoverProvider()),
+			vscode.languages.registerDocumentSymbolProvider("crystal", new CrystalDocumentSymbolProvider()),
+			vscode.languages.registerCompletionItemProvider(CRYSTAL_MODE, new CrystalCompletionItemProvider())
 		)
 		if (config["implementations"]) {
 			context.subscriptions.push(
