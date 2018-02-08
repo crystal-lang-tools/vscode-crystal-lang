@@ -5,6 +5,13 @@
 
 - See [roadmap](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Roadmap).
 
+## [0.3.10] - 2019-02-07
+### Fix
+- Diagnostics doesn't work [#47](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/47)
+
+### Changes
+- Indentation pattern based on vscode-ruby [#46](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/46)
+
 ## [0.3.9] - 2017-11-15
 ### Add
 - Test integration [#41](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/41).
