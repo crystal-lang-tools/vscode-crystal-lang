@@ -1,7 +1,7 @@
 import * as vscode from "vscode"
 import { spawn } from "child_process"
 
-import { searchProblems } from "./crystalUtils"
+import { searchProblems, childOnStd, childOnError } from "./crystalUtils"
 
 /**
  * Formatting provider using VSCode module
@@ -18,21 +18,13 @@ export class CrystalFormattingProvider implements vscode.DocumentFormattingEditP
 			let child = spawn(`${config["compiler"]}`, ["tool", "format", "--no-color", "-f", "json", "-"])
 			child.stdin.write(document.getText())
 			child.stdin.end()
-			child.stdout.on("data", (data) => {
+			childOnStd(child, "data", (data) => {
 				response += data
 			})
-			child.stdout.on("end", () => {
+			childOnStd(child, "end", () => {
 				return resolve(response)
 			})
-			child.on("error", (err) => {
-				vscode.window.showErrorMessage("Crystal compiler not found. " + err.message)
-				console.error(err.message)
-			})
-			child.on("exit", (exitCode) => {
-				if (exitCode != 0) {
-					return resolve("")
-				}
-			})
+			childOnError(child)
 		})
 	}
 

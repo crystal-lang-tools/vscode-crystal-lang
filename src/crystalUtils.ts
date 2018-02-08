@@ -209,19 +209,16 @@ export function spawnTools(document, position, command, key) {
 				"-f",
 				"json"
 			], { cwd: ROOT, env: CRENV })
-			child.stdout.on("data", (data) => {
+			childOnStd(child, "data", (data) => {
 				response += data
 			})
-			child.stdout.on("end", () => {
+			childOnStd(child, "end", () => {
 				searchProblems(response.toString(), document.uri)
 				Concurrent.counter -= 1
 				statusBarItem.hide()
 				return resolve(response)
 			})
-			child.on("error", (err) => {
-				vscode.window.showErrorMessage("Crystal compiler not found. " + err.message)
-				console.error(err.message)
-			})
+			childOnError(child)
 		} else if (config[key]) {
 			return resolve(`{"status":"blocked"}`)
 		} else {
@@ -265,18 +262,33 @@ export function spawnCompiler(document, build) {
 		]
 	})()
 	let child = spawn(`${config["compiler"]}`, options, { cwd: ROOT, env: CRENV })
-	child.stdout.on("data", (data) => {
+	childOnStd(child, "data", (data) => {
 		response += data
 	})
-	child.stdout.on("end", () => {
+	childOnStd(child, "end", () => {
 		searchProblems(response.toString(), document.uri)
 		if (build) {
 			Concurrent.counter -= 1
 			statusBarItem.hide()
 		}
 	})
+	childOnError(child)
+}
+
+/**
+ * Helper method for using process stdout and stderr
+ */
+export function childOnStd(child, event, block) {
+	child.stdout.on(event, block)
+	child.stderr.on(event, block)
+}
+
+/**
+ * Helper method for printing crystal plugin errors
+ */
+export function childOnError(child) {
 	child.on("error", (err) => {
-		vscode.window.showErrorMessage("Crystal compiler not found. " + err.message)
+		vscode.window.showErrorMessage("Error executing Crystal plugin. " + err.message)
 		console.error(err.message)
 	})
 }
