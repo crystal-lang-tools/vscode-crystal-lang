@@ -205,6 +205,15 @@
 					"name": "punctuation.definition.variable.crystal"
 				}
 			},
+			"match": "(\\%)[a-zA-Z_]\\w*[\\s|\\.\\]",
+			"name": "variable.other.readwrite.fresh.crystal"
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "punctuation.definition.variable.crystal"
+				}
+			},
 			"match": "(\\$)(!|@|&|`|'|\\+|\\d+|~|=|\/|\\\\|,|;|\\.|<|>|_|\\*|\\$|\\?|:|\"|-[0adFiIlpv])",
 			"name": "variable.other.readwrite.global.pre-defined.crystal"
 		},
