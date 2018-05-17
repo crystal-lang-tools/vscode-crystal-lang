@@ -20,13 +20,13 @@ const crystalConfiguration = {
 }
 
 // VSCode identificator for Crystal
-const CRYSTAL_MODE: vscode.DocumentFilter = { language: "crystal", scheme: "file" }
+const CRYSTAL_MODE: client.DocumentSelector = [{ language: "crystal", scheme: "file" }];
 
 /**
  * Ensure to analyze only Crystal documents
  */
 function diagnosticDocument(document) {
-	if (document.languageId == "crystal") {
+	if (document.languageId == "crystal" && document.uri.scheme == "file") {
 		getDiagnostic(document)
 	}
 }
@@ -49,7 +49,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	if (fs.existsSync(scry)) {
 		let serverOptions = { command: scry, args: [] }
 		let clientOptions: client.LanguageClientOptions = {
-			documentSelector: ["crystal"],
+			documentSelector: CRYSTAL_MODE,
 			synchronize: {
 				configurationSection: "crystal-lang",
 				fileEvents: vscode.workspace.createFileSystemWatcher("**/*.cr")
@@ -61,11 +61,11 @@ export async function activate(context: vscode.ExtensionContext) {
 		// If server is disabled use Node.js implementation instead.
 		context.subscriptions.push(
 			diagnosticCollection,
-			vscode.languages.registerDocumentFormattingEditProvider("crystal", new CrystalFormattingProvider()),
+			vscode.languages.registerDocumentFormattingEditProvider(CRYSTAL_MODE, new CrystalFormattingProvider()),
 			vscode.workspace.onDidOpenTextDocument(diagnosticDocument),
 			vscode.workspace.onDidSaveTextDocument(diagnosticDocument),
 			vscode.languages.registerHoverProvider(CRYSTAL_MODE, new CrystalHoverProvider()),
-			vscode.languages.registerDocumentSymbolProvider("crystal", new CrystalDocumentSymbolProvider()),
+			vscode.languages.registerDocumentSymbolProvider(CRYSTAL_MODE, new CrystalDocumentSymbolProvider()),
 			vscode.languages.registerCompletionItemProvider(CRYSTAL_MODE, new CrystalCompletionItemProvider())
 		)
 		if (config["implementations"]) {
