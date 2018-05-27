@@ -12,7 +12,7 @@ This extension provides support for the [Crystal](https://github.com/crystal-lan
 2. [Features](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Features)
 3. [Settings](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Settings)
 4. [Useful extensions](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Useful-extensions)
-5. [Know issues](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Known-Issues)
+5. [Known issues](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Known-Issues)
 6. [Roadmap](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Roadmap)
 
 ## Release Notes
