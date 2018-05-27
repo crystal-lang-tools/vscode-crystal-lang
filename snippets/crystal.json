@@ -299,7 +299,7 @@
 			"\t$0",
 			"end"
 		],
-		"description": "A loop executes its body forever until a break."
+		"description": "Spawns a fiber."
 	},
 	"inline block": {
 		"prefix": "{",
