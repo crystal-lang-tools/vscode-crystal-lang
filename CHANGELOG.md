@@ -5,7 +5,7 @@
 
 - See [roadmap](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Roadmap).
 
-## [0.3.10] - 2019-02-07
+## [0.3.10] - 2018-02-07
 ### Fix
 - Diagnostics doesn't work [#47](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/47)
 
