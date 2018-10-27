@@ -12,7 +12,7 @@ const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignmen
 const config = vscode.workspace.getConfiguration("crystal-lang")
 
 // Allow to create enviroments variables
-const CRENV = Object.create(process.env)
+const CRENV = Object.create({ ...process.env })
 
 // Root folder for current workspace
 const ROOT = vscode.workspace.rootPath
@@ -34,7 +34,7 @@ const STDLIB = (() => {
 	const regex = /CRYSTAL_PATH="(.*)"\n/;
 	try {
 		let output = execSync(`${config["compiler"]} env`)
-		const match = regex.exec(output.toString());
+    const match = regex.exec(output.toString())
 		if (match && match.length === 2) {
 			return match[1]
 		}
