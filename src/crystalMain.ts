@@ -66,7 +66,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			vscode.workspace.onDidSaveTextDocument(diagnosticDocument),
 			vscode.languages.registerHoverProvider(CRYSTAL_MODE, new CrystalHoverProvider()),
 			vscode.languages.registerDocumentSymbolProvider(CRYSTAL_MODE, new CrystalDocumentSymbolProvider()),
-			vscode.languages.registerCompletionItemProvider(CRYSTAL_MODE, new CrystalCompletionItemProvider())
+			vscode.languages.registerCompletionItemProvider(CRYSTAL_MODE, new CrystalCompletionItemProvider(), '.')
 		)
 		if (config["implementations"]) {
 			context.subscriptions.push(
