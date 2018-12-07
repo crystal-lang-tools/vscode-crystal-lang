@@ -24,6 +24,19 @@
 			],
 		"description": "HTTP Server example with error, logs and static handler."
 	},
+	"HTTP handler": {
+		"prefix": "http handler",
+		"body": [
+			"class ${1:HTTPHandler}",
+			"\tinclude HTTP::Handler",
+			"",
+			"\tdef call(context)",
+			"\t\t$0",
+			"\tend",
+			"end"
+		],
+		"description": "HTTP Handler example."
+	},
 	"Exception block": {
 		"prefix": "begin",
 		"body": [
