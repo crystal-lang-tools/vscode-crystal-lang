@@ -2,21 +2,25 @@
 	"HTTP simple server": {
 		"prefix": "http server",
 		"body": [
-				"server = HTTP::Server.new(${1:\"0.0.0.0\"}, ${2:8080}) do |context|",
-  				"\tcontext.response.content_type = \"text/plain\"",
-  				"\tcontext.response.print \"Hello world!\"",
-				"end"
+				"server = HTTP::Server.new do |context|",
+					"\tcontext.response.content_type = \"text/plain\"",
+					"\tcontext.response.print \"Hello world!\"",
+				"end",
+				"\nserver.bind_tcp ${1:\"0.0.0.0\"}, ${2:8080}",
+				"server.listen"
 			],
 		"description": "HTTP Server example."
 	},
 	"HTTP server with handlers": {
 		"prefix": "http server with handlers",
 		"body": [
-				"HTTP::Server.new(${1:\"127.0.0.1\"}, ${2:8080}, [",
-  				"\tHTTP::ErrorHandler.new,",
-  				"\tHTTP::LogHandler.new,",
-  				"\tHTTP::StaticFileHandler.new(\".\"),",
-				"]).listen"
+				"server = HTTP::Server.new([",
+					"\tHTTP::ErrorHandler.new,",
+					"\tHTTP::LogHandler.new,",
+					"\tHTTP::StaticFileHandler.new(\".\"),",
+				"])",
+				"\nserver.bind_tcp ${1:\"0.0.0.0\"}, ${2:8080}",
+				"server.listen"
 			],
 		"description": "HTTP Server example with error, logs and static handler."
 	},
