@@ -138,7 +138,7 @@
 		},
 		{
 			"comment": "everything being a method but having a special function is a..",
-			"match": "\\b(initialize|new|loop|include|extend|raise|getter|setter|property|class_getter|class_setter|class_property|describe|it|with|delegate|def_hash|def_equals|def_equals_and_hash|forward_missing_to|record|assert_responds_to|spawn|p|pp|alias)\\b[!?]?",
+			"match": "\\b(initialize|new|loop|include|extend|getter|setter|property|class_getter|class_setter|class_property|describe|it|with|delegate|def_hash|def_equals|def_equals_and_hash|forward_missing_to|record|assert_responds_to|alias)\\b[!?]?",
 			"name": "keyword.control.special-method.crystal"
 		},
 		{
@@ -212,8 +212,9 @@
 			"name": "support.class.crystal"
 		},
 		{
-			"match": "\\b((abort|at_exit|autoload|binding|callcc|caller|caller_locations|chomp|chop|eval|exec|exit|fork|format|gets|global_variables|gsub|lambda|load|local_variables|open|p|print|printf|proc|putc|puts|rand|readline|readlines|select|set_trace_func|sleep|spawn|sprintf|srand|sub|syscall|system|test|trace_var|trap|untrace_var|warn)\\b(?![?!])|autoload\\?|exit!)",
-			"name": "support.function.kernel.crystal"
+			"match": "\\b(abort|at_exit|caller|delay|exit|fork|future|lazy|loop|main|p|pp|print|printf|puts|rand|read_line|sleep|spawn|sprintf|system|with_color|debugger|record)\\b[!?]?",
+			"name": "support.function.kernel.crystal",
+			"comment": "Fetch from https://crystal-lang.org/api/0.27.0/toplevel.html"
 		},
 		{
 			"match": "\\b[A-Z\\x{80}-\\x{10FFFF}][\\w\\x{80}-\\x{10FFFF}]*\\b",
