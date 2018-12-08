@@ -60,6 +60,12 @@ const KEYWORDS = [
 	"nil?", "abstract", "pointerof", "protected", "uninitialized", "instance_sizeof"
 ]
 
+const spawnOptions = {
+	cwd: ROOT,
+	env: CRENV,
+	stdio: ["ignore", "pipe", "pipe"]
+}
+
 /**
  * Check main file in current workspace
  */
@@ -198,17 +204,17 @@ export function spawnTools(document, position, command, key) {
 			Concurrent.counter += 1
 			statusBarItem.text = `${config["compiler"]} tool ${command} is working...`
 			statusBarItem.show()
-			let child = spawn(`${config["compiler"]}`, [
+			let child = spawn(config["compiler"], [
 				"tool",
 				command,
 				"-c",
 				`${file}:${position.line + 1}:${position.character + 1}`,
-				`${scope}`,
+				scope,
 				"--no-color",
 				"--error-trace",
 				"-f",
 				"json"
-			], { cwd: ROOT, env: CRENV })
+			], spawnOptions)
 			childOnStd(child, "data", (data) => {
 				response += data
 			})
@@ -235,7 +241,7 @@ export function spawnCompiler(document, build) {
 	let file = tryLinuxPath(document.fileName)
 	let scope = mainFile(file)
 	let response = ""
-	let options = (() => {
+	let args = (() => {
 		if (build) {
 			Concurrent.counter += 1
 			statusBarItem.text = `${config["compiler"]} build --no-codegen is working...`
@@ -246,7 +252,7 @@ export function spawnCompiler(document, build) {
 				"--no-color",
 				"--no-codegen",
 				"--error-trace",
-				`${scope}`,
+				scope,
 				"-f",
 				"json"
 			]
@@ -258,10 +264,10 @@ export function spawnCompiler(document, build) {
 			"--no-color",
 			"-f",
 			"json",
-			`${file}`
+			file
 		]
 	})()
-	let child = spawn(`${config["compiler"]}`, options, { cwd: ROOT, env: CRENV })
+	let child = spawn(config["compiler"], args, spawnOptions)
 	childOnStd(child, "data", (data) => {
 		response += data
 	})
