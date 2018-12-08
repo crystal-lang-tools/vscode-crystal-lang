@@ -205,7 +205,7 @@
 					"name": "punctuation.definition.variable.crystal"
 				}
 			},
-			"match": "(\\%)[a-zA-Z_]\\w*[\\s|\\.\\]",
+			"match": "(\\%)([a-zA-Z_]\\w*\\.)*[a-zA-Z_]\\w*",
 			"name": "variable.other.readwrite.fresh.crystal"
 		},
 		{
