@@ -12,7 +12,7 @@
 	},
 	"bugs": "https://github.com/crystal-lang-tools/vscode-crystal-lang/issues",
 	"engines": {
-		"vscode": "^1.15.0"
+		"vscode": "^1.26.0"
 	},
 	"keywords": [
 		"crystal",
@@ -20,7 +20,11 @@
 		"languages"
 	],
 	"categories": [
-		"Languages"
+		"Programming Languages",
+		"Snippets",
+		"Themes",
+		"Formatters",
+		"Keymaps"
 	],
 	"galleryBanner": {
 		"color": "#000000",
@@ -101,6 +105,33 @@
 				"key": "Ctrl+Shift+I"
 			}
 		],
+		"taskDefinitions": [
+			{
+				"type": "crystal",
+				"required": [
+					"command"
+				],
+				"properties": {
+					"command": {
+						"type": "string"
+					},
+					"file": {
+						"type": "string"
+					}
+				}
+			},
+			{
+				"type": "shards",
+				"required": [
+					"command"
+				],
+				"properties": {
+					"command": {
+						"type": "string"
+					}
+				}
+			}
+		],
 		"configuration": {
 			"type": "object",
 			"title": "Crystal Lang configuration",
@@ -150,6 +181,11 @@
 					"default": "crystal",
 					"description": "Absolute path for Crystal compiler executable."
 				},
+				"crystal-lang.shards": {
+					"type": "string",
+					"default": "shards",
+					"description": "Absolute path for Shards compiler executable."
+				},
 				"crystal-lang.server": {
 					"type": "string",
 					"default": "",
@@ -183,12 +219,13 @@
 	},
 	"devDependencies": {
 		"typescript": "^2.4.2",
-		"vscode": "^1.1.6",
+		"vscode": "^1.1.17",
 		"mocha": "^3.5.0",
 		"@types/node": "^8.0.26",
 		"@types/mocha": "^2.2.42"
 	},
 	"dependencies": {
-		"vscode-languageclient": "^3.4.5"
+		"vscode-languageclient": "^3.4.5",
+		"yaml": "^1.0.3"
 	}
 }
