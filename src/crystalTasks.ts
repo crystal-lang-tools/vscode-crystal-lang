@@ -135,6 +135,7 @@ class CrystalTaskProvider implements TaskProvider {
 interface CrystalTaskDefinition extends TaskDefinition {
 	label: string
 	command: string
+	args?: Array<string>
 	file?: string
 }
 
@@ -157,7 +158,10 @@ function getCrystalTasks(target: WorkspaceFolder): Task[] {
 
 function createCrystalTask({ definition, group, presentationOptions, problemMatcher }: TaskConfigItem, target: WorkspaceFolder): Task {
 	let taskBin = getCrystalCompiler(target)
-	const taskFile = (definition.file !== undefined) ? definition.file : ''
+	let taskArgs: Array<string> = (definition.args !== undefined) ? definition.args : []
+	if (definition.file !== undefined) {
+		taskArgs.push(definition.file)
+	}
 
 	let source = 'Crystal'
 	if (definition.type !== 'crystal') {
@@ -165,14 +169,14 @@ function createCrystalTask({ definition, group, presentationOptions, problemMatc
 		source = 'Shards'
 	}
 
-	const execCmd = `${taskBin} ${definition.command} ${taskFile}`
+	const execCmd = `${taskBin} ${definition.command} ${taskArgs}`
 	const execOption: ShellExecutionOptions = {
 		cwd: target.uri.fsPath
 	}
 	const exec = new ShellExecution(execCmd, execOption)
 	let label = definition.label
-	if (definition.type == 'crystal' && taskFile !== '') {
-		label = `${label} - ${taskFile}`
+	if (definition.type == 'crystal' && definition.file !== undefined) {
+		label = `${label} - ${definition.file}`
 	}
 
 	const task = new Task(definition, target, label, source, exec, problemMatcher)
@@ -187,7 +191,7 @@ function createCrystalTask({ definition, group, presentationOptions, problemMatc
 	return task
 }
 
-const CRYSTAL_TASKS: Array<{type: string, command: string, group: TaskGroup}> = [
+const CRYSTAL_TASKS: Array<{type: string, command: string, args?: Array<string>, group: TaskGroup}> = [
 	{
 		type: 'crystal',
 		command: 'run',
@@ -195,8 +199,13 @@ const CRYSTAL_TASKS: Array<{type: string, command: string, group: TaskGroup}> = 
 	},
 	{
 		type: 'crystal',
-		command: 'build',
-		group: TaskGroup.Build
+		command: 'docs',
+		group: TaskGroup.Clean
+	},
+	{
+		type: 'crystal',
+		command: 'tool format',
+		group: TaskGroup.Clean
 	},
 	{
 		type: 'crystal',
@@ -211,6 +220,14 @@ const CRYSTAL_TASKS: Array<{type: string, command: string, group: TaskGroup}> = 
 	{
 		type: 'shards',
 		command: 'update',
+		group: TaskGroup.Build
+	},
+	{
+		type: 'shards',
+		command: 'build',
+		args: [
+			'--release'
+		],
 		group: TaskGroup.Build
 	},
 	{
@@ -231,10 +248,11 @@ function createCrystalTaskConfigItem(target: WorkspaceFolder): Array<TaskConfigI
 		const def: CrystalTaskDefinition = {
 			label: opt.command,
 			type: opt.type,
-			command: opt.command
+			command: opt.command,
+			args: opt.args,
 		}
 
-		if (opt.type == 'crystal' && opt.command !== 'spec') {
+		if (opt.type == 'crystal' && opt.group == TaskGroup.Build) {
 			def.file = mainFile
 		}
 

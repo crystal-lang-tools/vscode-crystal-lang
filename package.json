@@ -115,6 +115,9 @@
 					"command": {
 						"type": "string"
 					},
+					"args": {
+						"type": "array"
+					},
 					"file": {
 						"type": "string"
 					}
@@ -128,6 +131,9 @@
 				"properties": {
 					"command": {
 						"type": "string"
+					},
+					"args": {
+						"type": "array"
 					}
 				}
 			}
