@@ -1,5 +1,6 @@
 import * as vscode from "vscode"
 import * as path from "path"
+import * as fs from "fs"
 
 import { spawnTools, tryWindowsPath } from "./crystalUtils"
 
@@ -34,8 +35,12 @@ export class CrystalImplementationsProvider implements vscode.DefinitionProvider
 	getLocalLocation(document: vscode.TextDocument, line: String) {
 		let required = line.slice(line.indexOf("\"") + 1, line.lastIndexOf("\""))
 		let dir = path.dirname(document.uri.path)
-		let expectedUri = vscode.Uri.file(path.join(dir, required + ".cr"))
-		return [new vscode.Location(expectedUri, new vscode.Position(0, 0))]
+		let location = path.join(dir, required + ".cr");
+		if (!fs.existsSync(location)) {
+			return null
+		}
+		let expectedUri = vscode.Uri.file(location)
+		return new vscode.Location(expectedUri, new vscode.Position(0, 0))
 	}
 
 	/**
@@ -44,7 +49,10 @@ export class CrystalImplementationsProvider implements vscode.DefinitionProvider
 	async provideDefinition(document: vscode.TextDocument, position: vscode.Position) {
 		let line = document.lineAt(position.line).text
 		if (this.isLocalRequire(document, position, line)) {
-			return this.getLocalLocation(document, line);
+			let location = this.getLocalLocation(document, line);
+			if (location) {
+				return location
+			}
 		}
 		let crystalOutput = await this.crystalImplementations(document, position)
 		let locations: vscode.Location[] = []
