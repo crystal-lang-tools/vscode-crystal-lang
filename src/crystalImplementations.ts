@@ -1,5 +1,6 @@
 import * as vscode from "vscode"
-import { dirname } from "path"
+import * as path from "path"
+import * as fs from "fs"
 
 import { spawnTools, tryWindowsPath } from "./crystalUtils"
 
@@ -16,9 +17,43 @@ export class CrystalImplementationsProvider implements vscode.DefinitionProvider
 	}
 
 	/**
+	 * Check if position is on local require (ex: require "../json")
+	 */
+	isLocalRequire(document: vscode.TextDocument, position: vscode.Position, line: String) {
+		let match = line.match(/^require\s*"([\.]{1,2}\/.*?)"\s*$/)
+		if (!match) {
+			return false
+		}
+		let capture = match.pop()
+		let word = document.getText(document.getWordRangeAtPosition(position))
+		return capture.indexOf(word) > -1
+	}
+
+	/**
+	 * Return location of local require
+	 */
+	getLocalLocation(document: vscode.TextDocument, line: String) {
+		let required = line.slice(line.indexOf("\"") + 1, line.lastIndexOf("\""))
+		let dir = path.dirname(document.uri.path)
+		let location = path.join(dir, required + ".cr");
+		if (!fs.existsSync(location)) {
+			return null
+		}
+		let expectedUri = vscode.Uri.file(location)
+		return new vscode.Location(expectedUri, new vscode.Position(0, 0))
+	}
+
+	/**
 	 * Search for definitions in a Crystal project
 	 */
 	async provideDefinition(document: vscode.TextDocument, position: vscode.Position) {
+		let line = document.lineAt(position.line).text
+		if (this.isLocalRequire(document, position, line)) {
+			let location = this.getLocalLocation(document, line);
+			if (location) {
+				return location
+			}
+		}
 		let crystalOutput = await this.crystalImplementations(document, position)
 		let locations: vscode.Location[] = []
 		if (crystalOutput.toString().startsWith(`{"status":"`)) {
