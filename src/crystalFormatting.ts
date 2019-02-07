@@ -42,7 +42,7 @@ export class CrystalFormattingProvider implements vscode.DocumentFormattingEditP
 		// }
 
 		// QuickFix to replace current code with formated one only if no syntax error is found
-		if (!response.toString().startsWith("Syntax error in ")) {
+		if (!response.toString().startsWith("Error:")) {
 			let lastLineId = document.lineCount - 1
 			let range = new vscode.Range(0, 0, lastLineId, document.lineAt(lastLineId).text.length)
 			textEditData = [vscode.TextEdit.replace(range, response.toString())]
