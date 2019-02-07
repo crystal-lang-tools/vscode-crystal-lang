@@ -5,7 +5,8 @@
 	"tasks": [
 		{
 			"label": "tsc: build",
-			"type": "process",
+			"type": "shell",
+			"isBackground": true,
 			"command": "npm",
 			"args": [
 				"run",
