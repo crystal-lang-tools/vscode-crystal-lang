@@ -5,6 +5,10 @@
 
 - See [roadmap](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Roadmap).
 
+## [0.3.12] - 2019-02-06
+### Fix
+- Detect Error messages
+
 ## [0.3.11] - 2019-02-06
 ### Add
 - Add `out` as a keyword [#50](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/50)
