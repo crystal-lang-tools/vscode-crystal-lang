@@ -5,6 +5,28 @@
 
 - See [roadmap](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Roadmap).
 
+## [0.3.11] - 2019-02-06
+### Add
+- Add `out` as a keyword [#50](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/50)
+- Adds fresh variables to the syntax [#53](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/53)
+- Restricting language services to local files [#54](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/54)
+- Task provider support [#77](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/77)
+- Improve crystal syntaxes [#76](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/76)
+
+### Fix
+- Fix typo and spawn description [#55](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/55)
+- edit:package.json categories from Languages to Programming Languages by @dengjie
+- fix: syntaxes json back to 0.10 cause master is not work by @dengjie
+- fix:add trigger string '.' use completion hint by @dengjie
+- Fix typo in changelog [#60](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/60)
+- Fix Crystal 0.27 snippets [#75](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/75)
+- Corrected regex issue and covered dotted fresh variables [#57](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/57)
+- Crystal command hanging on windows [#59](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/59)
+- Remove format flag [#80](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/80)
+
+### Changes
+- Manually handle go-to-definition of local requires [#78](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/78)
+
 ## [0.3.10] - 2018-02-07
 ### Fix
 - Diagnostics doesn't work [#47](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/47)
