@@ -38,10 +38,10 @@ suite("Common Utils", () => {
 		assert.equal(utils.isNotLib("lib"), false)
 	})
 
-	test("Search problems on compiler output", () => {
-		assert.equal(utils.searchProblems("", new vscode.Uri).length, 0)
-		assert.equal(utils.searchProblems(`[{"file":"","line":1,"column":1,"size":null,"message":"for empty hashes use '{} of KeyType => ValueType'"}]`, new vscode.Uri).length, 1)
-	})
+	// test("Search problems on compiler output", () => {
+	// 	assert.equal(utils.searchProblems("", new vscode.Uri).length, 0)
+	// 	assert.equal(utils.searchProblems(`[{"file":"","line":1,"column":1,"size":null,"message":"for empty hashes use '{} of KeyType => ValueType'"}]`, new vscode.Uri).length, 1)
+	// })
 
 	// -----------------------
 	// TODO: create more tests

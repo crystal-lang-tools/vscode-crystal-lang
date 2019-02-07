@@ -9,6 +9,7 @@ import { CrystalFormattingProvider } from "./crystalFormatting"
 import { CrystalDocumentSymbolProvider } from "./crystalSymbols"
 import { CrystalCompletionItemProvider } from "./crystalCompletion"
 import { CrystalImplementationsProvider } from "./crystalImplementations"
+import { registerCrystalTask } from "./crystalTasks"
 
 // Language configuration for identation and patterns. Based on vscode-ruby
 const crystalConfiguration = {
@@ -35,7 +36,6 @@ function diagnosticDocument(document) {
  * Init function for this extension
  */
 export async function activate(context: vscode.ExtensionContext) {
-
 	// Call features not implemented on server yet.
 	context.subscriptions.push(
 		vscode.languages.setLanguageConfiguration("crystal", crystalConfiguration),
@@ -43,6 +43,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// Extension configuration
 	const config = vscode.workspace.getConfiguration("crystal-lang")
+
+	// Register Tasks
+	registerCrystalTask(context)
 
 	// Detect server and set configuration
 	let scry = config["server"]
