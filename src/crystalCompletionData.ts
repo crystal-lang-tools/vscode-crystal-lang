@@ -988,10 +988,10 @@ export const STRUCTS = [
 	["Time", "struct Time", ""],
 	["Toplevel", "Top Level Namespace", ""],
 	["Tuple", "struct Tuple(*T)", ""],
-	["Uint16", "struct UInt16", ""],
-	["Uint32", "struct UInt32", ""],
-	["Uint64", "struct UInt64", ""],
-	["Uint8", "struct UInt8", ""],
+	["UInt16", "struct UInt16", ""],
+	["UInt32", "struct UInt32", ""],
+	["UInt64", "struct UInt64", ""],
+	["UInt8", "struct UInt8", ""],
 	["Union", "struct Union(*T)", ""],
 	["Value", "abstract struct Value", ""]
 ]
