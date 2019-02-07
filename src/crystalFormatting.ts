@@ -47,7 +47,7 @@ export class CrystalFormattingProvider implements vscode.DocumentFormattingEditP
 			let range = new vscode.Range(0, 0, lastLineId, document.lineAt(lastLineId).text.length)
 			textEditData = [vscode.TextEdit.replace(range, response.toString())]
 	
-			return textEditData
 		}
+		return textEditData
 	}
 }
