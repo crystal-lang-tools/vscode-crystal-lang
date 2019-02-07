@@ -258,13 +258,13 @@ export function spawnCompiler(document, build) {
 			]
 		}
 		return [
-			"tool",
-			"format",
-			"--check",
+			"build",
+			"--no-debug",
 			"--no-color",
+			"--no-codegen",
+			scope,
 			"-f",
-			"json",
-			file
+			"json"
 		]
 	})()
 	let child = spawn(config["compiler"], args, spawnOptions)
