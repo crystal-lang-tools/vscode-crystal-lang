@@ -5,6 +5,10 @@
 
 - See [roadmap](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Roadmap).
 
+## [0.3.13] - 2019-02-08
+### Fix
+- Whole buffer replaced with syntax error [#84](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/84)
+
 ## [0.3.12] - 2019-02-06
 ### Fix
 - Detect Error messages
