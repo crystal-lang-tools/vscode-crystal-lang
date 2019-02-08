@@ -1,5 +1,4 @@
 import * as vscode from "vscode"
-import { spawn } from "child_process"
 
 import { Concurrent, isNotLib, spawnCompiler } from "./crystalUtils"
 

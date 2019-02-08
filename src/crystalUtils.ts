@@ -192,6 +192,47 @@ export function searchProblems(response: string, uri: vscode.Uri) {
 }
 
 /**
+ * Parse raw output from crystal tool format - response and create diagnostics
+ */
+export function searchProblemsFromRaw(response: string, uri: vscode.Uri) {
+	let diagnostics = []
+
+	const config = vscode.workspace.getConfiguration("crystal-lang")
+
+	let responseData = response.match(/.* in (.*):(\d+): (.*)/)
+
+	let parsedLine:number
+
+	try {
+		parsedLine = parseInt(responseData[2])
+	} catch (e) {
+		parsedLine = 0
+	}
+
+	let columnLocation = 1 // No way to get column from crystal tool format -
+
+	if (parsedLine != 0) {
+		let problem = {
+			line: parsedLine,
+			column: columnLocation,
+			message: responseData[3]
+		}
+
+		let range = new vscode.Range(problem.line - 1, problem.column - 1, problem.line - 1, problem.column - 1)
+		let diagnostic = new vscode.Diagnostic(range, problem.message, vscode.DiagnosticSeverity.Error)
+		diagnostics.push([uri, [diagnostic]])
+	}
+
+	if (diagnostics.length == 0) {
+		diagnosticCollection.clear()
+	} else if (config["problems"] != "none") {
+		diagnosticCollection.set(diagnostics)
+	}
+
+	return diagnostics
+}
+
+/**
  * Execute Crystal tools context and implementations
  */
 export function spawnTools(document, position, command, key) {
@@ -258,13 +299,11 @@ export function spawnCompiler(document, build) {
 			]
 		}
 		return [
-			"build",
-			"--no-debug",
+			"tool",
+			"format",
+			"--check",
 			"--no-color",
-			"--no-codegen",
-			scope,
-			"-f",
-			"json"
+			scope
 		]
 	})()
 	let child = spawn(config["compiler"], args, spawnOptions)
@@ -272,10 +311,12 @@ export function spawnCompiler(document, build) {
 		response += data
 	})
 	childOnStd(child, "end", () => {
-		searchProblems(response.toString(), document.uri)
 		if (build) {
+			searchProblems(response.toString(), document.uri)
 			Concurrent.counter -= 1
 			statusBarItem.hide()
+		} else {
+			searchProblemsFromRaw(response.toString(), document.uri)
 		}
 	})
 	childOnError(child)

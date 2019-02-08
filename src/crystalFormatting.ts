@@ -1,7 +1,7 @@
 import * as vscode from "vscode"
 import { spawn } from "child_process"
 
-import { searchProblems, childOnStd, childOnError } from "./crystalUtils"
+import { searchProblemsFromRaw, childOnStd, childOnError } from "./crystalUtils"
 
 /**
  * Formatting provider using VSCode module
@@ -42,7 +42,8 @@ export class CrystalFormattingProvider implements vscode.DocumentFormattingEditP
 		// }
 
 		// QuickFix to replace current code with formated one only if no syntax error is found
-		if (!response.toString().startsWith("Error:")) {
+		if ((searchProblemsFromRaw(response.toString(), document.uri).length == 0) &&
+			response.toString().length > 0) {
 			let lastLineId = document.lineCount - 1
 			let range = new vscode.Range(0, 0, lastLineId, document.lineAt(lastLineId).text.length)
 			textEditData = [vscode.TextEdit.replace(range, response.toString())]
