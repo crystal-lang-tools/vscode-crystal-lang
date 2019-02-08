@@ -199,12 +199,12 @@ export function searchProblemsFromRaw(response: string, uri: vscode.Uri) {
 
 	const config = vscode.workspace.getConfiguration("crystal-lang")
 
-	let responseData = response.match(/.* in (.*):(\d+): (.*)/)
+	let responseData = response.match(/.* in .*(\d+): (.*)/)
 
 	let parsedLine:number
 
 	try {
-		parsedLine = parseInt(responseData[2])
+		parsedLine = parseInt(responseData[1])
 	} catch (e) {
 		parsedLine = 0
 	}
@@ -215,7 +215,7 @@ export function searchProblemsFromRaw(response: string, uri: vscode.Uri) {
 		let problem = {
 			line: parsedLine,
 			column: columnLocation,
-			message: responseData[3]
+			message: responseData[2]
 		}
 
 		let range = new vscode.Range(problem.line - 1, problem.column - 1, problem.line - 1, problem.column - 1)
