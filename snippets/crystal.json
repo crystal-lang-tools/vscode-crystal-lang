@@ -364,5 +364,23 @@
 			"end"
 		],
 		"description": "Wait for channels messages using a case statement."
+	},
+	"Spec description": {
+		"prefix": "desc",
+		"body": [
+			"describe $1 do",
+			"\t$0",
+			"end"
+		],
+		"description": "Creates a test group block"
+	},
+	"Spec concrete test case": {
+		"prefix": "it",
+		"body": [
+			"it $1 do",
+			"\t$0",
+			"end"
+		],
+		"description": "Creates a concrete test case block"
 	}
 }
