@@ -227,7 +227,7 @@
 		"@types/mocha": "^2.2.42",
 		"@types/node": "^8.0.26",
 		"mocha": "^5.2.0",
-		"typescript": "^2.4.2",
+		"typescript": "^3.5.2",
 		"vscode": "^1.1.28"
 	},
 	"dependencies": {
