@@ -72,15 +72,13 @@ export class CrystalHoverProvider extends CrystalContext implements vscode.Hover
 				if (isNotKeyword(word) && !parseInt(word) && !stop) {
 					// Checks Symbols
 					let symbols = await getSymbols(document.uri)
-					if (symbols !== undefined) {
-						for (let symbol of symbols) {
-							if (symbol.name == word) {
-								let container = symbol.containerName ? ` of ${symbol.containerName}` : ""
-								return new vscode.Hover({
-									language: "plaintext",
-									value: `${vscode.SymbolKind[symbol.kind]} ${symbol.name}${container}`
-								})
-							}
+					for (let symbol of symbols) {
+						if (symbol.name == word) {
+							let container = symbol.containerName ? ` of ${symbol.containerName}` : ""
+							return new vscode.Hover({
+								language: "plaintext",
+								value: `${vscode.SymbolKind[symbol.kind]} ${symbol.name}${container}`
+							})
 						}
 					}
 					// Checks completion data

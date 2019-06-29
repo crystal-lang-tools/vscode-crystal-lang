@@ -143,7 +143,8 @@ export function isNotLib(file) {
  * Seach symbols for a crystal document
  */
 export function getSymbols(uri): Thenable<vscode.SymbolInformation[]> {
-	return vscode.commands.executeCommand("vscode.executeDocumentSymbolProvider", uri)
+	return vscode.commands.executeCommand<vscode.SymbolInformation[]>("vscode.executeDocumentSymbolProvider", uri)
+		.then(symbols => symbols === undefined ? [] : symbols)
 }
 
 /**
