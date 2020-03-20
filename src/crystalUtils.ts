@@ -199,7 +199,7 @@ export function searchProblemsFromRaw(response: string, uri: vscode.Uri) {
 
 	const config = vscode.workspace.getConfiguration("crystal-lang")
 
-	let responseData = response.match(/.* in .*(\d+): (.*)/)
+	let responseData = response.match(/.* in .*?(\d+):\S* (.*)/)
 
 	let parsedLine:number
 
