@@ -330,8 +330,39 @@
 			"name": "meta.function.method.without-arguments.crystal"
 		},
 		{
-			"match": "(?x)\n\\b\n(\n  [\\d](?>_?\\d)*                             # 100_000\n  (\\.(?![^[:space:][:digit:]])(?>_?\\d)*)?   # fractional part\n  ([eE][-+]?\\d(?>_?\\d)*)?                   # 1.23e-4\n  |\n  0\n  (?:\n    [xX]\\h(?>_?\\h)*|\n    [oO]?[0-7](?>_?[0-7])*|\n    [bB][01](?>_?[01])*|\n    [dD]\\d(?>_?\\d)*\n  )                                           # A base indicator can only be used with an integer\n)\\b",
-			"name": "constant.numeric.crystal"
+			"comment": "Floating point literal (fraction)",
+			"name": "constant.numeric.float.crystal",
+			"match": "\\b[0-9][0-9_]*\\.[0-9][0-9_]*([eE][+-]?[0-9_]+)?(f32|f64)?\\b"
+		},
+		{
+			"comment": "Floating point literal (exponent)",
+			"name": "constant.numeric.float.crystal",
+			"match": "\\b[0-9][0-9_]*(\\.[0-9][0-9_]*)?[eE][+-]?[0-9_]+(f32|f64)?\\b"
+		},
+		{
+			"comment": "Floating point literal (typed)",
+			"name": "constant.numeric.float.crystal",
+			"match": "\\b[0-9][0-9_]*(\\.[0-9][0-9_]*)?([eE][+-]?[0-9_]+)?(f32|f64)\\b"
+		},
+		{
+			"comment": "Integer literal (decimal)",
+			"name": "constant.numeric.integer.decimal.crystal",
+			"match": "\\b([1-9]|[0-9]_)[0-9_]*([ui](8|16|32|64|128))?\\b"
+		},
+		{
+			"comment": "Integer literal (hexadecimal)",
+			"name": "constant.numeric.integer.hexadecimal.crystal",
+			"match": "\\b0x[a-fA-F0-9_]+([ui](8|16|32|64|128))?\\b"
+		},
+		{
+			"comment": "Integer literal (octal)",
+			"name": "constant.numeric.integer.octal.rust",
+			"match": "\\b0o[0-7_]+([ui](8|16|32|64|128))?\\b"
+		},
+		{
+			"comment": "Integer literal (binary)",
+			"name": "constant.numeric.integer.binary.crystal",
+			"match": "\\b0b[01_]+([ui](8|16|32|64|128))?\\b"
 		},
 		{
 			"begin": ":'",
