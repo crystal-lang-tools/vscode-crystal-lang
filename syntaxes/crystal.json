@@ -152,7 +152,7 @@
 		},
 		{
 			"comment": "Just as above but being not a logical operation",
-			"match": "(?<!\\.)\\b(asm|alias|alias_method|break|next|pointerof|typeof|sizeof|instance_sizeof|return|super|yield|uninitialized)\\b(?![?!])",
+			"match": "(?<!\\.)\\b(asm|alias|alias_method|break|next|pointerof|typeof|sizeof|instance_sizeof|offsetof|return|super|yield|uninitialized)\\b(?![?!])",
 			"name": "keyword.control.pseudo-method.crystal"
 		},
 		{
