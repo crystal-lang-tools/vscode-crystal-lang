@@ -5,6 +5,24 @@
 
 - See [roadmap](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Roadmap).
 
+## [0.4.0] - 2020-03-30
+
+This new minor version has many fixes done by crystal lang community, see: [Crystal Lang Tools](https://github.com/crystal-lang-tools/vscode-crystal-lang)
+
+### Add
+- Improve TypeScript config by [Massimiliano Bertinetti](https://github.com/Acciaiodigitale) [#92](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/92)
+- Add offsetof keyword by by [Massimiliano Bertinetti](https://github.com/Acciaiodigitale) [#94](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/94)
+- Refactor and adding support for literal with type numeric by by [Andra Antariksa](https://github.com/andraantariksa) [#103](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/103)
+- Add snippets for testing with Spec by [Massimiliano Bertinetti](https://github.com/Acciaiodigitale) [#90](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/90)
+- Use incremental build by [fabon](https://github.com/fabon-f)
+- Update TypeScript version by [fabon](https://github.com/fabon-f)
+- Add offsetof keyword by [malte-v](https://github.com/malte-v)
+- Add #describe and #it snippets by [reiswindy](https://github.com/reiswindy)
+
+### Fix
+- bumped minimist version for vulnerability issue by [Massimiliano Bertinetti](https://github.com/Acciaiodigitale) [#107](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/107)
+- Fixed problems with formatting the code with errors by [speles](https://github.com/speles) [#99](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/99)
+
 ## [0.3.14] - 2019-02-08
 ### Fix
 - Makes syntax error matching backward compatible (< 0.27.2)

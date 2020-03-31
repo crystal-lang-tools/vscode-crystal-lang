@@ -29,4 +29,4 @@ See [Changelog](https://github.com/crystal-lang-tools/vscode-crystal-lang/blob/m
 
 ## Contributors
 
-- [@faustinoaq](https://github.com/faustinoaq) Faustino Aguilar - creator, maintainer
+- See [Contributors](https://github.com/crystal-lang-tools/vscode-crystal-lang/graphs/contributors)
