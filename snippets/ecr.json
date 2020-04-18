@@ -111,7 +111,7 @@
 		"description": "A case is a control expression which functions a bit like pattern matching."
 	},
 	"block do": {
-		"prefix": "d",
+		"prefix": "do",
 		"body": [
 			"<% ${1:array}.each do %>",
 			"\t$0",
@@ -120,7 +120,7 @@
 		"description": "Create a block without arguments"
 	},
 	"block do with args": {
-		"prefix": "do",
+		"prefix": "dop",
 		"body": [
 			"<% ${1:array}.each do |$2| %>",
 			"\t$0",
