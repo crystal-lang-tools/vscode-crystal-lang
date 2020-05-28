@@ -63,6 +63,7 @@ const KEYWORDS = [
 const spawnOptions = {
 	cwd: ROOT,
 	env: CRENV,
+	shell: "bash",
 	stdio: ["ignore", "pipe", "pipe"]
 }
 
