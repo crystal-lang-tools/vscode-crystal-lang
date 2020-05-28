@@ -326,7 +326,7 @@
 		"description": "Create an inline block"
 	},
 	"block do": {
-		"prefix": "d",
+		"prefix": "do",
 		"body": [
 			"do",
 			"\t$0",
@@ -335,7 +335,7 @@
 		"description": "Create a block without arguments"
 	},
 	"block do with args": {
-		"prefix": "do",
+		"prefix": "dop",
 		"body": [
 			"do |$1|",
 			"\t$0",
