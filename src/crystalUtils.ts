@@ -31,9 +31,9 @@ const WORKSPACE = (() => {
 
 // Get and verify standard library path from Crystal env
 const STDLIB = (() => {
-	const regex = /CRYSTAL_PATH="(.*)"\n/;
+	const regex = /(.*)\n/;
 	try {
-		let output = execSync(`${config["compiler"]} env`)
+		let output = execSync(`${config["compiler"]} env CRYSTAL_PATH`)
 		const match = regex.exec(output.toString());
 		if (match && match.length === 2) {
 			return match[1]
