@@ -1,7 +1,7 @@
 import {ExtensionContext, Task, TaskDefinition, ShellExecution, ShellExecutionOptions, TextDocument, WorkspaceFolder, WorkspaceFoldersChangeEvent, TaskGroup, TaskPresentationOptions, TaskRevealKind, TaskPanelKind, Disposable, Uri, workspace, TaskProvider} from "vscode"
 import * as path from 'path'
 import * as fs from 'fs'
-import YAML from 'yaml'
+import * as YAML from 'yaml'
 
 // Copy from https://github.com/rust-lang/rls-vscode/blob/master/src/tasks.ts
 export function registerCrystalTask(context: ExtensionContext): void {
