@@ -20,6 +20,7 @@ export class CrystalFormattingProvider implements vscode.DocumentFormattingEditP
 			let child = spawn(`${config["compiler"]}`, ["tool", "format", "--no-color", "-"])
 			child.stdin.write(document.getText())
 			child.stdin.end()
+			child.stdout.setEncoding('utf-8')
 			childOnError(child)
 			child.stdout.on("data", (data) => {
 				responseOut += data
