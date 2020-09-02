@@ -226,13 +226,14 @@
 	"devDependencies": {
 		"@types/mocha": "^2.2.42",
 		"@types/node": "^8.0.26",
+		"@types/yaml": "^1.9.7",
+		"minimist": ">=1.2.2",
 		"mocha": "^5.2.0",
 		"typescript": "^3.5.2",
-		"vscode": "^1.1.28",
-		"minimist": ">=1.2.2"
+		"vscode": "^1.1.28"
 	},
 	"dependencies": {
 		"vscode-languageclient": "^3.4.5",
-		"yaml": "^1.0.3"
+		"yaml": "^1.9.7"
 	}
 }
