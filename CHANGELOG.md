@@ -4,6 +4,16 @@
 ### Todo
 
 - See [roadmap](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Roadmap).
+## [0.5.0.] - 2020-09-19
+
+This new minor version has many fixes done by crystal lang community, see: [Crystal Lang Tools](https://github.com/crystal-lang-tools/vscode-crystal-lang)
+
+### Fix
+- Update block snippets by [MatheusRich](https://github.com/MatheusRich) [#109](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/109)
+- Use `crystal env CRYSTAL_PATH` to get Crystal stdlib path by [MakeNowJust](https://github.com/MakeNowJust) [#115](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/115)
+- upgrade yaml version and fix import by [zhenfeng-zhu](https://github.com/zhenfeng-zhu) [#118](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/118)
+- Explicitly set UTF-8 encoding when formatting by [lmatayoshi]() [#121](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/121)
+
 
 ## [0.4.0] - 2020-03-30
 

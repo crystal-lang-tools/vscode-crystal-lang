@@ -2,3 +2,4 @@ out
 node_modules
 .directory
 .vscode-test
+crystal-lang-*.vsix
