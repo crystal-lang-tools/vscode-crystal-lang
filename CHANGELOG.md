@@ -2,9 +2,15 @@
 
 ## [Unreleased]
 ### Todo
-
 - See [roadmap](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Roadmap).
-## [0.5.0.] - 2020-09-19
+
+## [0.6.0] - 2020-09-19
+
+### Fix
+- Upgraded depencencies done by [elbywan](https://github.com/elbywan) [#126](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/126)
+
+
+## [0.5.0] - 2020-09-19
 
 This new minor version has many fixes done by crystal lang community, see: [Crystal Lang Tools](https://github.com/crystal-lang-tools/vscode-crystal-lang)
 
