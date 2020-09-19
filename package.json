@@ -12,7 +12,7 @@
 	},
 	"bugs": "https://github.com/crystal-lang-tools/vscode-crystal-lang/issues",
 	"engines": {
-		"vscode": "^1.26.0"
+		"vscode": "^1.49.0"
 	},
 	"keywords": [
 		"crystal",
@@ -220,20 +220,20 @@
 	"scripts": {
 		"vscode:prepublish": "tsc -p ./",
 		"compile": "tsc -watch -p ./",
-		"postinstall": "node ./node_modules/vscode/bin/install",
 		"test": "echo ok"
 	},
 	"devDependencies": {
-		"@types/mocha": "^2.2.42",
-		"@types/node": "^8.0.26",
+		"@types/mocha": "^8.0.3",
+		"@types/node": "^14.11.1",
+		"@types/vscode": "^1.49.0",
 		"@types/yaml": "^1.9.7",
 		"minimist": ">=1.2.2",
 		"mocha": "^8.1.3",
-		"typescript": "^3.5.2",
-		"vscode": "^1.1.28"
+		"typescript": "^4.0.3",
+		"vscode-test": "^1.4.0"
 	},
 	"dependencies": {
-		"vscode-languageclient": "^3.4.5",
+		"vscode-languageclient": "^6.1.3",
 		"yaml": "^1.9.7"
 	}
 }

@@ -1,5 +1,5 @@
 import * as vscode from "vscode"
-import { execSync, spawn } from "child_process"
+import { execSync, spawn, SpawnOptions } from "child_process"
 
 // -----------------------------
 // Private utilities (no export)
@@ -60,7 +60,7 @@ const KEYWORDS = [
 	"nil?", "abstract", "pointerof", "protected", "uninitialized", "instance_sizeof"
 ]
 
-const spawnOptions = {
+const spawnOptions : SpawnOptions = {
 	cwd: ROOT,
 	env: CRENV,
 	shell: "bash",
