@@ -1,6 +1,11 @@
 # VSCode Extension for Crystal Language
 
-[![Build Status](https://travis-ci.org/crystal-lang-tools/vscode-crystal-lang.svg?branch=master)](https://travis-ci.org/crystal-lang-tools/vscode-crystal-lang) [![Join the chat at https://gitter.im/crystal-lang-tools/vscode](https://badges.gitter.im/crystal-lang-tools/vscode.svg)](https://gitter.im/crystal-lang-tools/vscode?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/crystal-lang-tools/vscode-crystal-lang.svg?branch=master)](https://travis-ci.org/crystal-lang-tools/vscode-crystal-lang)
+
+---
+**This is the official version of the plugin for Crystal Language support in VS Code.**
+**Remove all old version before install this one.**
+---
 
 This extension provides support for the [Crystal](https://github.com/crystal-lang) programming language.
 
