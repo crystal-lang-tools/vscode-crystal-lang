@@ -35,7 +35,7 @@ export class CrystalFormattingProvider implements vscode.DocumentFormattingEditP
 	}
 
 	/**
-	 * Return formatted documment to VSCode
+	 * Return formatted document to VSCode
 	 */
 	async provideDocumentFormattingEdits(document: vscode.TextDocument) {
 		let response = await this.execFormat(document)
