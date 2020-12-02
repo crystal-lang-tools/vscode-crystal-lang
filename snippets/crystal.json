@@ -374,6 +374,15 @@
 		],
 		"description": "Creates a test group block"
 	},
+	"Spec context": {
+		"prefix": "context",
+		"body": [
+			"context \"${1:when }\" do",
+			"\t$0",
+			"end"
+		],
+		"description": "Creates a test context block"
+	},
 	"Spec concrete test case": {
 		"prefix": "it",
 		"body": [
