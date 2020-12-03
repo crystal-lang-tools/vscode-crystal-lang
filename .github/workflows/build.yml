@@ -8,18 +8,21 @@ on:
 
 name: Build Extension
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
-      - name: Publish to Open VSX Registry
-        uses: HaaLeo/publish-vscode-extension@v0
-        id: publishToOpenVSX
-        with:
-          pat: ${{ secrets.OPEN_VSX_TOKEN }}
-      - name: Publish to Visual Studio Marketplace
-        uses: HaaLeo/publish-vscode-extension@v0
-        with:
-          pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
-          registryUrl: https://marketplace.visualstudio.com
-          extensionFile: ${{ steps.publishToOpenVSX.outputs.vsixPath }}
-          packagePath: ''
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+    - run: npm install
+    - run: xvfb-run -a npm test
+      if: runner.os == 'Linux'
+    - run: npm test
+      if: runner.os != 'Linux'
+
