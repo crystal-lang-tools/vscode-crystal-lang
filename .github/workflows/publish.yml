@@ -1,28 +1,20 @@
 on:
-  push:
-    release:
-      types:
-      - created
+  release:
+    types:
+    - created
 
-name: Build and Deploy Extension
+name: Publish Extension
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Install Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: 10.x
-    - run: npm install
-    - run: xvfb-run -a npm test
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - run: npm ci
       - name: Publish to Open VSX Registry
         uses: HaaLeo/publish-vscode-extension@v0
-        id: publishToOpenVSX
         with:
           pat: ${{ secrets.OPEN_VSX_TOKEN }}
       - name: Publish to Visual Studio Marketplace
@@ -30,6 +22,4 @@ jobs:
         with:
           pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
           registryUrl: https://marketplace.visualstudio.com
-          extensionFile: ${{ steps.publishToOpenVSX.outputs.vsixPath }}
-          packagePath: ''
 
