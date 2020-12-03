@@ -1,7 +1,10 @@
 on:
   push:
-    tags:
-      - "*"
+    branches:
+    - master
+  release:
+    types:
+    - created
 
 name: Deploy Extension
 jobs:
