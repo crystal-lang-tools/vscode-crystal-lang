@@ -6,7 +6,7 @@ on:
     types:
     - created
 
-name: Deploy Extension
+name: Build Extension
 jobs:
   deploy:
     runs-on: ubuntu-latest

@@ -6,6 +6,7 @@ on:
     types:
     - created
 
+name: Deploy Extension
 jobs:
   build:
     strategy:
