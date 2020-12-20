@@ -14,7 +14,7 @@ import { registerCrystalTask } from "./crystalTasks"
 // Language configuration for identation and patterns. Based on vscode-ruby
 const crystalConfiguration = {
 	indentationRules: {
-		increaseIndentPattern: /^\s*((begin|(private\s+abstract|private|abstract)\s+(class|struct)|class|struct|(private|protected)\s+def|def|fun|macro|else|elsif|ensure|for|if|module|rescue|unless|until|when|while|case)|([^#]*\sdo\b)|([^#]*=\s*(case|if|unless)))\b([^#\{;]|("|'|\/).*\4)*(#.*)?$/,
+		increaseIndentPattern: /^\s*((begin|(private\s+abstract|private|abstract)\s+(class|struct)|class|struct|(private|protected)\s+def|def|fun|macro|else|elsif|ensure|for|if|module|rescue|unless|until|when|in|while|case)|([^#]*\sdo\b)|([^#]*=\s*(case|if|unless)))\b([^#\{;]|("|'|\/).*\4)*(#.*)?$/,
 		decreaseIndentPattern: /^\s*([}\]]([,)]?\s*(#|$)|\.[a-zA-Z_]\w*\b)|(end|rescue|ensure|else|elsif|when|in)\b)/
 	},
 	wordPattern: /(-?\d+(?:\.\d+))|(:?[A-Za-z][^-`~@#%^&()=+[{}|;:'",<>/.*\]\s\\!?]*[!?]?)/
