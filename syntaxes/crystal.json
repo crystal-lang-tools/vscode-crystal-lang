@@ -1000,7 +1000,7 @@
 			"name": "string.quoted.other.literal.lower.crystal",
 			"patterns": [
 				{
-					"comment": "Cant be named because its not neccesarily an escape.",
+					"comment": "Cant be named because its not necessarily an escape.",
 					"match": "\\\\."
 				}
 			]
