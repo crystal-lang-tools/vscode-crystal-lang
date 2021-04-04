@@ -3,7 +3,7 @@
 ![Publish Extension](https://github.com/crystal-lang-tools/vscode-crystal-lang/workflows/Publish%20Extension/badge.svg)
 ---
 **This is the official version of the plugin for Crystal Language support in VS Code.**
-**Remove all old version before install this one.**
+**Remove all old versions before installing this one.**
 ---
 
 This extension provides support for the [Crystal](https://github.com/crystal-lang) programming language.
