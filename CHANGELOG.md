@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+The Changelog will be updated on the upcoming v1.0 release
+
 ### Todo
 - See [roadmap](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Roadmap).
 
