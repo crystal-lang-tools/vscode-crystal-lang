@@ -1469,12 +1469,6 @@
 			"name": "meta.function-call.crystal",
 			"patterns": [
 				{
-					"include": "#nest_function_parens"
-				},
-				{
-					"include": "#known_function_names"
-				},
-				{
 					"match": "([a-zA-Z0-9_!?]+)(?=\\()",
 					"name": "entity.name.function.crystal"
 				},
