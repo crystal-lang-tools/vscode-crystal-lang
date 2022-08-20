@@ -4,4 +4,3 @@
 /.vscode-test
 
 crystal-lang-*.vsix
-package-lock.json
