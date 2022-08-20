@@ -1,11 +1,6 @@
 import * as vscode from 'vscode';
 import * as TDATA from './crystalCompletionData';
-import { getSymbols, spawnTools } from './crystalUtils';
-
-export interface CompletionResponse {
-    status: string;
-    contexts: Record<string, string>[];
-}
+import { CompletionResponse, getSymbols, spawnTools } from './crystalUtils';
 
 export class CrystalCompletionItemProvider implements vscode.CompletionItemProvider {
     private completions: vscode.CompletionList;

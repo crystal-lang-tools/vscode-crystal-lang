@@ -93,6 +93,11 @@ function tryLinuxPath(path: string) {
 // Public constants utilities (export)
 // -----------------------------------
 
+export interface CompletionResponse {
+    status: string;
+    contexts: Record<string, string>[];
+}
+
 // Diagnostics provider
 export const diagnosticCollection = vscode.languages.createDiagnosticCollection("crystal")
 
