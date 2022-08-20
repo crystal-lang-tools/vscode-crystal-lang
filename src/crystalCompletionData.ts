@@ -4,14 +4,17 @@
 // TODO: Include all the Standard Library ;-)
 // ------------------------------------------
 
-export const REFLECTION_METHODS = [
+export type Completion = [string, string, string];
+
+export const REFLECTION_METHODS: Completion[] = [
 	["is_a?", "is_a?", "The pseudo-method is_a? determines whether an expression's runtime type inherits or includes another type."],
 	["nil?", "nil?", "The pseudo-method nil? determines whether an expression's runtime is Nil."],
 	["responds_to?", "responds_to?", "The pseudo-method responds_to? determines whether a type has a method with the given name."],
 	["as", "as", "The as pseudo-method restricts the types of an expression."],
-	["as?", "as?", "The as? pseudo-method is similar to as, except that it returns nil instead of raising an exception when the type doesn't match. It also can't be used to cast between pointer types and other types.", 5]
+	["as?", "as?", "The as? pseudo-method is similar to as, except that it returns nil instead of raising an exception when the type doesn't match. It also can't be used to cast between pointer types and other types."]
 ]
-export const NIL_METHODS = [
+
+export const NIL_METHODS: Completion[] = [
 	["clone", "clone", ""],
 	["to_json", "to_json(json : JSON::Builder)", ""],
 	["==", "==(other : Nil)", "Returns true: Nil has only one singleton value: nil."],
@@ -25,9 +28,10 @@ export const NIL_METHODS = [
 	["to_s", "to_s(io : IO)", "Doesn't write anything to the given IO."],
 	["to_s", "to_s", "Returns an empty string."],
 	["to_yaml", "to_yaml(yaml : YAML::Builder)", ""],
-	["try", "try(&block)", "Doesn't yields to the block.", 5]
+	["try", "try(&block)", "Doesn't yields to the block."]
 ]
-export const BOOL_METHODS = [
+
+export const BOOL_METHODS: Completion[] = [
 	["!=", "!=(other : Bool) : Bool", "Returns true if self is not equal to other."],
 	["&", "&(other : Bool)", "Bitwise AND."],
 	["==", "==(other : Bool) : Bool", "Returns true if self is equal to other."],
@@ -38,9 +42,10 @@ export const BOOL_METHODS = [
 	["to_s", "to_s", "Returns true for true and false for false."],
 	["clone", "clone", ""],
 	["to_json", "to_json(json : JSON::Builder)", ""],
-	["to_yaml", "to_yaml(yaml : YAML::Builder)", "", 5]
+	["to_yaml", "to_yaml(yaml : YAML::Builder)", ""]
 ]
-export const INT_METHODS = [
+
+export const INT_METHODS: Completion[] = [
 	["%", "%(other : Int)", "Returns self modulo other."],
 	["**", "**(exponent : Float) : Float64", "Returns the value of raising self to the power of exponent."],
 	["**", "**(exponent : Int) : self", "Returns the value of raising self to the power of exponent."],
@@ -245,9 +250,10 @@ export const INT_METHODS = [
 	["|", "|(other : Int64) : self", "Returns the result of performing a bitwise OR of self's and other's bits."],
 	["|", "|(other : Int32) : self", "Returns the result of performing a bitwise OR of self's and other's bits."],
 	["|", "|(other : Int16) : self", "Returns the result of performing a bitwise OR of self's and other's bits."],
-	["|", "|(other : Int8) : self", "Returns the result of performing a bitwise OR of self's and other's bits.", 5]
+	["|", "|(other : Int8) : self", "Returns the result of performing a bitwise OR of self's and other's bits."]
 ]
-export const FLOAT_METHODS = [
+
+export const FLOAT_METHODS: Completion[] = [
 	["%", "%(other)", ""],
 	["-", "-", ""],
 	["<=>", "<=>(other : BigRational)", ""],
@@ -265,7 +271,8 @@ export const FLOAT_METHODS = [
 	["seconds", "seconds", ""],
 	["to_json", "to_json(json : JSON::Builder)", ""]
 ]
-export const CHAR_METHODS = [
+
+export const CHAR_METHODS: Completion[] = [
 	["%", "%(other)", ""],
 	["-", "-", ""],
 	["<=>", "<=>(other : BigRational)", ""],
@@ -285,7 +292,8 @@ export const CHAR_METHODS = [
 	["to_big_i", "to_big_i : BigInt", "Returns a BigInt representing this float (rounded using floor)."],
 	["to_io", "to_io(io : IO, format : IO::ByteFormat)", "Writes this float to the given io in the given format."]
 ]
-export const STRING_METHODS = [
+
+export const STRING_METHODS: Completion[] = [
 	["build", "build(capacity = 64, &block) : self", "Builds a String by creating a String::Builder with the given initial capacity, yielding it to the block and finally getting a String out of it."],
 	["%", "%(other)", "Interpolates other into the string using Kernel#sprintf."],
 	["*", "*(times : Int)", "Makes a new String by adding str to itself times times."],
@@ -492,7 +500,8 @@ export const STRING_METHODS = [
 	["unsafe_byte_slice", "unsafe_byte_slice(byte_offset, count)", ""],
 	["unsafe_byte_slice", "unsafe_byte_slice(byte_offset)", ""]
 ]
-export const SYMBOLS_METHODS = [
+
+export const SYMBOLS_METHODS: Completion[] = [
 	["!=", "!=(other : Symbol) : Bool", "Returns true if self is not equal to other."],
 	["<=>", "<=>(other : Symbol)", "Compares symbol with other based on String#<=> method."],
 	["==", "==(other : Symbol) : Bool", "Returns true if self is equal to other."],
@@ -505,14 +514,15 @@ export const SYMBOLS_METHODS = [
 	["to_json", "to_json(json : JSON::Builder)", ""],
 	["clone", "clone", ""]
 ]
-export const ARRAY_METHODS = [
+
+export const ARRAY_METHODS: Completion[] = [
 	["includes?", "includes?(other : self)", "Returns true if the array contains search."],
-	["join", "join(separator, io)", "Prints to io all the elements in the collection, separated by separator.", 5],
-	["join", "join(separator = \"\")", "Returns a String created by concatenating the elements in the collection, separated by separator (defaults to none).", 5],
-	["join", "join(separator, io, &block)", "Prints to io the concatenation of the elements, with the possibility of controlling how the printing is done via a block.", 5],
-	["join", "join(separator = \"\", &block)", "Returns a String created by concatenating the results of passing the elements in the collection to the passed block, separated by separator (defaults to none).", 5],
-	["each", "each", "Returns an iterator over the array entries.", 5],
-	["each", "each(&block) : Nil", "Calls the given block for each element and passes in the element.", 5],
+	["join", "join(separator, io)", "Prints to io all the elements in the collection, separated by separator."],
+	["join", "join(separator = \"\")", "Returns a String created by concatenating the elements in the collection, separated by separator (defaults to none)."],
+	["join", "join(separator, io, &block)", "Prints to io the concatenation of the elements, with the possibility of controlling how the printing is done via a block."],
+	["join", "join(separator = \"\", &block)", "Returns a String created by concatenating the results of passing the elements in the collection to the passed block, separated by separator (defaults to none)."],
+	["each", "each", "Returns an iterator over the array entries."],
+	["each", "each(&block) : Nil", "Calls the given block for each element and passes in the element."],
 	["build", "build(capacity : Int, &block)", "Creates a new Array, allocating an internal buffer with the given capacity, and yielding that buffer."],
 	["each_product", "each_product(arrays : Array(Array), reuse = false, &block)", ""],
 	["each_product", "each_product(*arrays : Array, reuse = false, &block)", ""],
@@ -618,62 +628,64 @@ export const ARRAY_METHODS = [
 	["unsafe_at", "unsafe_at(index : Int)", ""],
 	["update", "update(index : Int, &block)", ""]
 ]
-export const HASH_METHODS = [
-	["zip", "zip(ary1 : Array(K), ary2 : Array(V))", "Zips two arrays into a Hash, taking keys from ary1 and values from ary2.", 5],
-	["==", "==(other : Hash)", "Compares with other.", 5],
-	["[]", "[](key)", "See also: Hash#fetch.", 5],
-	["[]=", "[]=(key : K, value : V)", "Sets the value of key to the given value.", 5],
-	["[]?", "[]?(key)", "Returns the value for the key given by key.", 5],
-	["clear", "clear", "Empties a Hash and returns it.", 5],
-	["clone", "clone", "Similar to #dup, but duplicates the values as well.", 5],
-	["compact", "compact", "Returns new Hash without nil values.", 5],
-	["compact!", "compact!", "Removes all nil value from self.", 5],
-	["delete", "delete(key)", "Deletes the key-value pair and returns the value, otherwise returns nil.", 5],
-	["delete", "delete(key, &block)", "Deletes the key-value pair and returns the value, else yields key with given block.", 5],
-	["delete_if", "delete_if(&block)", "Deletes each key-value pair for which the given block returns true.", 5],
-	["dup", "dup", "Duplicates a Hash.", 5],
-	["each", "each", "Returns an iterator over the hash entries.", 5],
-	["each", "each(&block) : Nil", "Calls the given block for each key-value pair and passes in the key and the value.", 5],
-	["each_key", "each_key", "Returns an iterator over the hash keys.", 5],
-	["each_key", "each_key(&block)", "Calls the given block for each key-value pair and passes in the key.", 5],
-	["each_value", "each_value(&block)", "Calls the given block for each key-value pair and passes in the value.", 5],
-	["each_value", "each_value", "Returns an iterator over the hash values.", 5],
-	["empty?", "empty?", "Returns true when hash contains no key-value pairs.", 5],
-	["fetch", "fetch(key, &block)", "Returns the value for the key given by key, or when not found calls the given block with the key.", 5],
-	["fetch", "fetch(key, default)", "Returns the value for the key given by key, or when not found the value given by default.", 5],
-	["fetch", "fetch(key)", "Returns the value for the key given by key.", 5],
-	["first_key", "first_key", "Returns the first key in the hash.", 5],
-	["first_key?", "first_key?", "Returns the first key if it exists, or returns nil.", 5],
-	["first_value", "first_value", "Returns the first value in the hash.", 5],
-	["first_value?", "first_value?", "Similar to #first_key?, but returns its value.", 5],
-	["has_key?", "has_key?(key)", "Returns true when key given by key exists, otherwise false.", 5],
-	["has_value?", "has_value?(val)", "Returns true when value given by value exists, otherwise false.", 5],
-	["hash", "hash", "See also: Object#hash.", 5],
-	["invert", "invert", "Inverts keys and values.", 5],
-	["key", "key(value)", "Returns the first key with the given value, else raises KeyError.", 5],
-	["key", "key(value, &block)", "Returns the first key with the given value, else yields value with the given block.", 5],
-	["key?", "key?(value)", "Returns the first key with the given value, else nil.", 5],
-	["key_index", "key_index(key)", "Returns the index of the given key, or nil when not found.", 5],
-	["keys", "keys", "Returns a new Array with all the keys.", 5],
-	["merge", "merge(other : Hash(L, W)) forall L, W", "Returns a new Hash with the keys and values of this hash and other combined.", 5],
-	["merge!", "merge!(other : Hash)", "Similar to #merge, but the receiver is modified.", 5],
-	["reject", "reject(*keys)", "Returns a new Hash without the given keys.", 5],
-	["reject", "reject(&block : K, V -> _)", "Returns a new hash consisting of entries for which the block returns false.", 5],
-	["reject!", "reject!(&block : K, V -> _)", "Equivalent to Hash#reject, but makes modification on the current object rather that returning a new one.", 5],
-	["reject!", "reject!(keys : Array | Tuple)", "Removes a list of keys out of hash.", 5],
-	["select", "select(&block : K, V -> _)", "Returns a new hash consisting of entries for which the block returns true.", 5],
-	["select", "select(keys : Array | Tuple)", "Returns a new Hash with the given keys.", 5],
-	["select!", "select!(&block : K, V -> _)", "Equivalent to Hash#select but makes modification on the current object rather that returning a new one.", 5],
-	["select!", "select!(keys : Array | Tuple)", "Removes every element except the given ones.", 5],
-	["shift", "shift(&block)", "Deletes and returns the first key-value pair in the hash.", 5],
-	["shift", "shift", "Deletes and returns the first key-value pair in the hash, or raises IndexError if the hash is empty.", 5],
-	["shift?", "shift?", "Same as #shift, but returns nil if the hash is empty.", 5],
-	["to_h", "to_h", "Returns self.", 5],
-	["to_s", "to_s(io : IO)", "Converts to a String.", 5],
-	["values", "values", "Returns only the values as an Array.", 5],
-	["values_at", "values_at(*indexes : K)", "Returns a tuple populated with the elements at the given indexes.", 5]
+
+export const HASH_METHODS: Completion[] = [
+	["zip", "zip(ary1 : Array(K), ary2 : Array(V))", "Zips two arrays into a Hash, taking keys from ary1 and values from ary2."],
+	["==", "==(other : Hash)", "Compares with other."],
+	["[]", "[](key)", "See also: Hash#fetch."],
+	["[]=", "[]=(key : K, value : V)", "Sets the value of key to the given value."],
+	["[]?", "[]?(key)", "Returns the value for the key given by key."],
+	["clear", "clear", "Empties a Hash and returns it."],
+	["clone", "clone", "Similar to #dup, but duplicates the values as well."],
+	["compact", "compact", "Returns new Hash without nil values."],
+	["compact!", "compact!", "Removes all nil value from self."],
+	["delete", "delete(key)", "Deletes the key-value pair and returns the value, otherwise returns nil."],
+	["delete", "delete(key, &block)", "Deletes the key-value pair and returns the value, else yields key with given block."],
+	["delete_if", "delete_if(&block)", "Deletes each key-value pair for which the given block returns true."],
+	["dup", "dup", "Duplicates a Hash."],
+	["each", "each", "Returns an iterator over the hash entries."],
+	["each", "each(&block) : Nil", "Calls the given block for each key-value pair and passes in the key and the value."],
+	["each_key", "each_key", "Returns an iterator over the hash keys."],
+	["each_key", "each_key(&block)", "Calls the given block for each key-value pair and passes in the key."],
+	["each_value", "each_value(&block)", "Calls the given block for each key-value pair and passes in the value."],
+	["each_value", "each_value", "Returns an iterator over the hash values."],
+	["empty?", "empty?", "Returns true when hash contains no key-value pairs."],
+	["fetch", "fetch(key, &block)", "Returns the value for the key given by key, or when not found calls the given block with the key."],
+	["fetch", "fetch(key, default)", "Returns the value for the key given by key, or when not found the value given by default."],
+	["fetch", "fetch(key)", "Returns the value for the key given by key."],
+	["first_key", "first_key", "Returns the first key in the hash."],
+	["first_key?", "first_key?", "Returns the first key if it exists, or returns nil."],
+	["first_value", "first_value", "Returns the first value in the hash."],
+	["first_value?", "first_value?", "Similar to #first_key?, but returns its value."],
+	["has_key?", "has_key?(key)", "Returns true when key given by key exists, otherwise false."],
+	["has_value?", "has_value?(val)", "Returns true when value given by value exists, otherwise false."],
+	["hash", "hash", "See also: Object#hash."],
+	["invert", "invert", "Inverts keys and values."],
+	["key", "key(value)", "Returns the first key with the given value, else raises KeyError."],
+	["key", "key(value, &block)", "Returns the first key with the given value, else yields value with the given block."],
+	["key?", "key?(value)", "Returns the first key with the given value, else nil."],
+	["key_index", "key_index(key)", "Returns the index of the given key, or nil when not found."],
+	["keys", "keys", "Returns a new Array with all the keys."],
+	["merge", "merge(other : Hash(L, W)) forall L, W", "Returns a new Hash with the keys and values of this hash and other combined."],
+	["merge!", "merge!(other : Hash)", "Similar to #merge, but the receiver is modified."],
+	["reject", "reject(*keys)", "Returns a new Hash without the given keys."],
+	["reject", "reject(&block : K, V -> _)", "Returns a new hash consisting of entries for which the block returns false."],
+	["reject!", "reject!(&block : K, V -> _)", "Equivalent to Hash#reject, but makes modification on the current object rather that returning a new one."],
+	["reject!", "reject!(keys : Array | Tuple)", "Removes a list of keys out of hash."],
+	["select", "select(&block : K, V -> _)", "Returns a new hash consisting of entries for which the block returns true."],
+	["select", "select(keys : Array | Tuple)", "Returns a new Hash with the given keys."],
+	["select!", "select!(&block : K, V -> _)", "Equivalent to Hash#select but makes modification on the current object rather that returning a new one."],
+	["select!", "select!(keys : Array | Tuple)", "Removes every element except the given ones."],
+	["shift", "shift(&block)", "Deletes and returns the first key-value pair in the hash."],
+	["shift", "shift", "Deletes and returns the first key-value pair in the hash, or raises IndexError if the hash is empty."],
+	["shift?", "shift?", "Same as #shift, but returns nil if the hash is empty."],
+	["to_h", "to_h", "Returns self."],
+	["to_s", "to_s(io : IO)", "Converts to a String."],
+	["values", "values", "Returns only the values as an Array."],
+	["values_at", "values_at(*indexes : K)", "Returns a tuple populated with the elements at the given indexes."]
 ]
-export const RANGE_METHODS = [
+
+export const RANGE_METHODS: Completion[] = [
 	["===", "===(value)", "Same as #includes?, useful for the case expression."],
 	["begin", "begin : B", "Returns the object that defines the beginning of this range."],
 	["bsearch", "bsearch(&block)", "By using binary search, returns the first value for which the passed block returns true."],
@@ -692,7 +704,8 @@ export const RANGE_METHODS = [
 	["step", "step(by = 1, &block)", "Iterates over this range, passing each nth element to the block."],
 	["sum", "sum(initial)", "If self is a Int range, it provides O(1) implementation, otherwise it is same as Enumerable#sum."],
 ]
-export const REGEX_METHODS = [
+
+export const REGEX_METHODS: Completion[] = [
 	["error?", "error?(source)", "Determines Regex's source validity."],
 	["escape", "escape(str) : String", "Returns a String constructed by escaping any metacharacters in str."],
 	["union", "union(patterns : Enumerable(Regex | String)) : self", "Union."],
@@ -830,11 +843,12 @@ export const REGEX_METHODS = [
 	["pointer", "pointer", ""],
 	["to_s", "to_s(io)", ""]
 ]
-export const TUPLE_METHODS = [
-	["join", "join(separator, io)", "Prints to io all the elements in the collection, separated by separator.", 5],
-	["join", "join(separator = \"\")", "Returns a String created by concatenating the elements in the collection, separated by separator (defaults to none).", 5],
-	["join", "join(separator, io, &block)", "Prints to io the concatenation of the elements, with the possibility of controlling how the printing is done via a block.", 5],
-	["join", "join(separator = \"\", &block)", "Returns a String created by concatenating the results of passing the elements in the collection to the passed block, separated by separator (defaults to none).", 5],
+
+export const TUPLE_METHODS: Completion[] = [
+	["join", "join(separator, io)", "Prints to io all the elements in the collection, separated by separator."],
+	["join", "join(separator = \"\")", "Returns a String created by concatenating the elements in the collection, separated by separator (defaults to none)."],
+	["join", "join(separator, io, &block)", "Prints to io the concatenation of the elements, with the possibility of controlling how the printing is done via a block."],
+	["join", "join(separator = \"\", &block)", "Returns a String created by concatenating the results of passing the elements in the collection to the passed block, separated by separator (defaults to none)."],
 	["from", "from(array : Array)", "Creates a tuple from the given array, with elements casted to the given types."],
 	["+", "+(other : Tuple)", "Returns a tuple that contains self's elements followed by other's elements."],
 	["<=>", "<=>(other : self)", "Implements the comparison operator."],
@@ -868,7 +882,8 @@ export const TUPLE_METHODS = [
 	["to_yaml", "to_yaml(yaml : YAML::Builder)", ""],
 	["unsafe_at", "unsafe_at(index : Int)", ""]
 ]
-export const NAMEDTUPLE_METHODS = [
+
+export const NAMEDTUPLE_METHODS: Completion[] = [
 	["from", "from(hash : Hash)", "Creates a named tuple from the given hash, with elements casted to the given types."],
 	["==", "==(other : NamedTuple)", "Returns true if this tuple has the same keys as other, and values for each key are the same in self and other."],
 	["==", "==(other : self)", "Returns true if this tuple has the same keys as other, and values for each key are the same in self and other."],
@@ -899,7 +914,8 @@ export const NAMEDTUPLE_METHODS = [
 	["to_json", "to_json(json : JSON::Builder)", ""],
 	["to_yaml", "to_yaml(yaml : YAML::Builder)", ""]
 ]
-export const PROC_METHODS = [
+
+export const PROC_METHODS: Completion[] = [
 	["==", "==(other : self)", ""],
 	["===", "===(other : self)", ""],
 	["===", "===(other)", ""],
@@ -913,7 +929,8 @@ export const PROC_METHODS = [
 	["call", "call(*args : *T) : R", "Invokes this Proc and returns the result."],
 	["partial", "partial(*args : *U) forall U", "Returns a new Proc that has its first arguments fixed to the values given by args."]
 ]
-export const TOP_LEVEL_METHODS = [
+
+export const TOP_LEVEL_METHODS: Completion[] = [
 	["`", "`(command) : String", "Returns the standard output of executing command in a subshell."],
 	["abort", "abort(message, status = 1) : NoReturn", "Terminates execution immediately, printing message to STDERR and then calling exit(status)."],
 	["at_exit", "at_exit(&handler : Int32 -> ) : Nil", "Registers the given Proc for execution when the program exits."],
@@ -955,7 +972,8 @@ export const TOP_LEVEL_METHODS = [
 	["parallel", "parallel(*jobs)", ""],
 	["redefine_main", "redefine_main(name = main)", ""]
 ]
-export const STRUCTS = [
+
+export const STRUCTS: Completion[] = [
 	["Atomic", "struct Atomic(T)", ""],
 	["BigFloat", "struct BigFloat", ""],
 	["BigInt", "struct BigInt", ""],
@@ -995,7 +1013,8 @@ export const STRUCTS = [
 	["Union", "struct Union(*T)", ""],
 	["Value", "abstract struct Value", ""]
 ]
-export const FILE_METHODS = [
+
+export const FILE_METHODS: Completion[] = [
 	["basename", "basename(path) : String", "Returns the last component of the given path."],
 	["basename", "basename(path, suffix) : String", "Returns the last component of the given path."],
 	["chmod", "chmod(path, mode : Int)", "Changes the permissions of the specified file."],
@@ -1030,7 +1049,8 @@ export const FILE_METHODS = [
 	["writable?", "writable?(path) : Bool", "Returns true if path is writable by the real user id of this process else returns false."],
 	["write", "write(filename, content, perm = DEFAULT_CREATE_MODE, encoding = nil, invalid = nil)", "Write the given content to filename."]
 ]
-export const DIR_METHODS = [
+
+export const DIR_METHODS: Completion[] = [
 	["cd", "cd(path)", "Changes the current working directory of the process to the given string."],
 	["cd", "cd(path, &block)", "Changes the current working directory of the process to the given string and invokes the block, restoring the original working directory when the block exits."],
 	["current", "current : String", "Returns the current working directory."],
@@ -1049,7 +1069,8 @@ export const DIR_METHODS = [
 	["glob", "glob(patterns : Enumerable(String)) : Array(String)", ""],
 	["glob", "glob(*patterns, &block)", ""]
 ]
-export const CHANNEL_METHODS = [
+
+export const CHANNEL_METHODS: Completion[] = [
 	["close", "close", ""],
 	["closed?", "closed?", ""],
 	["inspect", "inspect(io)", ""],
@@ -1063,7 +1084,8 @@ export const CHANNEL_METHODS = [
 	["wait_for_receive", "wait_for_receive", ""],
 	["wait_for_send	", "wait_for_send	", ""]
 ]
-export const CLASSES = [
+
+export const CLASSES: Completion[] = [
 	["Argumenterror", "class ArgumentError", ""],
 	["Array", "class Array(T)", ""],
 	["Box", "class Box(T)", ""],
@@ -1106,7 +1128,8 @@ export const CLASSES = [
 	["Uri", "class URI", ""],
 	["Weakref", "class WeakRef(T)", ""]
 ]
-export const MODULES = [
+
+export const MODULES: Completion[] = [
 	["Adler32", "module Adler32", ""],
 	["Base64", "module Base64", ""],
 	["Benchmark", "module Benchmark", ""],
@@ -1151,9 +1174,11 @@ export const MODULES = [
 	["Zip", "module Zip", ""],
 	["Zlib", "module Zlib", ""]
 ]
-export const ALIAS = [
+
+export const ALIAS: Completion[] = [
 	["Bytes", "alias Bytes", ""]
 ]
-export const ENUMS = [
+
+export const ENUMS: Completion[] = [
 	["Signal", "enum Signal", ""]
 ]
