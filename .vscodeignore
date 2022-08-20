@@ -1,9 +1,10 @@
-.vscode/**
-.vscode-test/**
-out/test/**
-test/**
-src/**
+/.vscode/**
+/.vscode-test/**
+/out/test/**
+/test/**
+/src/**
+
 **/*.map
+.directory
 .gitignore
 tsconfig.json
-.directory
