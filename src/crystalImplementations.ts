@@ -1,79 +1,104 @@
-import * as vscode from "vscode"
-import * as path from "path"
-import * as fs from "fs"
+import * as vscode from 'vscode';
+import { spawn } from 'child_process';
+import { existsSync } from 'fs';
+import * as path from 'path';
+import { mainFile } from './crystalUtils';
 
-import { spawnTools, tryWindowsPath } from "./crystalUtils"
+export interface ImplementationResponse {
+    status: string;
+    message: string;
+    implementations:{
+        line: number;
+        column: number;
+        filename: string;
+    }[];
+}
 
-/**
- * Show implementations using VSCode provider
- */
-export class CrystalImplementationsProvider implements vscode.DefinitionProvider {
+export class CrystalImplementationProvider implements vscode.ImplementationProvider {
+    async provideImplementation(
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken
+    ): Promise<vscode.LocationLink[] | vscode.Definition> {
+        const line = document.lineAt(position.line);
+        const match = /^require\s+"(\.\.?\/.+)"\s*$/g.exec(line.text);
 
-	/**
-	 * Execute crystal tool context for current file:position
-	 */
-	crystalImplementations(document: vscode.TextDocument, position: vscode.Position) {
-		return spawnTools(document, position, "impl", "implementations")
-	}
+        if (match.length) {
+            const location = path.join(
+                path.dirname(document.fileName),
+                match[0].endsWith('.cr') ? match[1] : match[1] + '.cr'
+            );
+            if (!existsSync(location)) return [];
 
-	/**
-	 * Check if position is on local require (ex: require "../json")
-	 */
-	isLocalRequire(document: vscode.TextDocument, position: vscode.Position, line: String) {
-		let match = line.match(/^require\s*"([\.]{1,2}\/.*?)"\s*$/)
-		if (!match) {
-			return false
-		}
-		let capture = match.pop()
-		let word = document.getText(document.getWordRangeAtPosition(position))
-		return capture.indexOf(word) > -1
-	}
+            return new vscode.Location(
+                vscode.Uri.file(location),
+                new vscode.Position(0, 0)
+            );
+        }
 
-	/**
-	 * Return location of local require
-	 */
-	getLocalLocation(document: vscode.TextDocument, line: String) {
-		let required = line.slice(line.indexOf("\"") + 1, line.lastIndexOf("\""))
-		let dir = path.dirname(document.uri.path)
-		let location = path.join(dir, required + ".cr");
-		if (!fs.existsSync(location)) {
-			return null
-		}
-		let expectedUri = vscode.Uri.file(location)
-		return new vscode.Location(expectedUri, new vscode.Position(0, 0))
-	}
+        try {
+            const response = await this.getImplementations(document, position);
+            if (response.status !== 'ok') return;
 
-	/**
-	 * Search for definitions in a Crystal project
-	 */
-	async provideDefinition(document: vscode.TextDocument, position: vscode.Position) {
-		let line = document.lineAt(position.line).text
-		if (this.isLocalRequire(document, position, line)) {
-			let location = this.getLocalLocation(document, line);
-			if (location) {
-				return location
-			}
-		}
-		let crystalOutput = await this.crystalImplementations(document, position)
-		let locations: vscode.Location[] = []
-		if (crystalOutput.toString().startsWith(`{"status":"`)) {
-			try {
-				let crystalMessageObject = JSON.parse(crystalOutput.toString())
-				if (crystalMessageObject.status == "ok") {
-					for (let element of crystalMessageObject.implementations) {
-						let file = tryWindowsPath(element.filename)
-						let position = new vscode.Position(element.line - 1, element.column - 1)
-						let location = new vscode.Location(vscode.Uri.file(file), position)
-						locations.push(location)
-					}
-				} else if (crystalMessageObject.status == "blocked") {
-					console.info("INFO: crystal is taking a moment to check implementation")
-				}
-			} catch (err) {
-				console.error("ERROR: JSON.parse failed to parse crystal implementations output")
-				throw err
-			}
-		}
-		return locations
-	}
+            const links: vscode.LocationLink[] = response.implementations.map(impl => {
+                return {
+                    targetUri: vscode.Uri.file(impl.filename),
+                    targetRange: new vscode.Range(
+                        impl.line,
+                        impl.column,
+                        impl.line, impl.column + 3
+                    )
+                }
+            });
+
+            return links;
+        } catch (err) {
+            console.error(err);
+            return [];
+        }
+    }
+
+    private getImplementations(
+        document: vscode.TextDocument,
+        position: vscode.Position
+    ): Promise<ImplementationResponse> {
+        return new Promise<ImplementationResponse>((res, rej) => {
+            const config = vscode.workspace.getConfiguration('crystal-lang');
+            const dir = vscode.workspace.getWorkspaceFolder(document.uri).name;
+            const location = path.join(dir, path.basename(document.fileName));
+
+            const child = spawn(
+                config.get<string>('compiler'),
+                [
+                    'tool',
+                    'implementations',
+                    '-c',
+                    `${location}:${position.line}:${position.character}`,
+                    mainFile(undefined) || document.fileName,
+                    '--no-color',
+                    '-f',
+                    'json'
+                ]
+            );
+
+            const out: string[] = [];
+            const err: string[] = [];
+
+            child.stdout
+                .setEncoding('utf-8')
+                .on('data', d => out.push(d))
+                .on('end', () => {
+                    try {
+                        res(JSON.parse(out.join()));
+                    } catch {
+                        rej('Failed to parse Crystal tool implementations response');
+                    }
+                });
+
+            child.stderr
+                .setEncoding('utf-8')
+                .on('data', d => err.push(d))
+                .on('end', () => rej(err.join()));
+        });
+    }
 }

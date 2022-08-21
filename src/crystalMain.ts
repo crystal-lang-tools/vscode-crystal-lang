@@ -8,7 +8,7 @@ import { getDiagnostic } from "./crystalDiagnostic"
 import { CrystalFormattingProvider } from "./crystalFormatting"
 import { CrystalDocumentSymbolProvider } from "./crystalSymbols"
 import { CrystalCompletionItemProvider } from "./crystalCompletion"
-import { CrystalImplementationsProvider } from "./crystalImplementations"
+import { CrystalImplementationProvider } from "./crystalImplementations"
 import { registerCrystalTask } from "./crystalTasks"
 
 // Language configuration for identation and patterns. Based on vscode-ruby
@@ -73,7 +73,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		)
 		if (config["implementations"]) {
 			context.subscriptions.push(
-				vscode.languages.registerDefinitionProvider(CRYSTAL_MODE, new CrystalImplementationsProvider()),
+				vscode.languages.registerImplementationProvider(CRYSTAL_MODE, new CrystalImplementationProvider())
 			)
 		}
 	}

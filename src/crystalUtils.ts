@@ -70,12 +70,10 @@ const spawnOptions : SpawnOptions = {
 /**
  * Check main file in current workspace
  */
-function mainFile(document) {
-	const config = vscode.workspace.getConfiguration("crystal-lang")
-	if (config["mainFile"]) {
-		return config["mainFile"].replace("${workspaceRoot}", WORKSPACE)
-	}
-	return document
+export function mainFile(document) {
+	const config = vscode.workspace.getConfiguration("crystal-lang");
+	if (!config.has('mainFile')) return;
+	return config.get<string>('mainFile').replace('${workspaceRoot}', WORKSPACE);
 }
 
 /**
