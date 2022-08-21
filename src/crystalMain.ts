@@ -58,8 +58,8 @@ export async function activate(context: vscode.ExtensionContext) {
 				fileEvents: vscode.workspace.createFileSystemWatcher("**/*.cr")
 			}
 		}
-		let disposable = new client.LanguageClient("Crystal Language", serverOptions, clientOptions).start()
-		context.subscriptions.push(disposable)
+		// let disposable = new client.LanguageClient("Crystal Language", serverOptions, clientOptions).start()
+		// context.subscriptions.push(disposable)
 	} else {
 		// If server is disabled use Node.js implementation instead.
 		context.subscriptions.push(
