@@ -1,5 +1,6 @@
 import * as vscode from "vscode"
 import { execSync, spawn, SpawnOptions } from "child_process"
+import * as path from 'path';
 
 // -----------------------------
 // Private utilities (no export)
@@ -240,43 +241,63 @@ export function searchProblemsFromRaw(response: string, uri: vscode.Uri) {
 /**
  * Execute Crystal tools context and implementations
  */
-export function spawnTools(document, position, command, key) {
-	return new Promise(function (resolve, reject) {
-		let response = ""
-		const config = vscode.workspace.getConfiguration("crystal-lang")
-		if (Concurrent.counter < Concurrent.limit() && config[key]) {
-			let file = tryLinuxPath(document.fileName)
-			let scope = mainFile(file)
-			Concurrent.counter += 1
-			statusBarItem.text = `${config["compiler"]} tool ${command} is working...`
-			statusBarItem.show()
-			let child = spawn(config["compiler"], [
-				"tool",
+export function spawnTools(
+	document: vscode.TextDocument,
+	position: vscode.Position,
+	command: string,
+	key: string
+): Promise<string> {
+	return new Promise<string>((res, rej) => {
+		const config = vscode.workspace.getConfiguration('crystal-lang');
+		if (Concurrent.counter >= Concurrent.limit() && !config.get(key))
+			return rej('blocked');
+
+		Concurrent.counter++;
+		statusBarItem.text = `Crystal tool ${command} is working...`;
+		statusBarItem.show();
+
+		const dir = vscode.workspace.getWorkspaceFolder(document.uri).name;
+		const file = path.join(dir, path.basename(document.fileName));
+		console.log(
+			`crystal tool ${command} -c ${file}:${position.line + 1}:${position.character + 1} ` +
+			`${mainFile(undefined) || document.fileName} --no-color --error-trace -f json`
+		);
+
+		const child = spawn(
+			config.get<string>('compiler'),
+			[
+				'tool',
 				command,
-				"-c",
+				'-c',
 				`${file}:${position.line + 1}:${position.character + 1}`,
-				scope,
-				"--no-color",
-				"--error-trace",
-				"-f",
-				"json"
-			], spawnOptions)
-			childOnStd(child, "data", (data) => {
-				response += data
-			})
-			childOnStd(child, "end", () => {
-				searchProblems(response.toString(), document.uri)
-				Concurrent.counter -= 1
-				statusBarItem.hide()
-				return resolve(response)
-			})
-			childOnError(child)
-		} else if (config[key]) {
-			return resolve(`{"status":"blocked"}`)
-		} else {
-			return resolve("")
-		}
-	})
+				mainFile(undefined) || document.fileName,
+				'--no-color',
+				'--error-trace',
+				'-f',
+				'json'
+			]
+		);
+
+		const out: string[] = [];
+		const err: string[] = [];
+
+		child.stdout
+			.setEncoding('utf-8')
+			.on('data', d => out.push(d))
+			.on('end', () => {
+				statusBarItem.hide();
+				res(out.join());
+			});
+
+		child.stderr
+			.setEncoding('utf-8')
+			.on('data', d => err.push(d))
+			.on('end', () => {
+				statusBarItem.hide();
+				console.error(err.join());
+				rej(err.join());
+			});
+	});
 }
 
 /**

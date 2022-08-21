@@ -35,8 +35,6 @@ const TYPES = [
 ];
 
 export class CrystalHoverProvider implements vscode.HoverProvider {
-    private position: vscode.Position;
-
     async provideHover(
         document: vscode.TextDocument,
         position: vscode.Position,
@@ -44,9 +42,7 @@ export class CrystalHoverProvider implements vscode.HoverProvider {
     ): Promise<vscode.Hover> {
         const config = vscode.workspace.getConfiguration('crystal-lang');
         if (!config.get<boolean>('hover')) return;
-        // if (this.position.isEqual(position)) return;
 
-        this.position = position;
         const line = document.getText(new vscode.Range(
             new vscode.Position(position.line, 0),
             position
@@ -63,6 +59,7 @@ export class CrystalHoverProvider implements vscode.HoverProvider {
             const output = await spawnTools(document, position, 'context', 'hover');
             const response = <CompletionResponse> JSON.parse(output as string);
 
+            console.log(response);
             if (response.status === 'ok') {
                 for (let context of response.contexts) {
                     let type = context[word];
@@ -78,13 +75,12 @@ export class CrystalHoverProvider implements vscode.HoverProvider {
 
         const symbols = await getSymbols(document.uri);
         const markdown = new vscode.MarkdownString();
-
         for (let symbol of symbols) {
             if (symbol.name === word) {
                 switch (symbol.kind) {
                     case 11:{
-                        markdown.appendCodeblock(`def ${symbol.name} : Any`, 'crystal');
-                        let docs = this.getDocsForDefinition(document);
+                        markdown.appendCodeblock(`def ${symbol.name}`, 'crystal');
+                        let docs = this.getDocsForDefinition(document, position);
                         if (docs) markdown.appendMarkdown(docs);
                         break;
                     // case 12:
@@ -97,7 +93,7 @@ export class CrystalHoverProvider implements vscode.HoverProvider {
                             `${vscode.SymbolKind[symbol.kind].toLowerCase()} ${symbol.name}`,
                             'crystal'
                         );
-                        let docs = this.getDocsForDefinition(document);
+                        let docs = this.getDocsForDefinition(document, position);
                         if (docs) markdown.appendMarkdown(docs);
                         break;
                     }
@@ -118,6 +114,7 @@ export class CrystalHoverProvider implements vscode.HoverProvider {
         for (let def of definitions) {
             if (!def[1]) continue;
             if (filtered.includes(def[1])) continue;
+
             filtered.push(def[1]);
             markdown.appendCodeblock(def[0]);
             markdown.appendMarkdown(def[1]);
@@ -127,20 +124,24 @@ export class CrystalHoverProvider implements vscode.HoverProvider {
         return new vscode.Hover(markdown);
     }
 
-    private getDocsForDefinition(document: vscode.TextDocument): string {
-        if (this.position.line === 1) return '';
-
+    private getDocsForDefinition(
+        document: vscode.TextDocument,
+        position: vscode.Position
+    ): string {
         const docs: string[] = [];
-        let current = this.position.line;
+        let current = position.line;
 
         while (true) {
-            if (current === 1) break;
-            let line = document.lineAt(current - 1);
+            if (current < 0) break;
+            console.log(`line: ${current}`);
+            let line = document.lineAt(current);
             if (!line) break;
+
             let text = line.text.trimLeft();
             if (!text.startsWith('#')) break;
+
             docs.push(text.slice(1));
-            current -= 1;
+            current--;
         }
 
         return docs.reverse().join('\n');
