@@ -10,7 +10,7 @@ import {
     TextEdit,
     window
 } from 'vscode';
-import { spawnFormatTool } from './tools';
+import { setStatusBar, spawnFormatTool } from './tools';
 
 export function getFormatRange(document: TextDocument): Range {
     return new Range(
@@ -27,10 +27,17 @@ class CrystalFormattingEditProvider implements DocumentFormattingEditProvider {
         options: FormattingOptions,
         token: CancellationToken
     ): Promise<TextEdit[]> {
+        const dispose = setStatusBar('Crystal: running format tool...');
         try {
             const format = await spawnFormatTool(document);
+            dispose();
+
+            if (!format.length) return;
             return [TextEdit.replace(getFormatRange(document), format)];
         } catch (err) {
+            dispose();
+            if (!err) return;
+
             console.error(err);
             window.showErrorMessage(`Failed to execute Crystal context tool: ${err}`);
             return [];

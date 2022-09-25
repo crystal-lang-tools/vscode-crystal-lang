@@ -10,7 +10,7 @@ import {
     TextDocument
 } from 'vscode';
 import { KEYWORDS } from './definitions';
-import { spawnContextTool } from './tools';
+import { setStatusBar, spawnContextTool } from './tools';
 
 class CrystalHoverProvider implements HoverProvider {
     async provideHover(document: TextDocument, position: Position, token: CancellationToken): Promise<Hover> {
@@ -20,11 +20,14 @@ class CrystalHoverProvider implements HoverProvider {
         const text = document.getText(document.getWordRangeAtPosition(position));
         if (KEYWORDS.includes(text)) return;
 
+        const dispose = setStatusBar('Crystal: running context tool...');
         try {
             const res = await spawnContextTool(document, position);
             if (res.status === 'ok') {
                 const ctx = res.contexts!.find(c => c[text]);
                 if (!ctx) return;
+
+                dispose();
                 const md = new MarkdownString().appendCodeblock(ctx[text], 'crystal');
                 return new Hover(md);
             }
@@ -33,6 +36,7 @@ class CrystalHoverProvider implements HoverProvider {
         }
 
         // TODO: implement symbol check
+        dispose();
     }
 }
 
