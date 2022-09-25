@@ -33,7 +33,7 @@
 	"activationEvents": [
 		"onLanguage:crystal"
 	],
-	"main": "./out/src/crystalMain",
+	"main": "./out/src/extension",
 	"contributes": {
 		"languages": [
 			{
