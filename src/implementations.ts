@@ -11,8 +11,7 @@ import {
     LocationLink,
     Position,
     TextDocument,
-    Uri,
-    workspace
+    Uri
 } from 'vscode';
 import { spawnImplTool } from './tools';
 
@@ -52,8 +51,7 @@ class CrystalImplementationProvider implements ImplementationProvider {
             const links: Location[] = [];
             for (let impl of res.implementations!) {
                 links.push(
-                    new Location(Uri.file(impl.filename),
-                    new Position(impl.line, impl.column))
+                    new Location(Uri.file(impl.filename), new Position(impl.line, impl.column))
                 );
             }
 

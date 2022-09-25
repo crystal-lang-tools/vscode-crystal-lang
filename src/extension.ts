@@ -4,7 +4,7 @@ import {
     ExtensionContext,
     LanguageConfiguration
 } from 'vscode';
-import * as client from 'vscode-languageclient';
+// import * as client from 'vscode-languageclient';
 import { registerFormatter } from './format';
 import { registerImplementations } from './implementations';
 

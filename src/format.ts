@@ -1,14 +1,14 @@
 import {
-    languages,
-    window,
     CancellationToken,
     DocumentFormattingEditProvider,
     DocumentSelector,
     ExtensionContext,
     FormattingOptions,
+    languages,
     Range,
     TextDocument,
-    TextEdit
+    TextEdit,
+    window
 } from 'vscode';
 import { spawnFormatTool } from './tools';
 
