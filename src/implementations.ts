@@ -24,7 +24,7 @@ class CrystalImplementationProvider implements ImplementationProvider {
         const line = document.lineAt(position.line);
         const matches = /^require\s+"(.+)"\s*$/.exec(line.text);
 
-        if (matches.length) {
+        if (matches?.length > 1) {
             const dir = path.dirname(document.fileName);
             let text = matches[1];
             
@@ -42,9 +42,8 @@ class CrystalImplementationProvider implements ImplementationProvider {
 
         try {
             const res = await spawnImplTool(document, position);
-            console.log(res);
             if (res.status === 'failed') {
-                console.error(res.message);
+                console.error(`Crystal implementations tool failed: ${res.message}`);
                 return [];
             }
 

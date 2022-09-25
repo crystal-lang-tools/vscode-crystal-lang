@@ -41,14 +41,8 @@ async function getCompilerPath(): Promise<string> {
 
 // async function getShardsPath(): Promise<string>;
 
-function getLocalPath(document: TextDocument): string {
-    const dir = workspace.getWorkspaceFolder(document.uri).name;
-    return path.join(dir, path.basename(document.fileName));
-}
-
 function getCursorPath(document: TextDocument, position: Position): string {
-    const path = getLocalPath(document);
-    return `${path}:${position.line + 1}:${position.character + 1}`;
+    return `${document.fileName}:${position.line + 1}:${position.character + 1}`;
 }
 
 interface Dependency {
@@ -72,7 +66,7 @@ interface Shard {
 }
 
 function getShardMainPath(document: TextDocument): string {
-    const dir = workspace.getWorkspaceFolder(document.uri).name;
+    const dir = workspace.getWorkspaceFolder(document.uri).uri.fsPath;
     const fp = path.join(dir, 'shard.yml');
 
     if (existsSync(fp)) {
@@ -81,7 +75,7 @@ function getShardMainPath(document: TextDocument): string {
         if (main) return path.resolve(dir, main);
     }
 
-    return getLocalPath(document);
+    return document.fileName;
 }
 
 export async function spawnFormatTool(document: TextDocument): Promise<string> {
@@ -122,22 +116,9 @@ export async function spawnImplTool(document: TextDocument, position: Position):
 
     return new Promise(res => {
         const cursor = getCursorPath(document, position);
-        const local = getLocalPath(document);
+        const main = getShardMainPath(document);
 
-        console.log(`${compiler} tool implementations -c ${cursor} ${local} -f json`);
-
-        const child = spawn(
-            compiler,
-            [
-                'tool',
-                'implementations',
-                '-c',
-                cursor,
-                local,
-                '-f',
-                'json'
-            ]
-        );
+        const child = spawn(compiler, ['tool', 'implementations', '-c', cursor, main, '-f', 'json']);
         const out: string[] = [];
         const err: string[] = [];
     
