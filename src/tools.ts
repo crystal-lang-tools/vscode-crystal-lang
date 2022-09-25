@@ -137,3 +137,34 @@ export async function spawnImplTool(document: TextDocument, position: Position):
             });
     });
 }
+
+interface ContextResponse {
+    status: string;
+    message: string;
+    contexts?: Record<string, string>[];
+}
+
+export async function spawnContextTool(document: TextDocument, position: Position): Promise<ContextResponse> {
+    const compiler = await getCompilerPath();
+
+    return new Promise((res, rej) => {
+        const cursor = getCursorPath(document, position);
+        const main = getShardMainPath(document);
+
+        console.debug(`crystal tool context -c ${cursor} ${main} -f json`);
+
+        const child = spawn(compiler, ['tool', 'context', '-c', cursor, main, '-f', 'json']);
+        const out: string[] = [];
+        const err: string[] = [];
+    
+        child.stdout
+            .setEncoding('utf-8')
+            .on('data', d => out.push(d))
+            .on('end', () => res(JSON.parse(out.join())));
+
+        child.stderr
+            .setEncoding('utf-8')
+            .on('data', d => err.push(d))
+            .on('end', () => rej(JSON.parse(err.join())));
+    });
+}
