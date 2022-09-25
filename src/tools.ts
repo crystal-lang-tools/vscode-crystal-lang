@@ -46,7 +46,7 @@ function getLocalPath(document: TextDocument): string {
     return path.join(dir, path.basename(document.fileName));
 }
 
-function getContextPath(document: TextDocument, position: Position): string {
+function getCursorPath(document: TextDocument, position: Position): string {
     const path = getLocalPath(document);
     return `${path}:${position.line + 1}:${position.character + 1}`;
 }
@@ -104,5 +104,55 @@ export async function spawnFormatTool(document: TextDocument): Promise<string> {
             .setEncoding('utf-8')
             .on('data', d => err.push(d))
             .on('end', () => rej(err.join()));
+    });
+}
+
+export interface ImplResponse {
+    status: string;
+    message: string;
+    implementations?:{
+        line: number;
+        column: number;
+        filename: string;
+    }[];
+}
+
+export async function spawnImplTool(document: TextDocument, position: Position): Promise<ImplResponse> {
+    const compiler = await getCompilerPath();
+
+    return new Promise(res => {
+        const cursor = getCursorPath(document, position);
+        const local = getLocalPath(document);
+
+        console.log(`${compiler} tool implementations -c ${cursor} ${local} -f json`);
+
+        const child = spawn(
+            compiler,
+            [
+                'tool',
+                'implementations',
+                '-c',
+                cursor,
+                local,
+                '-f',
+                'json'
+            ]
+        );
+        const out: string[] = [];
+        const err: string[] = [];
+    
+        child.stdout
+            .setEncoding('utf-8')
+            .on('data', d => out.push(d))
+            .on('end', () => res(JSON.parse(out.join())));
+
+        child.stderr
+            .setEncoding('utf-8')
+            .on('data', d => err.push(d))
+            .on('end', () => {
+                const raw = JSON.parse(err.join());
+                if (!Array.isArray(raw)) return res(raw);
+                res({status: 'failed', message: raw[0]['message']});
+            });
     });
 }

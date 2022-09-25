@@ -6,6 +6,7 @@ import {
 } from 'vscode';
 import * as client from 'vscode-languageclient';
 import { registerFormatter } from './format';
+import { registerImplementations } from './implementations';
 
 const selector = <DocumentSelector> [{ language: 'crystal', scheme: 'file' }];
 
@@ -23,6 +24,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     );
 
     registerFormatter(selector, context);
+    registerImplementations(selector, context);
 }
 
 export function deactivate() {}
