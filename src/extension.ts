@@ -8,6 +8,7 @@ import {
 import { registerFormatter } from './format';
 import { registerHover } from './hover';
 import { registerImplementations } from './implementations';
+import { registerSymbols } from './symbols';
 
 const selector = <DocumentSelector> [{ language: 'crystal', scheme: 'file' }];
 
@@ -27,6 +28,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     registerFormatter(selector, context);
     registerHover(selector, context);
     registerImplementations(selector, context);
+    registerSymbols(selector, context);
 }
 
 export function deactivate() {}
