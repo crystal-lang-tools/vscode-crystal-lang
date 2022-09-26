@@ -1,10 +1,10 @@
-import * as vscode from 'vscode';
 import {
     DocumentSelector,
     ExtensionContext,
-    LanguageConfiguration
+    LanguageConfiguration,
+    languages
 } from 'vscode';
-// import * as client from 'vscode-languageclient';
+import { registerCompletion } from './completion';
 import { registerFormatter } from './format';
 import { registerHover } from './hover';
 import { registerImplementations } from './implementations';
@@ -22,9 +22,10 @@ const configuration = <LanguageConfiguration> {
 
 export async function activate(context: ExtensionContext): Promise<void> {
     context.subscriptions.push(
-        vscode.languages.setLanguageConfiguration('crystal', configuration)
+        languages.setLanguageConfiguration('crystal', configuration)
     );
 
+    registerCompletion(selector, context);
     registerFormatter(selector, context);
     registerHover(selector, context);
     registerImplementations(selector, context);
