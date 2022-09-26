@@ -10,7 +10,7 @@ import * as path from 'path';
 import * as yaml from 'yaml';
 
 export function setStatusBar(message: string): () => void {
-    const bar = window.setStatusBarMessage(message);
+    const bar = window.setStatusBarMessage(`Crystal: ${message} $(loading~spin)`);
     return () => bar.dispose();
 }
 

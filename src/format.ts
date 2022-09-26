@@ -27,7 +27,7 @@ class CrystalFormattingEditProvider implements DocumentFormattingEditProvider {
         options: FormattingOptions,
         token: CancellationToken
     ): Promise<TextEdit[]> {
-        const dispose = setStatusBar('Crystal: running format tool...');
+        const dispose = setStatusBar('running format tool...');
         try {
             const format = await spawnFormatTool(document);
             dispose();

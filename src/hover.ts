@@ -20,7 +20,7 @@ class CrystalHoverProvider implements HoverProvider {
         const text = document.getText(document.getWordRangeAtPosition(position));
         if (KEYWORDS.includes(text)) return;
 
-        const dispose = setStatusBar('Crystal: running context tool...');
+        const dispose = setStatusBar('running context tool...');
         try {
             const res = await spawnContextTool(document, position);
             if (res.status === 'ok') {
