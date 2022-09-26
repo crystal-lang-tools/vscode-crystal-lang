@@ -16,7 +16,7 @@ import {
 const MODULE_OR_LIB_PATTERN = /^\s*(?:private\s+)?(?:module|lib)\s+(\w+)[\r\n;]?$/;
 const MACRO_PATTERN = /^\s*(?:private\s+)?macro\s+(\w+)(?:[\w\(\)\*,_]+)?[\r\n;]?$/;
 const CLASS_PATTERN = /^\s*(?:abstract\s+)?(?:private\s+)?class\s+(\w+)(?:\s+<\s+\w+)?[\r\n;]?$/;
-const STRUCT_PATTERN = /^\s*(?:abstract\s+)?(?:private\s+)?(struct|record)\s+(\w+)(?:\s+<\s+\w+)?(?:.+do\s+(?:\|.+\|)?)?[\r\n;]?$/;
+const STRUCT_PATTERN = /^\s*(?:abstract\s+)?(?:private\s+)?(?:struct|record)\s+(\w+)(?:\s+<\s+\w+)?(?:.+do(?:\s+\|.+\|)?)?[\r\n;]?$/;
 const CONSTANT_PATTERN = /^\s*(?:([A-Z0-9_]+)\s+=.+|(?:private\s+)?(?:alias|type)\s+(\w+))[\r\n;]?$/;
 const ENUM_OR_UNION_PATTERN = /^\s*(?:private\s+)?(?:enum|union)\s+(\w+)[\r\n;]?$/;
 const DEF_PATTERN = /^\s*(?:abstract\s+)?(?:(?:private|protected)\s+)?(?:def|fun)\s+(\w+)(?:[\(\)\*:,]+)?.*$/;
@@ -25,118 +25,97 @@ const IVAR_PATTERN = /^\s*@(\w+)\s+[:=].+[\r\n;]?$/;
 const VARIABLE_PATTERN = /^\s*(\w+)\s+[:=].+[\r\n;]?$/;
 
 class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
+    private symbols: SymbolInformation[];
+    private container: string[];
+
     provideDocumentSymbols(document: TextDocument, token: CancellationToken): ProviderResult<SymbolInformation[] | DocumentSymbol[]> {
+        this.symbols = [];
+        this.container = [];
+
         const lines = document.getText().split(process.platform === 'win32' ? '\r\n' : '\n');
-        const symbols: {name: string, kind: SymbolKind}[] = [];
-        let inline = 0;
         let matches: RegExpExecArray;
-        let containers: string[] = [];
 
-        function setContainer(value: string): void {
-            if (containers.includes(value)) containers.pop();
-            containers.push(value);
-        }
-
-        for (let line of lines) {
+        for (let [index, line] of lines.entries()) {
             if (/^\s*#.*/.test(line)) continue;
 
             matches = DEF_PATTERN.exec(line);
             if (matches.length) {
-                symbols.push({ name: matches[1], kind: SymbolKind.Function });
-                inline++;
+                this.create(matches[1], this.container.length ? SymbolKind.Method : SymbolKind.Function, document, index);
                 continue;
             }
 
             matches = MACRO_PATTERN.exec(line);
             if (matches.length) {
-                symbols.push({ name: matches[1], kind: SymbolKind.Function });
-                inline++;
+                this.create(matches[1], SymbolKind.Function, document, index);
                 continue;
             }
 
             matches = CLASS_PATTERN.exec(line);
             if (matches.length) {
-                symbols.push({ name: matches[1], kind: SymbolKind.Class });
-                setContainer(matches[1]);
-                inline++;
+                this.create(matches[1], SymbolKind.Class, document, index);
+                this.container.push(matches[1]);
                 continue;
             }
 
             matches = PROPERTY_PATTERN.exec(line);
             if (matches.length) {
-                symbols.push({ name: matches[1], kind: SymbolKind.Class });
-                inline++;
+                this.create(matches[1], SymbolKind.Method, document, index);
                 continue;
             }
 
             matches = STRUCT_PATTERN.exec(line);
             if (matches.length) {
-                symbols.push({ name: matches[2], kind: SymbolKind.Struct });
-                if (matches[1] === 'struct' || !/.+do\s+(?:\|.+\|)?$/.test(line)) {
-                    setContainer(matches[1]);
-                    inline++;
-                }
+                this.create(matches[1], SymbolKind.Struct, document, index);
+                this.container.push(matches[1]);
                 continue;
             }
 
             matches = MODULE_OR_LIB_PATTERN.exec(line);
             if (matches.length) {
-                symbols.push({ name: matches[1], kind: SymbolKind.Module });
-                setContainer(matches[1]);
-                inline++;
+                this.create(matches[1], SymbolKind.Module, document, index);
+                this.container.push(matches[1]);
                 continue;
             }
 
             matches = ENUM_OR_UNION_PATTERN.exec(line);
             if (matches.length) {
-                symbols.push({ name: matches[1], kind: SymbolKind.Enum });
-                inline++;
+                this.create(matches[1], SymbolKind.Enum, document, index);
+                this.container.push(matches[1]);
                 continue;
             }
 
             matches = CONSTANT_PATTERN.exec(line);
             if (matches.length) {
-                symbols.push({ name: matches[1], kind: SymbolKind.Constant });
-                inline++;
+                this.create(matches[1], SymbolKind.Constant, document, index);
                 continue;
             }
 
             matches = IVAR_PATTERN.exec(line);
             if (matches.length) {
-                symbols.push({ name: matches[1], kind: SymbolKind.Property });
+                this.create(matches[1], SymbolKind.Property, document, index);
                 continue;
             }
 
             matches = VARIABLE_PATTERN.exec(line);
             if (matches.length) {
-                symbols.push({ name: matches[1], kind: SymbolKind.Variable });
+                this.create(matches[1], SymbolKind.Variable, document, index);
                 continue;
             }
 
             if (/\s*end(?:\..*)?$/.test(line)) {
-                inline--;
-                if (inline <= 0) containers = [];
-                continue;
-            }
-
-            if (/\s*(?:.+=\s*)?(?:if|unless|while|until|select|case|begin)/.test(line)) {
-                inline++;
-                continue;
-            }
-
-            if (/^.+do\s+(?:\|.+\|)?$/.test(line)) {
-                inline++;
+                this.container.pop();
                 continue;
             }
         }
 
-        return symbols.map(
-            (sym, i) => new SymbolInformation(
-                sym.name,
-                sym.kind,
-                containers[i - 1],
-                new Location(document.uri, new Position(i, 0))
-            )
+        console.debug(this.symbols);
+        return this.symbols;
+    }
+
+    private create(name: string, kind: SymbolKind, { uri }: TextDocument, index: number): void {
+        const loc = new Location(uri, new Position(index, 0));
+        this.symbols.push(
+            new SymbolInformation(name, kind, this.container[index - 1], loc)
         );
     }
 }
