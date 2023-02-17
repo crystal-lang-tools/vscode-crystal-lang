@@ -24,8 +24,8 @@ class CrystalHoverProvider implements HoverProvider {
 	): Promise<Hover> {
 		const line = document.lineAt(position.line);
 		if (!line.text || /^#(?!{).+/.test(line.text)) return;
-		if (/^\s*require\s+".*"/.test(line.text) && !line.text.includes('*'))
-			return this.provideRequireHover(document, line);
+		if (/^\s*require\s+".*"/.test(line.text))
+			return await this.provideRequireHover(document, line);
 
 		const text = document.getText(document.getWordRangeAtPosition(position));
 		if (KEYWORDS.includes(text)) return; // TODO: potential custom keyword highlighting/info support? Rust??
@@ -70,24 +70,50 @@ class CrystalHoverProvider implements HoverProvider {
 		// private provideSymbolContext()
 	}
 
-	private provideRequireHover(document: TextDocument, line: TextLine): Hover {
-		let match = /"(\.{1,2}\/[\w+\/]+)"/.exec(line.text)[1];
+	private async provideRequireHover(
+		document: TextDocument,
+		line: TextLine
+	): Promise<Hover> {
+		let match = /"(\.{1,2}\/[\w\*\/]+)"/.exec(line.text)[1];
+		const dirname = workspace.getWorkspaceFolder(document.uri).name;
+		const md = new MarkdownString();
+
 		if (match) {
 			console.debug('[Hover] identifying local require');
 
-			if (!match.endsWith('.cr')) match += '.cr';
-			const dir = path.dirname(document.fileName);
-			const src = path.resolve(dir, match);
-			if (!existsSync(src)) return;
-			console.debug(`[Hover] resolved: ${src}`);
+			if (match.includes('*')) {
+				console.debug(`[Hover] globbing: ${path.join('src', match)}`);
+				const files = await workspace.findFiles(path.join('src', match));
+				if (!files.length) return;
+				const lines: string[] = [];
 
-			const dirname = workspace.getWorkspaceFolder(document.uri).name;
-			const relative = path
-				.join('.', src.split(dirname)[1])
-				.replace(/\\+/, '/');
-			const md = new MarkdownString()
-				.appendCodeblock(`require "${relative}"`, 'crystal')
-				.appendMarkdown(`[Go to source](file:///${src})`);
+				for (let file of files.slice(0, 10)) {
+					let relative = path.join('.', file.path.split(dirname)[1]);
+					lines.push(`require "${relative}"`);
+				}
+				lines.sort();
+
+				const extra = files.length - 10;
+				if (extra > 0) lines.push(`\n...and ${extra} more`);
+				md.appendCodeblock(
+					lines.join('\n').replace(/\\+/g, '/'),
+					'crystal'
+				).appendText(`Resolved ${files.length} sources.`);
+			} else {
+				if (!match.endsWith('.cr')) match += '.cr';
+				const dir = path.dirname(document.fileName);
+				const src = path.resolve(dir, match);
+				if (!existsSync(src)) return;
+				console.debug(`[Hover] resolved: ${src}`);
+
+				const relative = path
+					.join('.', src.split(dirname)[1])
+					.replace(/\\+/, '/');
+
+				md.appendCodeblock(`require "${relative}"`, 'crystal').appendMarkdown(
+					`[Go to source](file:///${src})`
+				);
+			}
 
 			return new Hover(md, line.range);
 		}
