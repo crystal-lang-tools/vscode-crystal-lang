@@ -14,7 +14,12 @@ import {
 	workspace,
 } from 'vscode';
 import { KEYWORDS } from './definitions';
-import { ContextError, setStatusBar, spawnContextTool } from './tools';
+import {
+	ContextError,
+	getMainForShard,
+	setStatusBar,
+	spawnContextTool,
+} from './tools';
 
 class CrystalHoverProvider implements HoverProvider {
 	async provideHover(
@@ -24,8 +29,11 @@ class CrystalHoverProvider implements HoverProvider {
 	): Promise<Hover> {
 		const line = document.lineAt(position.line);
 		if (!line.text || /^#(?!{).+/.test(line.text)) return;
-		if (/^\s*require\s+".*"/.test(line.text))
-			return await this.provideRequireHover(document, line);
+		if (/"(\.{1,2}\/[\w\*\/]+)"/.test(line.text))
+			return await this.provideLocalRequireHover(document, line);
+
+		if (/"([\w\/v-]+)"/.test(line.text))
+			return this.provideShardRequireHover(document, line);
 
 		const text = document.getText(document.getWordRangeAtPosition(position));
 		if (KEYWORDS.includes(text)) return; // TODO: potential custom keyword highlighting/info support? Rust??
@@ -70,55 +78,73 @@ class CrystalHoverProvider implements HoverProvider {
 		// private provideSymbolContext()
 	}
 
-	private async provideRequireHover(
+	private async provideLocalRequireHover(
 		document: TextDocument,
 		line: TextLine
 	): Promise<Hover> {
-		let match = /"(\.{1,2}\/[\w\*\/]+)"/.exec(line.text)[1];
 		const dirname = workspace.getWorkspaceFolder(document.uri).name;
 		const md = new MarkdownString();
+		let match = /"(\.{1,2}\/[\w\*\/]+)"/.exec(line.text)[1];
+		console.debug('[Hover] identifying local require');
 
-		if (match) {
-			console.debug('[Hover] identifying local require');
+		if (match.includes('*')) {
+			console.debug(`[Hover] globbing: ${path.join('src', match)}`);
+			const files = await workspace.findFiles(path.join('src', match));
+			if (!files.length) return;
+			const lines: string[] = [];
 
-			if (match.includes('*')) {
-				console.debug(`[Hover] globbing: ${path.join('src', match)}`);
-				const files = await workspace.findFiles(path.join('src', match));
-				if (!files.length) return;
-				const lines: string[] = [];
-
-				for (let file of files.slice(0, 10)) {
-					let relative = path.join('.', file.path.split(dirname)[1]);
-					lines.push(`require "${relative}"`);
-				}
-				lines.sort();
-
-				const extra = files.length - 10;
-				if (extra > 0) lines.push(`\n...and ${extra} more`);
-				md.appendCodeblock(
-					lines.join('\n').replace(/\\+/g, '/'),
-					'crystal'
-				).appendText(`Resolved ${files.length} sources.`);
-			} else {
-				if (!match.endsWith('.cr')) match += '.cr';
-				const dir = path.dirname(document.fileName);
-				const src = path.resolve(dir, match);
-				if (!existsSync(src)) return;
-				console.debug(`[Hover] resolved: ${src}`);
-
-				const relative = path
-					.join('.', src.split(dirname)[1])
-					.replace(/\\+/g, '/');
-
-				md.appendCodeblock(`require "${relative}"`, 'crystal').appendMarkdown(
-					`[Go to source](file:///${src})`
-				);
+			for (let file of files.slice(0, 10)) {
+				let relative = path.join('.', file.path.split(dirname)[1]);
+				lines.push(`require "${relative}"`);
 			}
+			lines.sort();
 
-			return new Hover(md, line.range);
+			const extra = files.length - 10;
+			if (extra > 0) lines.push(`\n...and ${extra} more`);
+			md.appendCodeblock(
+				lines.join('\n').replace(/\\+/g, '/'),
+				'crystal'
+			).appendText(`Resolved ${files.length} sources.`);
+		} else {
+			if (!match.endsWith('.cr')) match += '.cr';
+			const dir = path.dirname(document.fileName);
+			const src = path.resolve(dir, match);
+			if (!existsSync(src)) return;
+			console.debug(`[Hover] resolved: ${src}`);
+
+			const relative = path
+				.join('.', src.split(dirname)[1])
+				.replace(/\\+/g, '/');
+
+			md.appendCodeblock(`require "${relative}"`, 'crystal').appendMarkdown(
+				`[Go to source](file:///${src})`
+			);
 		}
 
-		// TODO: add shards lookup
+		return new Hover(md, line.range);
+	}
+
+	private provideShardRequireHover(
+		document: TextDocument,
+		line: TextLine
+	): Hover {
+		const dirname = workspace.getWorkspaceFolder(document.uri).name;
+		const md = new MarkdownString();
+		const match = /"([\w\/v-]+)"/.exec(line.text)[1];
+		console.debug('[Hover] identifying shard require');
+
+		const main = getMainForShard(document, match);
+		if (!main) return;
+		console.debug(`[Hover] resolved: ${main}`);
+
+		const relative = path
+			.join('.', main.split(dirname)[1])
+			.replace(/\\+/g, '/');
+		md.appendCodeblock(`require "${relative}"`, 'crystal').appendMarkdown(
+			`[Go to source](file:///${main})`
+		);
+
+		return new Hover(md, line.range);
 	}
 }
 

@@ -92,6 +92,26 @@ function getShardMainPath(document: TextDocument): string {
 	return document.fileName;
 }
 
+// TODO: switch this for a hardcoded stdlib check?
+// export async function getCrystalLibPath(): Promise<string>
+
+export function getMainForShard(
+	document: TextDocument,
+	name: string
+): string | undefined {
+	const dir = workspace.getWorkspaceFolder(document.uri).uri.fsPath;
+	const fp = path.join(dir, 'lib', name, 'shard.yml');
+	console.debug(fp);
+	if (!existsSync(fp)) return;
+
+	const shard = yaml.parse(fp) as Shard;
+	const main = shard.targets?.[shard.name]?.main;
+	if (main) return path.resolve(dir, main);
+
+	const mp = path.join(dir, 'lib', name, 'src', name + '.cr');
+	if (existsSync(mp)) return mp;
+}
+
 export async function spawnFormatTool(document: TextDocument): Promise<string> {
 	const compiler = await getCompilerPath();
 
