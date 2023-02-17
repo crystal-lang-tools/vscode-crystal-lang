@@ -4,41 +4,44 @@ import {
     Position,
     TextDocument
 } from 'vscode';
-import { exec, ExecException, ExecOptions, spawn } from 'child_process';
+import { ChildProcess, exec, spawn } from 'child_process';
 import { existsSync } from 'fs';
 import * as path from 'path';
 import * as yaml from 'yaml';
 import { promisify } from 'util';
-import { error } from 'console';
+
+function execWrapper(
+	command: string,
+	callback?: (error: { stdout: string, stderr: string }, stdout: string, stderr: string) => void,
+): ChildProcess {
+	return exec(command, {}, (err, stdout, stderr) => {
+		if (err) {
+			callback({ stderr, stdout }, stdout, stderr)
+			return
+		}
+		callback({ stdout, stderr }, stdout, stderr);
+	});
+};
+
+const execAsync = promisify(execWrapper);
 
 export function setStatusBar(message: string): () => void {
     const bar = window.setStatusBarMessage(`Crystal: ${message} $(loading~spin)`);
     return () => bar.dispose();
 }
 
-async function getCompilerPath(): Promise<string> {
+function getCompilerPath(): Promise<string> {
     const config = workspace.getConfiguration('crystal-lang');
 
     if (config.has('compiler')) {
         const exe = config.get<string>('compiler');
-        if (path.isAbsolute(exe) && existsSync(exe)) return exe;
+        if (path.isAbsolute(exe) && existsSync(exe)) return Promise.resolve(exe);
     }
 
-    return new Promise((res, rej) => {
-        const child = spawn(process.platform === 'win32' ? 'where' : 'which', ['crystal']);
-        const out: string[] = [];
-        const err: string[] = [];
+    const command = (process.platform === 'win32' ? 'where' : 'which') + ' crystal';
+    console.debug(command);
 
-        child.stdout
-            .setEncoding('utf-8')
-            .on('data', d => out.push(d))
-            .on('end', () => res(out.join()));
-
-        child.stderr
-            .setEncoding('utf-8')
-            .on('data', d => err.push(d))
-            .on('end', () => rej(err.join()));
-    });
+    return execAsync(command);
 }
 
 // async function getShardsPath(): Promise<string>;
@@ -83,7 +86,7 @@ function getShardMainPath(document: TextDocument): string {
 export async function spawnFormatTool(document: TextDocument): Promise<string> {
     const compiler = await getCompilerPath();
 
-    return new Promise((res, rej) => {
+    return await new Promise((res, rej) => {
         const child = spawn(compiler, ['tool', 'format', '--no-color', '-']);
         child.stdin.write(document.getText());
         child.stdin.end();
@@ -115,29 +118,12 @@ export interface ImplResponse {
 
 export async function spawnImplTool(document: TextDocument, position: Position): Promise<ImplResponse> {
     const compiler = await getCompilerPath();
+    const cursor = getCursorPath(document, position);
+    const main = getShardMainPath(document);
 
-    return new Promise(res => {
-        const cursor = getCursorPath(document, position);
-        const main = getShardMainPath(document);
+    console.debug(`${compiler} tool implementations -c ${cursor} ${main} -f json`);
 
-        const child = spawn(compiler, ['tool', 'implementations', '-c', cursor, main, '-f', 'json']);
-        const out: string[] = [];
-        const err: string[] = [];
-
-        child.stdout
-            .setEncoding('utf-8')
-            .on('data', d => out.push(d))
-            .on('end', () => res(JSON.parse(out.join())));
-
-        child.stderr
-            .setEncoding('utf-8')
-            .on('data', d => err.push(d))
-            .on('end', () => {
-                const raw = JSON.parse(err.join());
-                if (!Array.isArray(raw)) return res(raw);
-                res({status: 'failed', message: raw[0]['message']});
-            });
-    });
+    return JSON.parse(await execAsync(`${compiler} tool implementations -c ${cursor} ${main} -f json`));
 }
 
 interface ContextResponse {
@@ -146,51 +132,19 @@ interface ContextResponse {
     contexts?: Record<string, string>[];
 }
 
-
-const execWrapper = (
-	command: string,
-	options: ExecOptions,
-	callback?: (error: ExecException & {output?: { stderr: string, stdout: string } } , stdout: string, stderr: string) => void,
-  ) => {
-	return exec(command, options, (err, stdout, stderr) => {
-		if (err) {
-			callback({ ...err, output: { stderr, stdout } }, stdout, stderr)
-			return
-		}
-		callback(err, stdout, stderr)
-	});
-};
-
-const promiseWrapper = promisify(execWrapper)
+export interface ContextError {
+    file: string;
+    line: number;
+    column: number;
+    message: string;
+}
 
 export async function spawnContextTool(document: TextDocument, position: Position): Promise<ContextResponse> {
     const compiler = await getCompilerPath();
-
 	const cursor = getCursorPath(document, position);
 	const main = getShardMainPath(document);
 
-	console.debug(`crystal tool context -c ${cursor} ${main} -f json`);
+	console.debug(`${compiler} tool context -c ${cursor} ${main} -f json`);
 
-	return JSON.parse(await promiseWrapper(`crystal tool context -c ${cursor} ${main} -f json`, {})) as ContextResponse
-
-    // return new Promise((res, rej) => {
-    //     const cursor = getCursorPath(document, position);
-    //     const main = getShardMainPath(document);
-
-    //     console.debug(`crystal tool context -c ${cursor} ${main} -f json`);
-
-    //     const child = spawn(compiler, ['tool', 'context', '-c', cursor, main, '-f', 'json']);
-    //     const out: string[] = [];
-    //     const err: string[] = [];
-
-    //     child.stdout
-    //         .setEncoding('utf-8')
-    //         .on('data', d => out.push(d))
-    //         .on('end', () => res(JSON.parse(out.join())));
-
-    //     child.stderr
-    //         .setEncoding('utf-8')
-    //         .on('data', d => err.push(d))
-    //         .on('end', () => rej(JSON.parse(err.join())));
-    // });
+    return JSON.parse(await execAsync(`${compiler} tool context -c ${cursor} ${main} -f json`));
 }
