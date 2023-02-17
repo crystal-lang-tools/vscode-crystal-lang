@@ -29,18 +29,24 @@ class CrystalFormattingEditProvider implements DocumentFormattingEditProvider {
 	): Promise<TextEdit[]> {
 		const dispose = setStatusBar('running format tool...');
 		try {
+			console.debug('[Format] getting formatting...');
 			const format = await spawnFormatTool(document);
-			dispose();
-
 			if (!format.length) return;
+
 			return [TextEdit.replace(getFormatRange(document), format)];
 		} catch (err) {
-			dispose();
 			if (!err) return;
 
-			console.error(err);
-			window.showErrorMessage(`Failed to execute Crystal context tool: ${err}`);
+			console.debug(`[Format] failed: ${err}`);
+			window.showErrorMessage(
+				`Failed to format document: ${err.replace(
+					/syntax error in '.*':/,
+					''
+				)}.`
+			);
 			return [];
+		} finally {
+			dispose();
 		}
 	}
 }
