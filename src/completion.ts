@@ -13,6 +13,7 @@ import {
 	SymbolKind,
 	TextDocument,
 } from 'vscode';
+import globals from './definitions/globals';
 import methods from './definitions/methods';
 
 class CrystalCompletionItemProvider implements CompletionItemProvider {
@@ -25,6 +26,10 @@ class CrystalCompletionItemProvider implements CompletionItemProvider {
 		context: CompletionContext
 	): Promise<CompletionItem[] | CompletionList<CompletionItem>> {
 		this.completions = [];
+		// temporary?
+		this.push(globals.CLASSES, SymbolKind.Class);
+		this.push(globals.MODULES, SymbolKind.Module);
+		this.push(globals.STRUCTS, SymbolKind.Struct);
 
 		const line = document.lineAt(position.line);
 		if (!line || /^#(?!{).+/.test(line.text)) return [];
