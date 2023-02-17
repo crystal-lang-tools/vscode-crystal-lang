@@ -25,10 +25,12 @@ class CrystalImplementationProvider implements ImplementationProvider {
 		const matches = /^require\s+"(.+)"\s*$/.exec(line.text);
 
 		if (matches?.length > 1) {
-			const dir = path.dirname(document.fileName);
 			let text = matches[1];
+			if (text.includes('*')) return [];
+			const dir = path.dirname(document.fileName);
+			console.debug(`[Implementations] identified: ${text}`);
 
-			if (/^\.{1,2}\/.+/.test(text)) {
+			if (/^\.{1,2}\/\w+/.test(text)) {
 				if (!text.endsWith('.cr')) text += '.cr';
 				const loc = path.join(dir, text);
 				if (!existsSync(loc)) return [];
@@ -41,9 +43,10 @@ class CrystalImplementationProvider implements ImplementationProvider {
 		}
 
 		try {
+			console.debug('[Implementations] getting implementations...');
 			const res = await spawnImplTool(document, position);
-			if (res.status === 'failed') {
-				console.error(`Crystal implementations tool failed: ${res.message}`);
+			if (res.status !== 'ok') {
+				console.debug(`[Implementations] failed: ${res}`);
 				return [];
 			}
 
@@ -59,7 +62,7 @@ class CrystalImplementationProvider implements ImplementationProvider {
 
 			return links;
 		} catch (err) {
-			console.error(`implementations: ${err}`);
+			console.debug(`[Implementations] failed: ${err}`);
 			return [];
 		}
 	}

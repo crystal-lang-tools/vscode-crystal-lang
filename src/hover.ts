@@ -1,3 +1,5 @@
+import { existsSync } from 'fs';
+import * as path from 'path';
 import {
 	CancellationToken,
 	DocumentSelector,
@@ -8,6 +10,8 @@ import {
 	MarkdownString,
 	Position,
 	TextDocument,
+	TextLine,
+	workspace,
 } from 'vscode';
 import { KEYWORDS } from './definitions';
 import { ContextError, setStatusBar, spawnContextTool } from './tools';
@@ -20,6 +24,8 @@ class CrystalHoverProvider implements HoverProvider {
 	): Promise<Hover> {
 		const line = document.lineAt(position.line);
 		if (!line.text || /^#(?!{).+/.test(line.text)) return;
+		if (/^\s*require\s+".*"/.test(line.text) && !line.text.includes('*'))
+			return this.provideRequireHover(document, line);
 
 		const text = document.getText(document.getWordRangeAtPosition(position));
 		if (KEYWORDS.includes(text)) return; // TODO: potential custom keyword highlighting/info support? Rust??
@@ -60,9 +66,33 @@ class CrystalHoverProvider implements HoverProvider {
 		} finally {
 			dispose();
 		}
-
 		// TODO: implement symbol check
 		// private provideSymbolContext()
+	}
+
+	private provideRequireHover(document: TextDocument, line: TextLine): Hover {
+		let match = /"(\.{1,2}\/[\w+\/]+)"/.exec(line.text)[1];
+		if (match) {
+			console.debug('[Hover] identifying local require');
+
+			if (!match.endsWith('.cr')) match += '.cr';
+			const dir = path.dirname(document.fileName);
+			const src = path.resolve(dir, match);
+			if (!existsSync(src)) return;
+			console.debug(`[Hover] resolved: ${src}`);
+
+			const dirname = workspace.getWorkspaceFolder(document.uri).name;
+			const relative = path
+				.join('.', src.split(dirname)[1])
+				.replace(/\\+/, '/');
+			const md = new MarkdownString()
+				.appendCodeblock(`require "${relative}"`, 'crystal')
+				.appendMarkdown(`[Go to source](file:///${src})`);
+
+			return new Hover(md, line.range);
+		}
+
+		// TODO: add shards lookup
 	}
 }
 
