@@ -92,8 +92,20 @@ function getShardMainPath(document: TextDocument): string {
 	return document.fileName;
 }
 
-// TODO: switch this for a hardcoded stdlib check?
-// export async function getCrystalLibPath(): Promise<string>
+export async function getCrystalLibPath(): Promise<string> {
+	const compiler = await getCompilerPath();
+	let libpath: string;
+
+	// FIXME: this is throwing for some reason even though it's fine
+	try {
+		libpath = await execAsync(`${compiler} env CRYSTAL_PATH`);
+	} catch (err) {
+		if (err.stderr.length) throw err;
+		libpath = err.stdout;
+	}
+
+	return libpath.replace(/^lib[:;]|(?:\r)?\n/g, '');
+}
 
 export function getMainForShard(
 	document: TextDocument,

@@ -1,4 +1,4 @@
-import { existsSync } from 'fs';
+import { existsSync, readdirSync } from 'fs';
 import * as path from 'path';
 import {
 	CancellationToken,
@@ -16,6 +16,7 @@ import {
 import { KEYWORDS } from './definitions';
 import {
 	ContextError,
+	getCrystalLibPath,
 	getMainForShard,
 	setStatusBar,
 	spawnContextTool,
@@ -33,7 +34,7 @@ class CrystalHoverProvider implements HoverProvider {
 			return await this.provideLocalRequireHover(document, line);
 
 		if (/"([\w\/v-]+)"/.test(line.text))
-			return this.provideShardRequireHover(document, line);
+			return await this.provideShardRequireHover(document, line);
 
 		const text = document.getText(document.getWordRangeAtPosition(position));
 		if (KEYWORDS.includes(text)) return; // TODO: potential custom keyword highlighting/info support? Rust??
@@ -124,25 +125,55 @@ class CrystalHoverProvider implements HoverProvider {
 		return new Hover(md, line.range);
 	}
 
-	private provideShardRequireHover(
+	private async provideShardRequireHover(
 		document: TextDocument,
 		line: TextLine
-	): Hover {
+	): Promise<Hover> {
 		const dirname = workspace.getWorkspaceFolder(document.uri).name;
 		const md = new MarkdownString();
 		const match = /"([\w\/v-]+)"/.exec(line.text)[1];
-		console.debug('[Hover] identifying shard require');
+		console.debug('[Hover] identifying shard/lib require');
 
 		const main = getMainForShard(document, match);
-		if (!main) return;
-		console.debug(`[Hover] resolved: ${main}`);
+		if (main) {
+			console.debug(`[Hover] resolved: ${main}`);
 
-		const relative = path
-			.join('.', main.split(dirname)[1])
-			.replace(/\\+/g, '/');
-		md.appendCodeblock(`require "${relative}"`, 'crystal').appendMarkdown(
-			`[Go to source](file:///${main})`
-		);
+			const relative = path
+				.join('.', main.split(dirname)[1])
+				.replace(/\\+/g, '/');
+
+			md.appendCodeblock(`require "${relative}"`, 'crystal').appendMarkdown(
+				`[Go to source](file:///${main})`
+			);
+		} else {
+			try {
+				console.debug('[Hover] getting crystal path...');
+				const libpath = await getCrystalLibPath();
+				let fp = path.join(libpath, match);
+				if (!existsSync(fp)) {
+					fp += '.cr';
+					if (!existsSync(fp)) return;
+				}
+				console.debug(`[Hover] resolved: ${fp}`);
+
+				if (!fp.endsWith('.cr')) {
+					if (existsSync(fp + '.cr')) {
+						fp += '.cr';
+					} else {
+						// TODO: levenshtein the fuck out of this
+						fp = path.join(fp, readdirSync(fp)[0]);
+						console.debug(`[Hover] expanded to: ${fp}`);
+					}
+				}
+
+				md.appendCodeblock(`require "${match}"`, 'crystal').appendMarkdown(
+					`[Go to source](file:///${fp})`
+				);
+			} catch (err) {
+				console.debug(`[Hover] failed: ${err.stderr}`);
+				return;
+			}
+		}
 
 		return new Hover(md, line.range);
 	}
