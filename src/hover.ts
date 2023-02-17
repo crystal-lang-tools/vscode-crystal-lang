@@ -108,7 +108,7 @@ class CrystalHoverProvider implements HoverProvider {
 
 				const relative = path
 					.join('.', src.split(dirname)[1])
-					.replace(/\\+/, '/');
+					.replace(/\\+/g, '/');
 
 				md.appendCodeblock(`require "${relative}"`, 'crystal').appendMarkdown(
 					`[Go to source](file:///${src})`
