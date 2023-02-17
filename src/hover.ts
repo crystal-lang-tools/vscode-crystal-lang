@@ -26,14 +26,16 @@ class CrystalHoverProvider implements HoverProvider {
 
 		const dispose = setStatusBar('running context tool...');
 		try {
+			console.debug('[Hover] getting context...');
 			const res = await spawnContextTool(document, position);
-			console.log('text: ', text);
-			console.log(res);
 			dispose();
-			if (res.status !== 'ok') return;
+			if (res.status !== 'ok') {
+				console.debug(`[Hover] failed: ${res}`);
+				return;
+			}
 
 			const ctx = res.contexts!.find(c => c[line.text]);
-			console.debug(ctx);
+			console.debug(`[Hover] context: ${ctx}`);
 			if (!ctx) return;
 
 			const md = new MarkdownString().appendCodeblock(
@@ -44,7 +46,12 @@ class CrystalHoverProvider implements HoverProvider {
 		} catch (err) {
 			dispose();
 
-			const res = <ContextError>JSON.parse(err.stderr)[0];
+			if (err.stderr.includes('cursor location must be')) {
+				console.debug('[Hover] failed to get correct cursor location');
+				return;
+			}
+			const res = JSON.parse(err.stderr)[0] as ContextError;
+
 			const lines = res.message.split('\n');
 			const msg = 'Error: ' + lines.filter(t => !t.startsWith(' -')).join('\n');
 			const overloads = lines.filter(t => t.startsWith(' -'));
