@@ -1,5 +1,5 @@
 const CLASSES = [
-    ['ArgumentError', 'class ArgumentError'],
+	['ArgumentError', 'class ArgumentError'],
 	['Array', 'class Array(T)'],
 	['Box', 'class Box(T)'],
 	['Channel', 'abstract class Channel(T)'],
@@ -30,7 +30,7 @@ const CLASSES = [
 	['StringScanner', 'class StringScanner'],
 	['TypeCastError', 'class TypeCastError'],
 	['URI', 'class URI'],
-	['Weakref', 'class WeakRef(T)']
+	['Weakref', 'class WeakRef(T)'],
 ];
 
 const MODULES = [
@@ -68,12 +68,12 @@ const MODULES = [
 ];
 
 const OTHERS = [
-    ['Bytes', 'alias Bytes'],
-    ['Signal', 'enum Signal']
+	['Bytes', 'alias Bytes'],
+	['Signal', 'enum Signal'],
 ];
 
 const STRUCTS = [
-    ['Atomic', 'struct Atomic(T)'],
+	['Atomic', 'struct Atomic(T)'],
 	['BigFloat', 'struct BigFloat'],
 	['BigInt', 'struct BigInt'],
 	['BigRational', 'struct BigRational'],
@@ -86,11 +86,11 @@ const STRUCTS = [
 	['Float32', 'struct Float32'],
 	['Float64', 'struct Float64'],
 	['Int', 'abstract struct Int'],
-    ['Int8', 'struct Int8'],
+	['Int8', 'struct Int8'],
 	['Int16', 'struct Int16'],
 	['Int32', 'struct Int32'],
 	['Int64', 'struct Int64'],
-    ['Int128', 'struct Int128'],
+	['Int128', 'struct Int128'],
 	['NamedTuple', 'struct NamedTuple(**T)'],
 	['Nil', 'struct Nil'],
 	['Number', 'abstract struct Number'],
@@ -104,18 +104,18 @@ const STRUCTS = [
 	['Time', 'struct Time'],
 	['Tuple', 'struct Tuple(*T)'],
 	['UInt', 'struct UInt'],
-    ['UInt8', 'struct UInt8'],
+	['UInt8', 'struct UInt8'],
 	['UInt16', 'struct UInt16'],
 	['UInt32', 'struct UInt32'],
 	['UInt64', 'struct UInt64'],
-    ['UInt128', 'struct UInt128'],
+	['UInt128', 'struct UInt128'],
 	['Union', 'struct Union(*T)'],
-	['Value', 'abstract struct Value']
+	['Value', 'abstract struct Value'],
 ];
 
 export default {
-    CLASSES,
-    MODULES,
-    OTHERS,
-    STRUCTS
-}
+	CLASSES,
+	MODULES,
+	OTHERS,
+	STRUCTS,
+};

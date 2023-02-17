@@ -1,69 +1,78 @@
-import * as path from 'path';
 import { existsSync } from 'fs';
+import * as path from 'path';
 import {
-    CancellationToken,
-    Definition,
-    DocumentSelector,
-    ExtensionContext,
-    ImplementationProvider,
-    languages,
-    Location,
-    LocationLink,
-    Position,
-    TextDocument,
-    Uri
+	CancellationToken,
+	Definition,
+	DocumentSelector,
+	ExtensionContext,
+	ImplementationProvider,
+	languages,
+	Location,
+	LocationLink,
+	Position,
+	TextDocument,
+	Uri,
 } from 'vscode';
 import { spawnImplTool } from './tools';
 
 class CrystalImplementationProvider implements ImplementationProvider {
-    async provideImplementation(
-        document: TextDocument,
-        position: Position,
-        token: CancellationToken
-    ): Promise<LocationLink[] | Definition> {
-        const line = document.lineAt(position.line);
-        const matches = /^require\s+"(.+)"\s*$/.exec(line.text);
+	async provideImplementation(
+		document: TextDocument,
+		position: Position,
+		token: CancellationToken
+	): Promise<LocationLink[] | Definition> {
+		const line = document.lineAt(position.line);
+		const matches = /^require\s+"(.+)"\s*$/.exec(line.text);
 
-        if (matches?.length > 1) {
-            const dir = path.dirname(document.fileName);
-            let text = matches[1];
-            
-            if (/^\.{1,2}\/.+/.test(text)) {
-                if (!text.endsWith('.cr')) text += '.cr';
-                const loc = path.join(dir, text);
-                if (!existsSync(loc)) return [];
+		if (matches?.length > 1) {
+			const dir = path.dirname(document.fileName);
+			let text = matches[1];
 
-                return new Location(Uri.file(loc), new Position(0, 0));
-            }
+			if (/^\.{1,2}\/.+/.test(text)) {
+				if (!text.endsWith('.cr')) text += '.cr';
+				const loc = path.join(dir, text);
+				if (!existsSync(loc)) return [];
 
-            // TODO: implement shard lookup
-            return [];
-        }
+				return new Location(Uri.file(loc), new Position(0, 0));
+			}
 
-        try {
-            const res = await spawnImplTool(document, position);
-            if (res.status === 'failed') {
-                console.error(`Crystal implementations tool failed: ${res.message}`);
-                return [];
-            }
+			// TODO: implement shard lookup
+			return [];
+		}
 
-            const links: Location[] = [];
-            for (let impl of res.implementations!) {
-                links.push(
-                    new Location(Uri.file(impl.filename), new Position(impl.line, impl.column))
-                );
-            }
+		try {
+			const res = await spawnImplTool(document, position);
+			if (res.status === 'failed') {
+				console.error(`Crystal implementations tool failed: ${res.message}`);
+				return [];
+			}
 
-            return links;
-        } catch (err) {
-            console.error(`implementations: ${err}`);
-            return [];
-        }
-    }
+			const links: Location[] = [];
+			for (let impl of res.implementations!) {
+				links.push(
+					new Location(
+						Uri.file(impl.filename),
+						new Position(impl.line, impl.column)
+					)
+				);
+			}
+
+			return links;
+		} catch (err) {
+			console.error(`implementations: ${err}`);
+			return [];
+		}
+	}
 }
 
-export function registerImplementations(selector: DocumentSelector, context: ExtensionContext): void {
-    context.subscriptions.push(
-        languages.registerImplementationProvider(selector, new CrystalImplementationProvider())
-    );
+export function registerImplementations(
+	selector: DocumentSelector,
+	context: ExtensionContext
+): void {
+	context.subscriptions.push(
+		languages.registerImplementationProvider(
+			selector,
+			new CrystalImplementationProvider()
+		)
+	);
 }
