@@ -47,7 +47,13 @@ function getCompilerPath(): Promise<string> {
 // async function getShardsPath(): Promise<string>;
 
 function getCursorPath(document: TextDocument, position: Position): string {
-	return `${document.fileName}:${position.line + 1}:${position.character + 1}`;
+	// https://github.com/crystal-lang/crystal/issues/13086
+	// return `${document.fileName}:${position.line + 1}:${position.character + 1}`;
+	const path = `${document.fileName}:${position.line + 1}:${
+		position.character + 1
+	}`;
+	if (/^\w:\\/.test(path)) return path.slice(2);
+	return path;
 }
 
 interface Dependency {
@@ -75,11 +81,14 @@ function getShardMainPath(document: TextDocument): string {
 	const fp = path.join(dir, 'shard.yml');
 
 	if (existsSync(fp)) {
-		const shard = <Shard>yaml.parse(fp);
+		const shard = yaml.parse(fp) as Shard;
 		const main = shard.targets?.[shard.name]?.main;
 		if (main) return path.resolve(dir, main);
 	}
 
+	// https://github.com/crystal-lang/crystal/issues/13086
+	// return document.fileName;
+	if (/^\w:\\/.test(document.fileName)) return document.fileName.slice(2);
 	return document.fileName;
 }
 

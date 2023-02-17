@@ -28,7 +28,7 @@ class CrystalHoverProvider implements HoverProvider {
 		try {
 			console.debug('[Hover] getting context...');
 			const res = await spawnContextTool(document, position);
-			dispose();
+
 			if (res.status !== 'ok') {
 				console.debug(`[Hover] failed: ${res}`);
 				return;
@@ -44,8 +44,6 @@ class CrystalHoverProvider implements HoverProvider {
 			);
 			return new Hover(md);
 		} catch (err) {
-			dispose();
-
 			if (err.stderr.includes('cursor location must be')) {
 				console.debug('[Hover] failed to get correct cursor location');
 				return;
@@ -59,9 +57,12 @@ class CrystalHoverProvider implements HoverProvider {
 
 			overloads.map(o => md.appendCodeblock(o, 'crystal'));
 			return new Hover(md);
+		} finally {
+			dispose();
 		}
 
 		// TODO: implement symbol check
+		// private provideSymbolContext()
 	}
 }
 
