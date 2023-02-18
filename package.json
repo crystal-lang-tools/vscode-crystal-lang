@@ -47,7 +47,7 @@
 			{
 				"id": "ecr",
 				"aliases": [
-					"Embed Crystal"
+					"Embedded Crystal"
 				],
 				"extensions": [
 					".ecr"
@@ -139,77 +139,42 @@
 			"type": "object",
 			"title": "Crystal Lang configuration",
 			"properties": {
-				"crystal-lang.problems": {
-					"type": "string",
-					"default": "syntax",
-					"enum": [
-						"syntax",
-						"build",
-						"none"
-					],
-					"description": "Allow to check errors.\n[syntax] show parser errors\n[build] compile without codegen\n[none] disable check."
-				},
-				"crystal-lang.implementations": {
-					"type": "boolean",
-					"default": false,
-					"description": "Allow to search implementation for method under cursor."
-				},
-				"crystal-lang.hover": {
-					"type": "boolean",
-					"default": false,
-					"description": "Show symbol information when mouse is hover."
-				},
-				"crystal-lang.completion": {
-					"type": "boolean",
-					"default": false,
-					"description": "Basic completion of methods and symbols."
-				},
-				"crystal-lang.mainFile": {
+				"crystal-lang.main": {
+					"title": "Main File",
 					"type": "string",
 					"default": "",
-					"description": "Check main file instead of current file.\nBy example: ${workspaceRoot}/src/main.cr."
-				},
-				"crystal-lang.maxNumberOfProblems": {
-					"type": "number",
-					"default": 100,
-					"description": "Controls the maximum number of problems."
-				},
-				"crystal-lang.processesLimit": {
-					"type": "number",
-					"default": 3,
-					"description": "[Reload required]\nCrystal processes running in background."
+					"description": "Check the main file instead of the current file.",
+					"examples": ["${workspaceRoot}/src/main.cr"]
 				},
 				"crystal-lang.compiler": {
+					"title": "Compiler",
 					"type": "string",
 					"default": "crystal",
-					"description": "Absolute path for Crystal compiler executable."
+					"description": "The path to the Crystal compiler."
 				},
 				"crystal-lang.shards": {
+					"title": "Shards",
 					"type": "string",
 					"default": "shards",
-					"description": "Absolute path for Shards compiler executable."
+					"description": "The path to the Shards executable."
 				},
-				"crystal-lang.server": {
+				"crystal-lang.spec": {
+					"title": "Spec Command",
 					"type": "string",
-					"default": "",
-					"description": "[Experimental][Reload required]\nAbsolute path for Scry server binary\n(Language Server Protocol for Crystal)."
+					"default": "spec",
+					"description": "The command to run for shard specs. This can include flag options."
 				},
-				"crystal-lang.logLevel": {
-					"type": "string",
-					"default": "error",
-					"enum": [
-						"debug",
-						"info",
-						"warn",
-						"error",
-						"fatal"
-					],
-					"description": "Controls the amount of data logged by crystal-lang.server"
-				},
-				"crystal-lang.bashOnWindows": {
+				"crystal-lang.notify.notFound": {
+					"title": "Shard Not Found",
 					"type": "boolean",
-					"default": false,
-					"description": "[Reload required]\nEnables support for Windows Subsystem Linux."
+					"default": true,
+					"markdownDescription": "Whether to notify if `shard.yml` cannot be found."
+				},
+				"crystal-lang.notify.specDone": {
+					"title": "Specs Finished",
+					"type": "boolean",
+					"default": true,
+					"description": "Whether to notify when specs have finished running."
 				}
 			}
 		}
