@@ -1,6 +1,7 @@
 import {
 	DocumentSelector,
 	ExtensionContext,
+	IndentAction,
 	LanguageConfiguration,
 	languages,
 } from 'vscode';
@@ -13,12 +14,22 @@ import { registerSymbols } from './symbols';
 const selector = <DocumentSelector>[{ language: 'crystal', scheme: 'file' }];
 
 const configuration = <LanguageConfiguration>{
+	comments: { lineComment: '#' },
 	indentationRules: {
 		increaseIndentPattern:
 			/^\s*((begin|(private\s+abstract|private|abstract)\s+(module|class|struct|enum)|class|struct|(private|protected)\s+def|def|fun|macro|else|elsif|ensure|for|if|module|enum|rescue|unless|until|when|while|case)|([^#]*\sdo\b)|([^#]*=\s*(case|if|unless)))\b([^#\{;]|("|'|\/).*\4)*(#.*)?$/,
 		decreaseIndentPattern:
 			/^\s*([}\]]([,)]?\s*(#|$)|\.[a-zA-Z_]\w*\b)|(end|rescue|ensure|else|elsif|when|(?:case[\s\S\n]+)in)\b)/,
 	},
+	onEnterRules: [
+		{
+			beforeText: /^\s*#(?!{).*$/,
+			action: {
+				appendText: '# ',
+				indentAction: IndentAction.None,
+			},
+		},
+	],
 	wordPattern:
 		/(-?\d+(?:\.\d+))|(:?[A-Za-z][^-`~@#%^&()=+[{}|;:'",<>/.*\]\s\\!?]*[!?]?)/,
 };
