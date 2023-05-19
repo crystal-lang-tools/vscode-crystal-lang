@@ -10,6 +10,7 @@ import { CrystalDocumentSymbolProvider } from "./crystalSymbols"
 import { CrystalCompletionItemProvider } from "./crystalCompletion"
 import { CrystalImplementationsProvider } from "./crystalImplementations"
 import { registerCrystalTask } from "./crystalTasks"
+import { registerCrystalMacroHoverProvider } from "./crystalMacro"
 
 // Language configuration for identation and patterns. Based on vscode-ruby
 const crystalConfiguration = {
@@ -46,6 +47,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// Register Tasks
 	registerCrystalTask(context)
+
+	registerCrystalMacroHoverProvider(context)
 
 	// Detect server and set configuration
 	let scry = config["server"]

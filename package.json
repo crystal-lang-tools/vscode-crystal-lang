@@ -162,6 +162,11 @@
 					"default": false,
 					"description": "Show symbol information when mouse is hover."
 				},
+				"crystal-lang.macroExpansionHover": {
+					"type": "boolean",
+					"default": false,
+					"description": "Show macro expansion when mouse hovers over a macro."
+				},
 				"crystal-lang.completion": {
 					"type": "boolean",
 					"default": false,
