@@ -66,6 +66,9 @@
 					".slang"
 				],
 				"configuration": "./slang-configuration.json"
+			},
+			{
+				"id": "crystal-markdown-injection"
 			}
 		],
 		"grammars": [
@@ -83,6 +86,17 @@
 				"language": "slang",
 				"scopeName": "text.slang",
 				"path": "./syntaxes/slang.json"
+			},
+			{
+				"language": "crystal-markdown-injection",
+				"scopeName": "markdown.crystal.codeblock",
+				"path": "./syntaxes/codeblock.json",
+				"injectTo": [
+					"text.html.markdown"
+				],
+				"embeddedLanguages": {
+					"meta.embedded.block.crystal": "crystal"
+				}
 			}
 		],
 		"snippets": [
