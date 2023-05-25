@@ -220,6 +220,20 @@
 					"description": "[Reload required]\nEnables support for Windows Subsystem Linux."
 				}
 			}
+		},
+		"commands": [
+			{
+				"command": "crystal-lang.showMacroExpansion",
+				"title": "Show macro expansion"
+			}
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"command": "crystal-lang.showMacroExpansion",
+					"group": "z_commands"
+				}
+			]
 		}
 	},
 	"scripts": {
