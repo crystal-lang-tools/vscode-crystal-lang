@@ -44,6 +44,8 @@ export async function activate(context: ExtensionContext): Promise<void> {
 	registerHover(selector, context);
 	registerImplementations(selector, context);
 	registerSymbols(selector, context);
+
+	console.debug('[Crystal] extension loaded');
 }
 
 export function deactivate() {}
