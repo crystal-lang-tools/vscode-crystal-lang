@@ -33,4 +33,7 @@ See [Changelog](https://github.com/crystal-lang-tools/vscode-crystal-lang/blob/m
 
 ## Contributors
 
-- See [Contributors](https://github.com/crystal-lang-tools/vscode-crystal-lang/graphs/contributors)
+- [@faustinoaq](https://github.com/faustinoaq) Faustino - creator
+- [@nobodywasishere](https://github.com/nobodywasishere) Margret Riegert - maintainer
+
+[See all contributors](https://github.com/crystal-lang-tools/vscode-crystal-lang/graphs/contributors)
