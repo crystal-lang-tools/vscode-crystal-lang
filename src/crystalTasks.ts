@@ -1,4 +1,4 @@
-import {ExtensionContext, Task, TaskDefinition, ShellExecution, ShellExecutionOptions, TextDocument, WorkspaceFolder, WorkspaceFoldersChangeEvent, TaskGroup, TaskPresentationOptions, TaskRevealKind, TaskPanelKind, Disposable, Uri, workspace, TaskProvider} from "vscode"
+import {ExtensionContext, Task, TaskDefinition, ShellExecution, ShellExecutionOptions, TextDocument, WorkspaceFolder, WorkspaceFoldersChangeEvent, TaskGroup, TaskPresentationOptions, TaskRevealKind, TaskPanelKind, Disposable, Uri, workspace, TaskProvider, tasks} from "vscode"
 import * as path from 'path'
 import * as fs from 'fs'
 import * as YAML from 'yaml'
@@ -102,7 +102,8 @@ class CrystalTaskClient {
 	}
 
 	async start(context: ExtensionContext) {
-		this.disposables.push(this.registerTaskProvider())
+		this.disposables.push(this.registerTaskProvider(TaskType.Crystal))
+		this.disposables.push(this.registerTaskProvider(TaskType.Shards))
 	}
 
 	async stop() {
@@ -112,19 +113,24 @@ class CrystalTaskClient {
 		})
 	}
 
-	registerTaskProvider() : Disposable {
-		let provider: TaskProvider = new CrystalTaskProvider(this.folder);
-		const disposable = workspace.registerTaskProvider('crystal', provider);
+	registerTaskProvider(taskType: TaskType) : Disposable {
+		let provider: TaskProvider = new CrystalTaskProvider(taskType, this.folder);
+		const disposable = tasks.registerTaskProvider(taskType, provider);
 		return disposable
 	}
 }
 
+enum TaskType {
+	Crystal = 'crystal',
+	Shards = 'shards',
+}
+
 class CrystalTaskProvider implements TaskProvider {
-	constructor(private _workspaceFolder: WorkspaceFolder) {
+	constructor(private _taskType: TaskType, private _workspaceFolder: WorkspaceFolder) {
 	}
 
 	public provideTasks() {
-		return getCrystalTasks(this._workspaceFolder)
+		return getCrystalTasks(this._taskType, this._workspaceFolder)
 	}
 
 	public resolveTask(_task : Task): Task | undefined {
@@ -146,8 +152,8 @@ interface TaskConfigItem {
 	presentationOptions?: TaskPresentationOptions
 }
 
-function getCrystalTasks(target: WorkspaceFolder): Task[] {
-	const taskList = createCrystalTaskConfigItem(target)
+function getCrystalTasks(taskType: TaskType, target: WorkspaceFolder): Task[] {
+	const taskList = createCrystalTaskConfigItem(taskType, target)
 	const list = taskList.map((def) => {
 		const task = createCrystalTask(def, target)
 		return task
@@ -237,14 +243,14 @@ const CRYSTAL_TASKS: Array<{type: string, command: string, args?: Array<string>,
 	}
 ]
 
-function createCrystalTaskConfigItem(target: WorkspaceFolder): Array<TaskConfigItem> {
+function createCrystalTaskConfigItem(taskType: TaskType, target: WorkspaceFolder): Array<TaskConfigItem> {
 	const problemMatcher = []
 	const presentationOptions: TaskPresentationOptions = {
 		reveal: TaskRevealKind.Always,
 		panel: TaskPanelKind.Dedicated,
 	}
 	const mainFile = getMainFile(target)
-	const tasks = CRYSTAL_TASKS.map((opt) => {
+	const tasks = CRYSTAL_TASKS.filter((task) => task.type === taskType).map((opt) => {
 		const def: CrystalTaskDefinition = {
 			label: opt.command,
 			type: opt.type,
