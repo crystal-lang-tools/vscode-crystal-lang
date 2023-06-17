@@ -1035,6 +1035,10 @@
 			"name": "comment.line.number-sign.crystal"
 		},
 		{
+      			"match": "\\b_([\\w]+[?!]?)",
+      			"name": "comment.unused.crystal"
+    		},
+		{
 			"begin": "(?><<-('?)((?:[_\\w]+_|)HTML)\\b\\1)",
 			"beginCaptures": {
 				"0": {
