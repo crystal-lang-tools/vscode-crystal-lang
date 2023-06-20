@@ -45,7 +45,7 @@ class CrystalHoverProvider implements HoverProvider {
 			const res = await spawnContextTool(document, position);
 
 			if (res.status !== 'ok') {
-				console.debug(`[Hover] failed: ${res}`);
+				console.debug(`[Hover] failed: ${JSON.stringify(res)}`);
 				return;
 			}
 

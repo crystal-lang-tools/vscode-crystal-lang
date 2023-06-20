@@ -1,4 +1,4 @@
-import { ChildProcess, exec, spawn } from 'child_process';
+import { ChildProcess, ExecException, ExecOptions, exec, spawn } from 'child_process';
 import { existsSync } from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
@@ -8,19 +8,21 @@ import * as yaml from 'yaml';
 function execWrapper(
 	command: string,
 	callback?: (
-		error: { stdout: string; stderr: string },
+		error: (ExecException & { stdout: string; stderr: string }) | {},
 		stdout: string,
 		stderr: string
 	) => void
 ): ChildProcess {
 	return exec(command, {}, (err, stdout, stderr) => {
 		if (err) {
-			callback({ stderr, stdout }, stdout, stderr);
+			callback({ ...err, stderr, stdout }, stdout, stderr);
 			return;
 		}
-		callback({ stdout, stderr }, stdout, stderr);
+
+		callback(err, stdout, stderr);
 	});
 }
+
 
 const execAsync = promisify(execWrapper);
 
@@ -29,7 +31,7 @@ export function setStatusBar(message: string): () => void {
 	return () => bar.dispose();
 }
 
-function getCompilerPath(): Promise<string> {
+async function getCompilerPath(): Promise<string> {
 	const config = workspace.getConfiguration('crystal-lang');
 
 	if (config.has('compiler')) {
@@ -39,9 +41,8 @@ function getCompilerPath(): Promise<string> {
 
 	const command =
 		(process.platform === 'win32' ? 'where' : 'which') + ' crystal';
-	console.debug(command);
 
-	return execAsync(command);
+	return (await execAsync(command)).trim();	
 }
 
 // async function getShardsPath(): Promise<string>;
@@ -137,13 +138,19 @@ export async function spawnFormatTool(document: TextDocument): Promise<string> {
 
 		child.stdout
 			.setEncoding('utf-8')
-			.on('data', d => out.push(d))
-			.on('end', () => res(out.join()));
+			.on('data', d => out.push(d));
 
 		child.stderr
 			.setEncoding('utf-8')
-			.on('data', d => err.push(d))
-			.on('end', () => rej(err.join()));
+			.on('data', d => err.push(d));
+
+		child.on('close', () => {
+			if (err.length > 0) {
+				rej(err.join());
+				return;
+			}
+			res(out.join());
+		})
 	});
 }
 
