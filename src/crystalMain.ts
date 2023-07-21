@@ -1,6 +1,6 @@
 import * as fs from "fs"
 import * as vscode from "vscode"
-import * as client from "vscode-languageclient"
+import * as client from "vscode-languageclient/node"
 
 import { diagnosticCollection } from "./crystalUtils"
 import { CrystalHoverProvider } from "./crystalHover"
@@ -32,6 +32,8 @@ function diagnosticDocument(document) {
 	}
 }
 
+let lsClient : client.LanguageClient
+
 /**
  * Init function for this extension
  */
@@ -58,8 +60,7 @@ export async function activate(context: vscode.ExtensionContext) {
 				fileEvents: vscode.workspace.createFileSystemWatcher("**/*.cr")
 			}
 		}
-		let disposable = new client.LanguageClient("Crystal Language", serverOptions, clientOptions).start()
-		context.subscriptions.push(disposable)
+		let lsClient = new client.LanguageClient("Crystal Language", serverOptions, clientOptions).start()
 	} else {
 		// If server is disabled use Node.js implementation instead.
 		context.subscriptions.push(
@@ -79,4 +80,9 @@ export async function activate(context: vscode.ExtensionContext) {
 	}
 }
 
-export function deactivate() { }
+export function deactivate() {
+	if (!lsClient) {
+		return undefined;
+	}
+	return lsClient.stop()
+}

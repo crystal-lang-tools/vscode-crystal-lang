@@ -234,17 +234,13 @@
 	"scripts": {
 		"vscode:prepublish": "tsc -p ./",
 		"compile": "tsc -watch -p ./",
-		"test": "echo ok"
+		"package": "vsce package"
 	},
 	"devDependencies": {
-		"@types/mocha": "^8.0.3",
 		"@types/node": "^14.11.1",
 		"@types/vscode": "^1.49.0",
-		"@types/yaml": "^1.9.7",
-		"minimist": ">=1.2.6",
-		"mocha": "^10.2.0",
 		"typescript": "^4.0.3",
-		"vscode-test": "^1.4.0"
+		"@vscode/vsce": "^2.19.0"
 	},
 	"dependencies": {
 		"vscode-languageclient": "^8.1.0",
