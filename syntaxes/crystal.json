@@ -288,7 +288,7 @@
 			"patterns": [
 				{
 					"begin": "(?![\\s,)])",
-					"end": "(?=,|\\)\\s*$)",
+					"end": "(?=,|\\)\\s*)",
 					"patterns": [
 						{
 							"captures": {
@@ -513,7 +513,7 @@
 		{
 			"begin": "%x\\[",
 			"beginCaptures": {
-				 "0": {
+				"0": {
 					"name": "punctuation.definition.string.begin.crystal"
 				}
 			},
@@ -1035,9 +1035,9 @@
 			"name": "comment.line.number-sign.crystal"
 		},
 		{
-      			"match": "\\b_([\\w]+[?!]?)",
-      			"name": "comment.unused.crystal"
-    		},
+			"match": "\\b_([\\w]+[?!]?)",
+			"name": "comment.unused.crystal"
+		},
 		{
 			"begin": "(?><<-('?)((?:[_\\w]+_|)HTML)\\b\\1)",
 			"beginCaptures": {
