@@ -17,7 +17,10 @@ export class CrystalFormattingProvider implements vscode.DocumentFormattingEditP
 			let responseOut = ""
 			let responseErr = ""
 			const config = vscode.workspace.getConfiguration("crystal-lang")
-			let child = spawn(`${config["compiler"]}`, ["tool", "format", "--no-color", "-"])
+			let child = spawn(
+				`${config["compiler"]}`, ["tool", "format", "--no-color", "-"],
+				{ shell: process.platform == "win32" }
+			)
 			child.stdin.write(document.getText())
 			child.stdin.end()
 			child.stdout.setEncoding('utf-8')

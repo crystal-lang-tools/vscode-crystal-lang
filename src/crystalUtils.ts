@@ -60,10 +60,10 @@ const KEYWORDS = [
 	"nil?", "abstract", "pointerof", "protected", "uninitialized", "instance_sizeof"
 ]
 
-const spawnOptions : SpawnOptions = {
+const spawnOptions: SpawnOptions = {
 	cwd: ROOT,
 	env: CRENV,
-	shell: "bash",
+	shell: process.platform == "win32" ? true : "bash",
 	stdio: ["ignore", "pipe", "pipe"]
 }
 
@@ -203,7 +203,7 @@ export function searchProblemsFromRaw(response: string, uri: vscode.Uri) {
 
 	let responseData = response.match(/.* in .*?(\d+):\S* (.*)/)
 
-	let parsedLine:number
+	let parsedLine: number
 
 	try {
 		parsedLine = parseInt(responseData[1])
