@@ -168,17 +168,17 @@
 				},
 				"crystal-lang.implementations": {
 					"type": "boolean",
-					"default": false,
+					"default": true,
 					"description": "Allow to search implementation for method under cursor."
 				},
 				"crystal-lang.hover": {
 					"type": "boolean",
-					"default": false,
+					"default": true,
 					"description": "Show symbol information when mouse is hover."
 				},
 				"crystal-lang.completion": {
 					"type": "boolean",
-					"default": false,
+					"default": true,
 					"description": "Basic completion of methods and symbols."
 				},
 				"crystal-lang.mainFile": {
