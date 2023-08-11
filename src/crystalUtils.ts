@@ -15,7 +15,7 @@ const config = vscode.workspace.getConfiguration("crystal-lang")
 const CRENV = Object.create(process.env)
 
 // Root folder for current workspace
-const ROOT = vscode.workspace.rootPath
+const ROOT = vscode.workspace.workspaceFolders[0].uri.path
 
 // Workspace checker for Bash on Windows
 const WORKSPACE = (() => {
@@ -70,12 +70,15 @@ const spawnOptions: SpawnOptions = {
 /**
  * Check main file in current workspace
  */
-function mainFile(document) {
+function mainFile(filePath: String) {
 	const config = vscode.workspace.getConfiguration("crystal-lang")
-	if (config["mainFile"]) {
+	const relFilePath = filePath.replace(WORKSPACE, "")
+	if (relFilePath.startsWith("/spec") || relFilePath.startsWith("\\spec")) {
+		return filePath
+	} else if (config["mainFile"]) {
 		return config["mainFile"].replace("${workspaceRoot}", WORKSPACE)
 	}
-	return document
+	return filePath
 }
 
 /**
@@ -237,7 +240,7 @@ export function searchProblemsFromRaw(response: string, uri: vscode.Uri) {
 /**
  * Execute Crystal tools context and implementations
  */
-export function spawnTools(document, position, command, key) {
+export function spawnTools(document: vscode.TextDocument, position: vscode.Position, command: string, key: string) {
 	return new Promise(function (resolve, reject) {
 		let response = ""
 		const config = vscode.workspace.getConfiguration("crystal-lang")
@@ -279,7 +282,7 @@ export function spawnTools(document, position, command, key) {
 /**
  * Execute Crystal compiler or parser
  */
-export function spawnCompiler(document, build) {
+export function spawnCompiler(document: vscode.TextDocument, build: boolean) {
 	const config = vscode.workspace.getConfiguration("crystal-lang")
 	let file = tryLinuxPath(document.fileName)
 	let scope = mainFile(file)
