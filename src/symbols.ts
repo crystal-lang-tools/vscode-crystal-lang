@@ -30,6 +30,7 @@ const DEF_PATTERN =
 const PROPERTY_PATTERN =
 	/^\s*(?:(?:private|protected)\s+)?(?:class_)?(?:property|getter|setter)(?:!|\?)?\s+(\w+)(?:(?:\s+:\s+\w+)?(?:\s*=.+)?)?(?:,\s*)?[\r\n;]?/;
 const IVAR_PATTERN = /^\s*@(\w+)\s+[:=].+[\r\n;]?$/;
+const CLASS_IVAR_PATTERN = /^\s*@@(\w+)\s+[:=].+[\r\n;]?$/;
 const VARIABLE_PATTERN = /^\s*(\w+)\s+[:=].+[\r\n;]?$/;
 
 class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
@@ -45,14 +46,14 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
 
 		const lines = document
 			.getText()
-			.split(process.platform === 'win32' ? '\r\n' : '\n');
+			.split(/\r?\n/);
 		let matches: RegExpExecArray;
 
 		for (let [index, line] of lines.entries()) {
 			if (/^\s*#.*/.test(line)) continue;
 
 			matches = DEF_PATTERN.exec(line);
-			if (matches.length) {
+			if (matches && matches.length) {
 				this.create(
 					matches[1],
 					this.container.length ? SymbolKind.Method : SymbolKind.Function,
@@ -63,59 +64,65 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
 			}
 
 			matches = MACRO_PATTERN.exec(line);
-			if (matches.length) {
+			if (matches && matches.length) {
 				this.create(matches[1], SymbolKind.Function, document, index);
 				continue;
 			}
 
 			matches = CLASS_PATTERN.exec(line);
-			if (matches.length) {
+			if (matches && matches.length) {
 				this.create(matches[1], SymbolKind.Class, document, index);
 				this.container.push(matches[1]);
 				continue;
 			}
 
 			matches = PROPERTY_PATTERN.exec(line);
-			if (matches.length) {
+			if (matches && matches.length) {
 				this.create(matches[1], SymbolKind.Method, document, index);
 				continue;
 			}
 
 			matches = STRUCT_PATTERN.exec(line);
-			if (matches.length) {
+			if (matches && matches.length) {
 				this.create(matches[1], SymbolKind.Struct, document, index);
 				this.container.push(matches[1]);
 				continue;
 			}
 
 			matches = MODULE_OR_LIB_PATTERN.exec(line);
-			if (matches.length) {
+			if (matches && matches.length) {
 				this.create(matches[1], SymbolKind.Module, document, index);
 				this.container.push(matches[1]);
 				continue;
 			}
 
 			matches = ENUM_OR_UNION_PATTERN.exec(line);
-			if (matches.length) {
+			if (matches && matches.length) {
 				this.create(matches[1], SymbolKind.Enum, document, index);
 				this.container.push(matches[1]);
 				continue;
 			}
 
 			matches = CONSTANT_PATTERN.exec(line);
-			if (matches.length) {
+			if (matches && matches.length) {
 				this.create(matches[1], SymbolKind.Constant, document, index);
 				continue;
 			}
 
 			matches = IVAR_PATTERN.exec(line);
-			if (matches.length) {
+			if (matches && matches.length) {
+				this.create(matches[1], SymbolKind.Property, document, index);
+				continue;
+			}
+
+			matches = CLASS_IVAR_PATTERN.exec(line);
+			if (matches && matches.length) {
 				this.create(matches[1], SymbolKind.Property, document, index);
 				continue;
 			}
 
 			matches = VARIABLE_PATTERN.exec(line);
-			if (matches.length) {
+			if (matches && matches.length) {
 				this.create(matches[1], SymbolKind.Variable, document, index);
 				continue;
 			}
