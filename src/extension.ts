@@ -8,7 +8,7 @@ import {
 import { registerCompletion } from './completion';
 import { registerFormatter } from './format';
 import { registerHover } from './hover';
-import { registerImplementations } from './implementations';
+import { registerDefinitions } from './definitions';
 import { registerSymbols } from './symbols';
 
 const selector = <DocumentSelector>[{ language: 'crystal', scheme: 'file' }];
@@ -42,10 +42,10 @@ export async function activate(context: ExtensionContext): Promise<void> {
 	registerCompletion(selector, context);
 	registerFormatter(selector, context);
 	registerHover(selector, context);
-	registerImplementations(selector, context);
+	registerDefinitions(selector, context);
 	registerSymbols(selector, context);
 
 	console.debug('[Crystal] extension loaded');
 }
 
-export function deactivate() {}
+export function deactivate() { }

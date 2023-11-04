@@ -3,9 +3,9 @@ import * as path from 'path';
 import {
 	CancellationToken,
 	Definition,
+	DefinitionProvider,
 	DocumentSelector,
 	ExtensionContext,
-	ImplementationProvider,
 	languages,
 	Location,
 	LocationLink,
@@ -15,8 +15,8 @@ import {
 } from 'vscode';
 import { spawnImplTool } from './tools';
 
-class CrystalImplementationProvider implements ImplementationProvider {
-	async provideImplementation(
+class CrystalDefinitionProvider implements DefinitionProvider {
+	async provideDefinition(
 		document: TextDocument,
 		position: Position,
 		token: CancellationToken
@@ -55,7 +55,7 @@ class CrystalImplementationProvider implements ImplementationProvider {
 				links.push(
 					new Location(
 						Uri.file(impl.filename),
-						new Position(impl.line, impl.column)
+						new Position(impl.line - 1, impl.column - 1)
 					)
 				);
 			}
@@ -68,14 +68,14 @@ class CrystalImplementationProvider implements ImplementationProvider {
 	}
 }
 
-export function registerImplementations(
+export function registerDefinitions(
 	selector: DocumentSelector,
 	context: ExtensionContext
 ): void {
 	context.subscriptions.push(
-		languages.registerImplementationProvider(
+		languages.registerDefinitionProvider(
 			selector,
-			new CrystalImplementationProvider()
+			new CrystalDefinitionProvider()
 		)
 	);
 }
