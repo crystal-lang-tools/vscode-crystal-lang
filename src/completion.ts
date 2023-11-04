@@ -26,7 +26,7 @@ class CrystalCompletionItemProvider implements CompletionItemProvider {
 		context: CompletionContext
 	): Promise<CompletionItem[] | CompletionList<CompletionItem>> {
 		this.completions = [];
-		// temporary?
+		// TODO: These should be added where types or classes are appropriate
 		this.push(globals.CLASSES, SymbolKind.Class);
 		this.push(globals.MODULES, SymbolKind.Module);
 		this.push(globals.STRUCTS, SymbolKind.Struct);
