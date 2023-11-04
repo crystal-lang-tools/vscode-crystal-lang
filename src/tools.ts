@@ -7,13 +7,14 @@ import * as yaml from 'yaml';
 
 function execWrapper(
 	command: string,
+	cwd: string,
 	callback?: (
 		error: (ExecException & { stdout: string; stderr: string }) | {},
 		stdout: string,
 		stderr: string
 	) => void
 ): ChildProcess {
-	return exec(command, {}, (err, stdout, stderr) => {
+	return exec(command, { 'cwd': cwd }, (err, stdout, stderr) => {
 		if (err) {
 			callback({ ...err, stderr, stdout }, stdout, stderr);
 			return;
@@ -42,7 +43,7 @@ async function getCompilerPath(): Promise<string> {
 	const command =
 		(process.platform === 'win32' ? 'where' : 'which') + ' crystal';
 
-	return (await execAsync(command)).trim();	
+	return (await execAsync(command, process.cwd())).trim();
 }
 
 // async function getShardsPath(): Promise<string>;
@@ -50,9 +51,8 @@ async function getCompilerPath(): Promise<string> {
 function getCursorPath(document: TextDocument, position: Position): string {
 	// https://github.com/crystal-lang/crystal/issues/13086
 	// return `${document.fileName}:${position.line + 1}:${position.character + 1}`;
-	const path = `${document.fileName}:${position.line + 1}:${
-		position.character + 1
-	}`;
+	const path = `${document.fileName}:${position.line + 1}:${position.character + 1
+		}`;
 	if (/^\w:\\/.test(path)) return path.slice(2);
 	return path;
 }
@@ -95,7 +95,7 @@ function getShardMainPath(document: TextDocument): string {
 
 export async function getCrystalLibPath(): Promise<string> {
 	const compiler = await getCompilerPath();
-	const libpath = await execAsync(`${compiler} env CRYSTAL_PATH`);
+	const libpath = await execAsync(`${compiler} env CRYSTAL_PATH`, process.cwd());
 
 	return libpath.replace(/^lib[:;]|(?:\r)?\n/g, '');
 }
@@ -170,7 +170,8 @@ export async function spawnImplTool(
 
 	return JSON.parse(
 		await execAsync(
-			`${compiler} tool implementations -c ${cursor} ${main} -f json`
+			`${compiler} tool implementations -c ${cursor} ${main} -f json`,
+			workspace.getWorkspaceFolder(document.uri).uri.path
 		)
 	);
 }
@@ -194,11 +195,17 @@ export async function spawnContextTool(
 ): Promise<ContextResponse> {
 	const compiler = await getCompilerPath();
 	const cursor = getCursorPath(document, position);
-	const main = getShardMainPath(document);
+	// Spec files shouldn't have main set to something in src/
+	// but are instead their own main files
+	const main = document.uri.path.includes('/spec/') ? document.uri.path : getShardMainPath(document);
 
 	console.debug(`${compiler} tool context -c ${cursor} ${main} -f json`);
 
 	return JSON.parse(
-		await execAsync(`${compiler} tool context -c ${cursor} ${main} -f json`)
+		await execAsync(
+			`${compiler} tool context -c ${cursor} ${main} -f json`,
+			workspace.getWorkspaceFolder(document.uri).uri.path
+		),
+
 	);
 }
