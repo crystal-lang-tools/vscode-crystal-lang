@@ -1,9 +1,11 @@
 import { ChildProcess, ExecException, ExecOptions, exec, spawn } from 'child_process';
-import { existsSync } from 'fs';
+import { existsSync, readFile } from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
-import { Position, TextDocument, window, workspace } from 'vscode';
+import { Position, TextDocument, WorkspaceFolder, window, workspace } from 'vscode';
 import * as yaml from 'yaml';
+import * as junit2json from 'junit2json';
+import { tmpdir } from 'os';
 
 function execWrapper(
 	command: string,
@@ -78,6 +80,7 @@ interface Shard {
 }
 
 function getShardMainPath(document: TextDocument): string {
+	const config = workspace.getConfiguration('crystal-lang');
 	const dir = workspace.getWorkspaceFolder(document.uri).uri.fsPath;
 	const fp = path.join(dir, 'shard.yml');
 
@@ -85,6 +88,10 @@ function getShardMainPath(document: TextDocument): string {
 		const shard = yaml.parse(fp) as Shard;
 		const main = shard.targets?.[shard.name]?.main;
 		if (main) return path.resolve(dir, main);
+	}
+
+	if (config.has("main")) {
+		return config.get<string>("main").replace("${workspaceRoot}", dir);
 	}
 
 	// https://github.com/crystal-lang/crystal/issues/13086
@@ -121,7 +128,12 @@ export async function spawnFormatTool(document: TextDocument): Promise<string> {
 	const compiler = await getCompilerPath();
 
 	return await new Promise((res, rej) => {
-		const child = spawn(compiler, ['tool', 'format', '--no-color', '-']);
+		const child = spawn(
+			compiler,
+			['tool', 'format', '--no-color', '-'],
+			{ shell: process.platform == "win32" }
+		);
+
 		child.stdin.write(document.getText());
 		child.stdin.end();
 
@@ -191,7 +203,8 @@ export interface ContextError {
 
 export async function spawnContextTool(
 	document: TextDocument,
-	position: Position
+	position: Position,
+	dry_run: boolean = false
 ): Promise<ContextResponse> {
 	const compiler = await getCompilerPath();
 	const cursor = getCursorPath(document, position);
@@ -208,4 +221,71 @@ export async function spawnContextTool(
 		),
 
 	);
+}
+
+// Runs `crystal spec --junit temp_file`
+export async function spawnSpecTool(
+	workspace: WorkspaceFolder,
+	dry_run: boolean = false,
+	paths?: string[]
+): Promise<junit2json.TestSuite> {
+	// Get compiler stuff
+	const compiler = await getCompilerPath();
+
+	// create a tempfile
+	// const tempFile = tempfile({ extension: "xml" });
+	const tempFile = tmpdir() + path.sep + "output.xml"
+
+	// execute crystal spec
+	var cmd = `${compiler} spec --junit_output '${tempFile}'`;
+	// Only valid for Crystal >= 1.11
+	// if (dry_run) {
+	// 	cmd += ` --dry-run`
+	// }
+	if (paths) {
+		cmd += ` '${paths.join("' '")}'`
+	}
+	console.debug(cmd);
+
+	await execAsync(cmd, workspace.uri.path)
+		.catch((err) => {
+			console.debug(JSON.stringify(err))
+		});
+
+	// read test results
+	const results = await readSpecResults(tempFile);
+
+	// parse junit
+	return await parseJunit(results);
+}
+
+function readSpecResults(file: string): Promise<Buffer> {
+	return new Promise((resolve, reject) => {
+		try {
+			if (!existsSync(file)) {
+				reject(new Error("Test results file doesn't exist"));
+			}
+
+			readFile(file, (error, data) => {
+				if (error) {
+					reject(new Error("Error reading test results file: " + error.message));
+				} else {
+					resolve(data);
+				}
+			})
+		} catch (err) {
+			reject(err);
+		}
+	})
+}
+
+function parseJunit(rawXml: Buffer): Promise<junit2json.TestSuite> {
+	return new Promise(async (resolve, reject) => {
+		try {
+			const output = await junit2json.parse(rawXml);
+			resolve(output as junit2json.TestSuite);
+		} catch (err) {
+			reject(err)
+		}
+	})
 }

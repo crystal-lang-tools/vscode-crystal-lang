@@ -46,7 +46,7 @@ class CrystalDefinitionProvider implements DefinitionProvider {
 			console.debug('[Implementations] getting implementations...');
 			const res = await spawnImplTool(document, position);
 			if (res.status !== 'ok') {
-				console.debug(`[Implementations] failed: ${res}`);
+				console.debug(`[Implementations] failed: ${res.message}`);
 				return [];
 			}
 
@@ -62,7 +62,7 @@ class CrystalDefinitionProvider implements DefinitionProvider {
 
 			return links;
 		} catch (err) {
-			console.debug(`[Implementations] failed: ${err}`);
+			console.debug(`[Implementations] failed: ${err.message}`);
 			return [];
 		}
 	}

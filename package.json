@@ -2,7 +2,7 @@
 	"name": "crystal-lang",
 	"displayName": "Crystal Language",
 	"description": "The Crystal Programming Language",
-	"version": "0.8.4",
+	"version": "0.9.0",
 	"publisher": "crystal-lang-tools",
 	"icon": "images/icon.gif",
 	"license": "MIT",
@@ -12,7 +12,7 @@
 	},
 	"bugs": "https://github.com/crystal-lang-tools/vscode-crystal-lang/issues",
 	"engines": {
-		"vscode": "^1.49.0"
+		"vscode": "^1.59.0"
 	},
 	"keywords": [
 		"crystal",
@@ -182,23 +182,22 @@
 	"scripts": {
 		"compile": "tsc -watch -p ./",
 		"format": "prettier --write ./src/**/*.ts",
-		"test": "echo ok",
+		"package": "vsce package",
 		"vscode:prepublish": "tsc -p ./"
 	},
 	"dependencies": {
-		"vscode-languageclient": "^8.0.2",
-		"yaml": "^2.1.1"
+		"vscode-languageclient": "^9.0.1",
+		"yaml": "^2.1.1",
+		"junit2json": "~3.1.4"
 	},
 	"devDependencies": {
 		"@types/mocha": "^8.0.3",
 		"@types/node": "^14.11.1",
 		"@types/vscode": "^1.70.0",
-		"@types/yaml": "^1.9.7",
 		"minimist": ">=1.2.2",
 		"mocha": "^10.2.0",
 		"prettier": "^2.8.4",
-		"typescript": "^4.0.3",
-		"vscode-test": "^1.4.0"
+		"typescript": "^4.0.3"
 	},
 	"prettier": {
 		"arrowParens": "avoid",

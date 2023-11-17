@@ -13,7 +13,7 @@ import {
 	TextLine,
 	workspace,
 } from 'vscode';
-import { KEYWORDS } from './definitions';
+import { KEYWORDS } from './definitions/index';
 import {
 	ContextError,
 	getCrystalLibPath,
@@ -51,12 +51,28 @@ class CrystalHoverProvider implements HoverProvider {
 
 			// TODO: Filter/select based on text around cursor position
 			// will provide multiple contexts / all contexts on line
-			const ctx = res.contexts!.find(c => c[line.text]);
-			console.debug(`[Hover] context: ${ctx}`);
-			if (!ctx) return;
+			console.debug(`[Hover] context: ${JSON.stringify(res)}`)
+			var ctx = res.contexts!.find(c => c[line.text]);
+			var context: string;
+			if (ctx === undefined) {
+				ctx = res.contexts!.find(c => c[text]);
+				if (ctx === undefined) {
+					ctx = res.contexts!.filter(c => c.keys.includes(text))[0]
+					if (ctx === undefined) return;
+
+					console.debug(`[Hover] context: ${text}: ${JSON.stringify(ctx)}`);
+					context = ctx.value
+				} else {
+					console.debug(`[Hover] context: ${text}: ${JSON.stringify(ctx)}`);
+					context = ctx[text];
+				}
+			} else {
+				console.debug(`[Hover] context: ${line.text}: ${JSON.stringify(ctx)}`);
+				context = ctx[line.text];
+			}
 
 			const md = new MarkdownString().appendCodeblock(
-				ctx[line.text],
+				context,
 				'crystal'
 			);
 			return new Hover(md);
