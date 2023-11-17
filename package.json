@@ -188,7 +188,8 @@
 	"dependencies": {
 		"vscode-languageclient": "^9.0.1",
 		"yaml": "^2.1.1",
-		"junit2json": "~3.1.4"
+		"junit2json": "~3.1.4",
+		"temp": "~0.9.4"
 	},
 	"devDependencies": {
 		"@types/mocha": "^8.0.3",

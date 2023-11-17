@@ -51,7 +51,7 @@ class CrystalHoverProvider implements HoverProvider {
 
 			// TODO: Filter/select based on text around cursor position
 			// will provide multiple contexts / all contexts on line
-			console.debug(`[Hover] context: ${JSON.stringify(res)}`)
+			console.debug(`[Hover] context: ${res.message}`)
 			var ctx = res.contexts!.find(c => c[line.text]);
 			var context: string;
 			if (ctx === undefined) {

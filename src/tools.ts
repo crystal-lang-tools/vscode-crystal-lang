@@ -6,6 +6,7 @@ import { Position, TextDocument, WorkspaceFolder, window, workspace } from 'vsco
 import * as yaml from 'yaml';
 import * as junit2json from 'junit2json';
 import { tmpdir } from 'os';
+import * as temp from 'temp';
 
 function execWrapper(
 	command: string,
@@ -233,8 +234,8 @@ export async function spawnSpecTool(
 	const compiler = await getCompilerPath();
 
 	// create a tempfile
-	// const tempFile = tempfile({ extension: "xml" });
-	const tempFile = tmpdir() + path.sep + "output.xml"
+	const tempFile = temp.path({ suffix: ".xml" })
+	// const tempFile = tmpdir() + path.sep + "output.xml"
 
 	// execute crystal spec
 	var cmd = `${compiler} spec --junit_output '${tempFile}'`;
@@ -245,11 +246,11 @@ export async function spawnSpecTool(
 	if (paths) {
 		cmd += ` '${paths.join("' '")}'`
 	}
-	console.debug(cmd);
+	console.debug("[Spec] executing specs for " + workspace.name + "with command: " + cmd);
 
 	await execAsync(cmd, workspace.uri.path)
 		.catch((err) => {
-			console.debug(JSON.stringify(err))
+			console.debug(`[Spec] Error: ${err.message}`)
 		});
 
 	// read test results

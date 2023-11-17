@@ -1,7 +1,7 @@
 import { tests, TestItem, Range, Position, Uri, WorkspaceFolder, workspace, TestRunProfileKind, TestMessage } from "vscode";
 import * as junit2json from 'junit2json';
 import * as path from 'path';
-import { spawnSpecTool } from "./tools";
+import { setStatusBar, spawnSpecTool } from "./tools";
 import { spawn } from "child_process";
 import { existsSync } from "fs";
 
@@ -32,10 +32,10 @@ export class CrystalTestingProvider {
 
         workspace.onDidChangeWorkspaceFolders((event) => {
             this.refreshSpecWorkspaceFolders()
-            event.added.forEach((folder) => {
-                console.debug("Adding folder to workspace: " + folder.uri.path)
-                this.getTestCases(folder)
-            })
+            for (var i = 0; i < event.added.length; i += 1) {
+                console.debug("Adding folder to workspace: " + event.added[i].uri.path)
+                this.getTestCases(event.added[i])
+            }
             event.removed.forEach((folder) => {
                 console.debug("Removing folder from workspace: " + folder.uri.path)
                 this.deleteWorkspaceChildren(folder)
@@ -76,11 +76,17 @@ export class CrystalTestingProvider {
     }
 
     async getTestCases(workspace: WorkspaceFolder, paths?: string[]): Promise<void> {
-        spawnSpecTool(workspace, true, paths)
-            .then(junit => this.convertJunitTestcases(junit))
-            .catch((err) => {
-                console.debug("Error: " + err.message + "\n" + err.stack);
-            })
+        const dispose = setStatusBar('searching for specs...');
+
+        try {
+            await spawnSpecTool(workspace, true, paths)
+                .then(junit => this.convertJunitTestcases(junit))
+                .catch((err) => {
+                    console.debug("[Spec] Error: " + err.message + "\n" + err.stack);
+                })
+        } finally {
+            dispose()
+        }
     }
 
     async execTestCases(workspace: WorkspaceFolder, paths?: string[]): Promise<junit2json.TestSuite> {
@@ -230,7 +236,6 @@ export class CrystalTestingProvider {
                 }
 
                 testsuite.testcase.forEach((testcase) => {
-                    // console.debug(JSON.stringify(testcase))
                     const item = this.controller.createTestItem(
                         // @ts-expect-error
                         testcase.file + " " + testcase.name,
@@ -302,7 +307,7 @@ export class CrystalTestingProvider {
                 resolve()
 
             } catch (err) {
-                console.debug(JSON.stringify(err))
+                console.debug(`[Spec] Error: ${err.message}`)
                 reject(err);
             }
         })
