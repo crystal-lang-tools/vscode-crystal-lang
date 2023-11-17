@@ -235,7 +235,6 @@ export async function spawnSpecTool(
 
 	// create a tempfile
 	const tempFile = temp.path({ suffix: ".xml" })
-	// const tempFile = tmpdir() + path.sep + "output.xml"
 
 	// execute crystal spec
 	var cmd = `${compiler} spec --junit_output '${tempFile}'`;
@@ -246,7 +245,7 @@ export async function spawnSpecTool(
 	if (paths) {
 		cmd += ` '${paths.join("' '")}'`
 	}
-	console.debug("[Spec] executing specs for " + workspace.name + "with command: " + cmd);
+	console.debug("[Spec] executing specs for " + workspace.name + " with command: " + cmd);
 
 	await execAsync(cmd, workspace.uri.path)
 		.catch((err) => {

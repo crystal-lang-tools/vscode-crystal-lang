@@ -139,7 +139,7 @@ export class CrystalTestingProvider {
                 try {
                     result = await this.execTestCases(workspaces[i], args)
                 } catch (err) {
-                    console.debug("Error: " + err.message)
+                    console.debug("[Spec] Error: " + err.message)
                     run.end()
                     return
                 }
@@ -231,7 +231,7 @@ export class CrystalTestingProvider {
         return new Promise((resolve, reject) => {
             try {
                 if (testsuite.tests === 0) {
-                    console.debug(`Error: No testcases in testsuite ${JSON.stringify(testsuite)}`)
+                    console.debug(`[Spec] Error: No testcases in testsuite ${JSON.stringify(testsuite)}`)
                     return
                 }
 

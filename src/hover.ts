@@ -113,17 +113,14 @@ class CrystalHoverProvider implements HoverProvider {
 			const lines: string[] = [];
 
 			for (let file of files.slice(0, 10)) {
-				let relative = path.join('.', file.path.split(dirname)[1]);
-				lines.push(`require "${relative}"`);
+				lines.push(`- [${file.path}](file://${file.path})`);
 			}
 			lines.sort();
 
 			const extra = files.length - 10;
 			if (extra > 0) lines.push(`\n...and ${extra} more`);
-			md.appendCodeblock(
-				lines.join('\n').replace(/\\+/g, '/'),
-				'crystal'
-			).appendText(`Resolved ${files.length} sources.`);
+			md.appendText(`Resolved ${files.length} sources:\n`)
+				.appendMarkdown(lines.join('\n'));
 		} else {
 			if (!match.endsWith('.cr')) match += '.cr';
 			const dir = path.dirname(document.fileName);
@@ -135,9 +132,8 @@ class CrystalHoverProvider implements HoverProvider {
 				.join('.', src.split(dirname)[1])
 				.replace(/\\+/g, '/');
 
-			md.appendCodeblock(`require "${relative}"`, 'crystal').appendMarkdown(
-				`[Go to source](file:///${src})`
-			);
+			md.appendCodeblock(`require "${relative}"`, 'crystal')
+				.appendMarkdown(`[Go to source](file://${src})`);
 		}
 
 		return new Hover(md, line.range);
@@ -161,7 +157,7 @@ class CrystalHoverProvider implements HoverProvider {
 				.replace(/\\+/g, '/');
 
 			md.appendCodeblock(`require "${relative}"`, 'crystal').appendMarkdown(
-				`[Go to source](file:///${main})`
+				`[Go to source](file://${main})`
 			);
 		} else {
 			try {
@@ -185,7 +181,7 @@ class CrystalHoverProvider implements HoverProvider {
 				}
 
 				md.appendCodeblock(`require "${match}"`, 'crystal').appendMarkdown(
-					`[Go to source](file:///${fp})`
+					`[Go to source](file://${fp})`
 				);
 			} catch (err) {
 				console.debug(`[Hover] failed: ${err.stderr}`);

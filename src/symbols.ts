@@ -133,7 +133,7 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
 			}
 		}
 
-		console.debug(this.symbols);
+		// console.debug(this.symbols);
 		return this.symbols;
 	}
 
