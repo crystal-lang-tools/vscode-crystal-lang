@@ -11,6 +11,7 @@ import { registerHover } from './hover';
 import { registerDefinitions } from './definitions';
 import { registerSymbols } from './symbols';
 import { CrystalTestingProvider } from './spec';
+import { registerMacroExpansion } from './macro';
 
 const selector = <DocumentSelector>[{ language: 'crystal', scheme: 'file' }];
 
@@ -45,6 +46,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 	registerHover(selector, context);
 	registerDefinitions(selector, context);
 	registerSymbols(selector, context);
+	registerMacroExpansion();
 
 	// Register tests/specs
 	new CrystalTestingProvider()

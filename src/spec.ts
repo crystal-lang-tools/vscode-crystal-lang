@@ -82,7 +82,9 @@ export class CrystalTestingProvider {
             await spawnSpecTool(workspace, true, paths)
                 .then(junit => this.convertJunitTestcases(junit))
                 .catch((err) => {
-                    console.debug("[Spec] Error: " + err.message + "\n" + err.stack);
+                    if (err.stderr !== "") {
+                        console.debug("[Spec] Error: " + err.message + "\n" + err.stack);
+                    }
                 })
         } finally {
             dispose()

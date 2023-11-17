@@ -36,7 +36,9 @@ class CrystalHoverProvider implements HoverProvider {
 		if (/"([\w\/v-]+)"/.test(line.text))
 			return await this.provideShardRequireHover(document, line);
 
-		const text = document.getText(document.getWordRangeAtPosition(position));
+		const pattern = /(?:\.|::)?[\w]+/;
+		const wordRange = document.getWordRangeAtPosition(position, pattern)
+		const text = document.getText(wordRange);
 		if (KEYWORDS.includes(text)) return; // TODO: potential custom keyword highlighting/info support? Rust??
 
 		const dispose = setStatusBar('running context tool...');
@@ -52,27 +54,40 @@ class CrystalHoverProvider implements HoverProvider {
 			// TODO: Filter/select based on text around cursor position
 			// will provide multiple contexts / all contexts on line
 			console.debug(`[Hover] context: ${res.message}`)
-			var ctx = res.contexts!.find(c => c[line.text]);
-			var context: string;
-			if (ctx === undefined) {
-				ctx = res.contexts!.find(c => c[text]);
-				if (ctx === undefined) {
-					ctx = res.contexts!.filter(c => c.keys.includes(text))[0]
-					if (ctx === undefined) return;
 
-					console.debug(`[Hover] context: ${text}: ${JSON.stringify(ctx)}`);
-					context = ctx.value
-				} else {
-					console.debug(`[Hover] context: ${text}: ${JSON.stringify(ctx)}`);
-					context = ctx[text];
-				}
+			var ctx_key = line.text;
+			var ctx = res.contexts!.find(c => c[ctx_key]);
+			var ctx_value: string;
+
+			if (ctx !== undefined) {
+				ctx_value = ctx[ctx_key];
 			} else {
-				console.debug(`[Hover] context: ${line.text}: ${JSON.stringify(ctx)}`);
-				context = ctx[line.text];
+				ctx_key = text
+				ctx = res.contexts!.find(c => c[ctx_key]);
 			}
 
+			if (ctx !== undefined) {
+				ctx_value = ctx[ctx_key];
+			} else {
+				ctx_key = text
+				for (var i = 0; i < res.contexts!.length; i += 1) {
+					const context: Record<string, string> = res.contexts![i]
+					const key = Object.keys(context).find(key => key.includes(ctx_key))
+
+					if (key) {
+						ctx = context as Record<string, string>
+						ctx_value = ctx[key]
+						break
+					}
+				}
+			}
+
+			if (ctx === undefined) return;
+
+			console.debug(`[Hover] context: ${ctx_key}: ${JSON.stringify(ctx_value)}`);
+
 			const md = new MarkdownString().appendCodeblock(
-				context,
+				ctx_key + ": " + ctx_value,
 				'crystal'
 			);
 			return new Hover(md);

@@ -1,5 +1,5 @@
 import { ChildProcess, ExecException, ExecOptions, exec, spawn } from 'child_process';
-import { existsSync, readFile } from 'fs';
+import { existsSync, readFile, readFileSync } from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
 import { Position, TextDocument, WorkspaceFolder, window, workspace } from 'vscode';
@@ -82,23 +82,30 @@ interface Shard {
 
 function getShardMainPath(document: TextDocument): string {
 	const config = workspace.getConfiguration('crystal-lang');
-	const dir = workspace.getWorkspaceFolder(document.uri).uri.fsPath;
+	const space = workspace.getWorkspaceFolder(document.uri);
+	const dir = space.uri.fsPath;
 	const fp = path.join(dir, 'shard.yml');
 
-	if (existsSync(fp)) {
-		const shard = yaml.parse(fp) as Shard;
-		const main = shard.targets?.[shard.name]?.main;
-		if (main) return path.resolve(dir, main);
+	// Specs are their own main files
+	if (document.uri.path.includes('/spec/')) {
+		return document.fileName;
 	}
 
-	if (config.has("main")) {
-		return config.get<string>("main").replace("${workspaceRoot}", dir);
+	// Pull a
+	if (existsSync(fp)) {
+		const shard_yml = readFileSync(fp, 'utf-8')
+		const shard = yaml.parse(shard_yml) as Shard;
+		var main = shard.targets?.[shard.name]?.main;
+		if (main) return path.resolve(dir, main);
 	}
 
 	// https://github.com/crystal-lang/crystal/issues/13086
 	// return document.fileName;
 	if (/^\w:\\/.test(document.fileName)) return document.fileName.slice(2);
-	return document.fileName;
+
+	// return document.fileName;
+	// Splat all top-level files in source folder
+	return space.uri.path + "/src/*.cr";
 }
 
 export async function getCrystalLibPath(): Promise<string> {
@@ -211,7 +218,7 @@ export async function spawnContextTool(
 	const cursor = getCursorPath(document, position);
 	// Spec files shouldn't have main set to something in src/
 	// but are instead their own main files
-	const main = document.uri.path.includes('/spec/') ? document.uri.path : getShardMainPath(document);
+	const main = getShardMainPath(document);
 
 	console.debug(`${compiler} tool context -c ${cursor} ${main} -f json`);
 
@@ -237,19 +244,21 @@ export async function spawnSpecTool(
 	const tempFile = temp.path({ suffix: ".xml" })
 
 	// execute crystal spec
-	var cmd = `${compiler} spec --junit_output '${tempFile}'`;
+	var cmd = `${compiler} spec --junit_output ${tempFile}`;
 	// Only valid for Crystal >= 1.11
 	// if (dry_run) {
 	// 	cmd += ` --dry-run`
 	// }
 	if (paths) {
-		cmd += ` '${paths.join("' '")}'`
+		cmd += ` ${paths.join(" ")}`
 	}
 	console.debug("[Spec] executing specs for " + workspace.name + " with command: " + cmd);
 
 	await execAsync(cmd, workspace.uri.path)
 		.catch((err) => {
-			console.debug(`[Spec] Error: ${err.message}`)
+			if (err.stderr !== "") {
+				console.debug(`[Spec] Error: ${JSON.stringify(err)}`)
+			}
 		});
 
 	// read test results
@@ -288,4 +297,19 @@ function parseJunit(rawXml: Buffer): Promise<junit2json.TestSuite> {
 			reject(err)
 		}
 	})
+}
+
+export async function spawnMacroExpandTool(document: TextDocument, position: Position) {
+	const compiler = await getCompilerPath();
+	const main = getShardMainPath(document);
+	const cursor = getCursorPath(document, position);
+	const folder = workspace.getWorkspaceFolder(document.uri).uri.path
+
+	const cmd = `${compiler} tool expand ${main} --cursor ${cursor}`
+
+	console.debug(cmd)
+	return await execAsync(cmd, folder)
+		.catch((err) => {
+			console.debug(`[Macro Expansion] Error: ${err.message}`)
+		});
 }

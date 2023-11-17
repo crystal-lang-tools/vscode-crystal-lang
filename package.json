@@ -151,15 +151,6 @@
 			"type": "object",
 			"title": "Crystal Lang configuration",
 			"properties": {
-				"crystal-lang.main": {
-					"title": "Main File",
-					"type": "string",
-					"default": "",
-					"description": "Check the main file instead of the current file.",
-					"examples": [
-						"${workspaceRoot}/src/main.cr"
-					]
-				},
 				"crystal-lang.compiler": {
 					"title": "Compiler",
 					"type": "string",
@@ -191,6 +182,20 @@
 					"description": "Whether to notify when specs have finished running."
 				}
 			}
+		},
+		"commands": [
+			{
+				"command": "crystal-lang.showMacroExpansion",
+				"title": "Show macro expansion"
+			}
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"command": "crystal-lang.showMacroExpansion",
+					"group": "z_commands"
+				}
+			]
 		}
 	},
 	"scripts": {
