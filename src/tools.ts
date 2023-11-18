@@ -7,6 +7,7 @@ import * as yaml from 'yaml';
 import * as junit2json from 'junit2json';
 import { tmpdir } from 'os';
 import * as temp from 'temp';
+import { cwd } from 'process';
 
 function execWrapper(
 	command: string,
@@ -26,7 +27,6 @@ function execWrapper(
 		callback(err, stdout, stderr);
 	});
 }
-
 
 const execAsync = promisify(execWrapper);
 
@@ -231,14 +231,34 @@ export async function spawnContextTool(
 	);
 }
 
+export type TestSuite = junit2json.TestSuite & {
+	tests?: number;
+	skipped?: number;
+	errors?: number;
+	failures?: number;
+	time?: number;
+	timestamp?: string;
+	hostname?: string;
+	testcase?: TestCase[]
+}
+
+export type TestCase = junit2json.TestCase & {
+	file?: string;
+	classname?: string;
+	name?: string;
+	line?: number;
+	time?: number;
+}
+
 // Runs `crystal spec --junit temp_file`
 export async function spawnSpecTool(
 	workspace: WorkspaceFolder,
 	dry_run: boolean = false,
 	paths?: string[]
-): Promise<junit2json.TestSuite> {
+): Promise<TestSuite> {
 	// Get compiler stuff
 	const compiler = await getCompilerPath();
+	const compiler_version = await getCrystalVersion();
 
 	// create a tempfile
 	const tempFile = temp.path({ suffix: ".xml" })
@@ -246,9 +266,9 @@ export async function spawnSpecTool(
 	// execute crystal spec
 	var cmd = `${compiler} spec --junit_output ${tempFile}`;
 	// Only valid for Crystal >= 1.11
-	// if (dry_run) {
-	// 	cmd += ` --dry-run`
-	// }
+	if (dry_run && compiler_version.minor > 10) {
+		cmd += ` --dry-run`
+	}
 	if (paths) {
 		cmd += ` ${paths.join(" ")}`
 	}
@@ -292,7 +312,7 @@ function parseJunit(rawXml: Buffer): Promise<junit2json.TestSuite> {
 	return new Promise(async (resolve, reject) => {
 		try {
 			const output = await junit2json.parse(rawXml);
-			resolve(output as junit2json.TestSuite);
+			resolve(output as TestSuite);
 		} catch (err) {
 			reject(err)
 		}
@@ -312,4 +332,24 @@ export async function spawnMacroExpandTool(document: TextDocument, position: Pos
 		.catch((err) => {
 			console.debug(`[Macro Expansion] Error: ${err.message}`)
 		});
+}
+
+interface SemVer {
+	major: number,
+	minor: number,
+	patch: number
+}
+
+async function getCrystalVersion(): Promise<SemVer> {
+	const compiler = await getCompilerPath();
+	const cmd = `${compiler} --version`
+	const response = await execAsync(cmd, cwd())
+
+	const match = response.match(/Crystal (\d+)\.(\d+)\.(\d+)/)
+
+	return {
+		major: Number(match[1]),
+		minor: Number(match[2]),
+		patch: Number(match[3])
+	}
 }

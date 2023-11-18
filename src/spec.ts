@@ -1,7 +1,7 @@
 import { tests, TestItem, Range, Position, Uri, WorkspaceFolder, workspace, TestRunProfileKind, TestMessage } from "vscode";
 import * as junit2json from 'junit2json';
 import * as path from 'path';
-import { setStatusBar, spawnSpecTool } from "./tools";
+import { TestSuite, TestCase, setStatusBar, spawnSpecTool } from "./tools";
 import { spawn } from "child_process";
 import { existsSync } from "fs";
 
@@ -146,11 +146,10 @@ export class CrystalTestingProvider {
                     return
                 }
 
-                result.testcase.forEach((testcase) => {
+                result.testcase.forEach((testcase: TestCase) => {
                     let exists = undefined
                     this.controller.items.forEach((child: TestItem) => {
                         if (exists === undefined) {
-                            // @ts-expect-error
                             exists = this.getChild(testcase.file + " " + testcase.name, child)
                         }
                     })
@@ -229,7 +228,7 @@ export class CrystalTestingProvider {
         return foundChild
     }
 
-    convertJunitTestcases(testsuite: junit2json.TestSuite): Promise<void> {
+    convertJunitTestcases(testsuite: TestSuite): Promise<void> {
         return new Promise((resolve, reject) => {
             try {
                 if (testsuite.tests === 0) {
@@ -237,31 +236,25 @@ export class CrystalTestingProvider {
                     return
                 }
 
-                testsuite.testcase.forEach((testcase) => {
+                testsuite.testcase.forEach((testcase: TestCase) => {
                     const item = this.controller.createTestItem(
-                        // @ts-expect-error
                         testcase.file + " " + testcase.name,
                         testcase.name,
-                        // @ts-expect-error
                         Uri.file(testcase.file)
                     )
 
                     if (testcase.hasOwnProperty('line')) {
                         item.range = new Range(
-                            // @ts-expect-error
                             new Position(testcase.line - 1, 0),
-                            // @ts-expect-error
                             new Position(testcase.line - 1, 0)
                         );
                     }
 
-                    // @ts-expect-error
                     let fullPath = workspace.getWorkspaceFolder(Uri.file(testcase.file)).uri.path +
                         path.sep + 'spec';
                     let parent: TestItem | null = null
 
                     // split the testcase.file and iterate over every folder in workspace
-                    // @ts-expect-error
                     testcase.file.replace(fullPath, "").split(path.sep).filter((folder => folder !== "")).forEach((node: string) => {
                         // build full path of folder
                         fullPath += path.sep + node
