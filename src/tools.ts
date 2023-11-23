@@ -10,7 +10,7 @@ import * as temp from 'temp';
 import { cwd } from 'process';
 import { doc } from 'prettier';
 
-export const crystalOutputChannel = window.createOutputChannel("Crystal", "markdown")
+export const crystalOutputChannel = window.createOutputChannel("Crystal", "log")
 
 function execWrapper(
 	command: string,
@@ -38,7 +38,7 @@ export function setStatusBar(message: string): () => void {
 	return () => bar.dispose();
 }
 
-async function getCompilerPath(): Promise<string> {
+export async function getCompilerPath(): Promise<string> {
 	const config = workspace.getConfiguration('crystal-lang');
 
 	if (config.has('compiler')) {
@@ -52,7 +52,42 @@ async function getCompilerPath(): Promise<string> {
 	return (await execAsync(command, process.cwd())).trim();
 }
 
-// async function getShardsPath(): Promise<string>;
+export async function getShardsPath(): Promise<string> {
+	const config = workspace.getConfiguration('crystal-lang');
+
+	if (config.has('shards')) {
+		const exe = config.get<string>('shards');
+		if (path.isAbsolute(exe) && existsSync(exe)) return Promise.resolve(exe);
+	}
+
+	const command =
+		(process.platform === 'win32' ? 'where' : 'which') + ' shards';
+
+	return (await execAsync(command, process.cwd())).trim();
+}
+
+export function getMainFile(folder: WorkspaceFolder): string {
+	const shardFile = getShardFile(folder)
+	if (existsSync(shardFile)) {
+		const io = readFileSync(shardFile, 'utf8')
+		const data = yaml.parse(io)
+
+		if (data.targets !== undefined) {
+			const values = Object.keys(data.targets).map(key => data.targets[key])
+			// NOTE: match first targets
+			if (values.length > 0) {
+				return values[0].main
+			}
+		}
+	}
+
+	const defaultMainFile = workspace.getConfiguration('crystal-lang', folder.uri).get<string>('mainFile', 'main.cr')
+	return defaultMainFile
+}
+
+function getShardFile(workspace: WorkspaceFolder): string {
+	return workspace.uri.path + path.sep + 'shard.yml'
+}
 
 function getCursorPath(document: TextDocument, position: Position): string {
 	// https://github.com/crystal-lang/crystal/issues/13086

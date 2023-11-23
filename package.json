@@ -163,23 +163,10 @@
 					"default": "shards",
 					"description": "The path to the Shards executable."
 				},
-				"crystal-lang.spec": {
-					"title": "Spec Command",
+				"crystal-lang.server": {
 					"type": "string",
-					"default": "spec",
-					"description": "The command to run for shard specs. This can include flag options."
-				},
-				"crystal-lang.notify.notFound": {
-					"title": "Shard Not Found",
-					"type": "boolean",
-					"default": true,
-					"markdownDescription": "Whether to notify if `shard.yml` cannot be found."
-				},
-				"crystal-lang.notify.specDone": {
-					"title": "Specs Finished",
-					"type": "boolean",
-					"default": true,
-					"description": "Whether to notify when specs have finished running."
+					"default": "",
+					"description": "[Experimental][Reload required]\nAbsolute path for Scry/Crystalline LSP server binary\n(Language Server Protocol for Crystal)."
 				}
 			}
 		},
@@ -207,11 +194,13 @@
 	"dependencies": {
 		"junit2json": "~3.1.4",
 		"temp": "~0.9.4",
+		"vscode-languageclient": "^8.1.0",
 		"yaml": "^2.1.1"
 	},
 	"devDependencies": {
 		"@types/express-serve-static-core": "^4.17.30",
 		"@types/node": "^14.11.1",
+		"@types/temp": "^0.9.4",
 		"@types/vscode": "^1.70.0",
 		"minimist": ">=1.2.2",
 		"prettier": "^2.8.4",

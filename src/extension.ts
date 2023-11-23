@@ -1,9 +1,9 @@
 import {
-	DocumentSelector,
 	ExtensionContext,
 	IndentAction,
 	LanguageConfiguration,
 	languages,
+	workspace,
 } from 'vscode';
 import { registerCompletion } from './completion';
 import { registerFormatter } from './format';
@@ -13,8 +13,11 @@ import { registerSymbols } from './symbols';
 import { CrystalTestingProvider } from './spec';
 import { registerMacroExpansion } from './macro';
 import { crystalOutputChannel } from './tools';
+import { registerTasks } from './tasks';
+import { existsSync } from 'fs';
+import { LanguageClient, LanguageClientOptions, DocumentSelector, MessageTransports, ServerOptions } from "vscode-languageclient/node"
 
-const selector = <DocumentSelector>[{ language: 'crystal', scheme: 'file' }];
+const selector: DocumentSelector = [{ language: 'crystal', scheme: 'file' }];
 
 const configuration = <LanguageConfiguration>{
 	comments: { lineComment: '#' },
@@ -37,22 +40,52 @@ const configuration = <LanguageConfiguration>{
 		/(-?\d+(?:\.\d+))|(:?[A-Za-z][^-`~@#%^&()=+[{}|;:'",<>/.*\]\s\\!?]*[!?]?)/,
 };
 
+let lsp_client: LanguageClient
+
 export async function activate(context: ExtensionContext): Promise<void> {
-	context.subscriptions.push(
-		languages.setLanguageConfiguration('crystal', configuration)
-	);
+	const config = workspace.getConfiguration("crystal-lang");
+	const lsp = config["server"]
 
-	registerCompletion(selector, context);
-	registerFormatter(selector, context);
-	registerHover(selector, context);
-	registerDefinitions(selector, context);
-	registerSymbols(selector, context);
-	registerMacroExpansion();
+	if (existsSync(lsp)) {
+		crystalOutputChannel.appendLine(`[Crystal] loading lsp ${lsp}`)
 
-	// Register tests/specs
-	new CrystalTestingProvider()
+		let serverOptions: ServerOptions = { command: lsp, args: [] }
+		let clientOptions: LanguageClientOptions = {
+			documentSelector: selector,
+			synchronize: {
+				configurationSection: "crystal-lang",
+				fileEvents: workspace.createFileSystemWatcher("**/*.cr")
+			},
+			outputChannel: crystalOutputChannel
+		}
+		let lsp_client = new LanguageClient("Crystal Language", serverOptions, clientOptions)
+		lsp_client.start()
 
-	crystalOutputChannel.appendLine('[Crystal] extension loaded');
+		return;
+	} else {
+		context.subscriptions.push(
+			languages.setLanguageConfiguration('crystal', configuration)
+		);
+
+		registerCompletion(selector, context);
+		registerFormatter(selector, context);
+		registerHover(selector, context);
+		registerDefinitions(selector, context);
+		registerSymbols(selector, context);
+		registerMacroExpansion();
+		registerTasks(context);
+
+		// Register tests/specs
+		new CrystalTestingProvider()
+
+		crystalOutputChannel.appendLine('[Crystal] extension loaded');
+	}
 }
 
-export function deactivate() { }
+export function deactivate() {
+	if (lsp_client) {
+		return lsp_client.stop()
+	}
+
+	return;
+}
