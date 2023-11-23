@@ -12,7 +12,7 @@
 	},
 	"bugs": "https://github.com/crystal-lang-tools/vscode-crystal-lang/issues",
 	"engines": {
-		"vscode": "^1.59.0"
+		"vscode": "^1.70.0"
 	},
 	"keywords": [
 		"crystal",
@@ -167,6 +167,11 @@
 					"type": "string",
 					"default": "",
 					"description": "[Experimental][Reload required]\nAbsolute path for Scry/Crystalline LSP server binary\n(Language Server Protocol for Crystal)."
+				},
+				"crystal-lang.spec-explorer": {
+					"type": "boolean",
+					"default": "true",
+					"description": "[Reload required]\nShow specs in the Test Explorer."
 				}
 			}
 		},
@@ -202,6 +207,7 @@
 		"@types/node": "^14.11.1",
 		"@types/temp": "^0.9.4",
 		"@types/vscode": "^1.70.0",
+		"@vscode/vsce": "^2.22.0",
 		"minimist": ">=1.2.2",
 		"prettier": "^2.8.4",
 		"typescript": "^4.0.3"

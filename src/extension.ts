@@ -46,6 +46,10 @@ export async function activate(context: ExtensionContext): Promise<void> {
 	const config = workspace.getConfiguration("crystal-lang");
 	const lsp = config["server"]
 
+	if (config["spec-explorer"]) {
+		new CrystalTestingProvider()
+	}
+
 	if (existsSync(lsp)) {
 		crystalOutputChannel.appendLine(`[Crystal] loading lsp ${lsp}`)
 
@@ -74,9 +78,6 @@ export async function activate(context: ExtensionContext): Promise<void> {
 		registerSymbols(selector, context);
 		registerMacroExpansion();
 		registerTasks(context);
-
-		// Register tests/specs
-		new CrystalTestingProvider()
 
 		crystalOutputChannel.appendLine('[Crystal] extension loaded');
 	}

@@ -86,6 +86,7 @@ class CrystalHoverProvider implements HoverProvider {
 					if (key) {
 						ctx = context as Record<string, string>
 						ctx_value = ctx[key]
+						ctx_key = key
 						break
 					}
 				}
