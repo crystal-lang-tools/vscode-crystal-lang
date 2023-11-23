@@ -33,15 +33,6 @@ class CrystalHoverProvider implements HoverProvider {
 		position: Position,
 		token: CancellationToken
 	): Promise<Hover> {
-		const pattern = /(?:\.|::)?[\w]+/;
-		const wordRange = document.getWordRangeAtPosition(position, pattern)
-		const text = document.getText(wordRange);
-		if (KEYWORDS.includes(text)) return; // TODO: potential custom keyword highlighting/info support? Rust??
-
-		if (this.previousDoc == document && this.previousText == text) return;
-		this.previousDoc = document;
-		this.previousText = text;
-
 		const line = document.lineAt(position.line);
 		if (!line.text || /^#(?!{).+/.test(line.text)) return;
 		if (/require\s+"(\.{1,2}\/[\w\*\/]+)"/.test(line.text))
@@ -49,6 +40,15 @@ class CrystalHoverProvider implements HoverProvider {
 
 		if (/require\s+"([\w\/v-]+)"/.test(line.text))
 			return await this.provideShardRequireHover(document, line);
+
+		const pattern = /(?:\.|::)?[\w]+/;
+		const wordRange = document.getWordRangeAtPosition(position, pattern)
+		const text = document.getText(wordRange);
+		if (KEYWORDS.includes(text)) return; // TODO: potential custom keyword highlighting/info support? Rust??
+
+		// if (this.previousDoc == document && this.previousText == text) return;
+		// this.previousDoc = document;
+		// this.previousText = text;
 
 		const dispose = setStatusBar('running context tool...');
 		try {
@@ -63,6 +63,7 @@ class CrystalHoverProvider implements HoverProvider {
 			// TODO: Filter/select based on text around cursor position
 			// will provide multiple contexts / all contexts on line
 			crystalOutputChannel.appendLine(`[Hover] context: ${res.message}`)
+			crystalOutputChannel.appendLine(`[Hover] context: ${JSON.stringify(res)}`)
 
 			var ctx_key = line.text;
 			var ctx = res.contexts!.find(c => c[ctx_key]);
@@ -86,7 +87,6 @@ class CrystalHoverProvider implements HoverProvider {
 					if (key) {
 						ctx = context as Record<string, string>
 						ctx_value = ctx[key]
-						ctx_key = key
 						break
 					}
 				}
