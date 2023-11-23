@@ -13,7 +13,7 @@ import {
 	TextDocument,
 	Uri,
 } from 'vscode';
-import { spawnImplTool } from './tools';
+import { crystalOutputChannel, spawnImplTool } from './tools';
 
 class CrystalDefinitionProvider implements DefinitionProvider {
 	async provideDefinition(
@@ -28,7 +28,7 @@ class CrystalDefinitionProvider implements DefinitionProvider {
 			let text = matches[1];
 			if (text.includes('*')) return [];
 			const dir = path.dirname(document.fileName);
-			console.debug(`[Implementations] identified: ${text}`);
+			crystalOutputChannel.appendLine(`[Implementations] identified: ${text}`);
 
 			if (/^\.{1,2}\/\w+/.test(text)) {
 				if (!text.endsWith('.cr')) text += '.cr';
@@ -43,10 +43,10 @@ class CrystalDefinitionProvider implements DefinitionProvider {
 		}
 
 		try {
-			console.debug('[Implementations] getting implementations...');
+			crystalOutputChannel.appendLine('[Implementations] getting implementations...');
 			const res = await spawnImplTool(document, position);
 			if (res.status !== 'ok') {
-				console.debug(`[Implementations] failed: ${res.message}`);
+				crystalOutputChannel.appendLine(`[Implementations] failed: ${res.message}`);
 				return [];
 			}
 
@@ -62,7 +62,7 @@ class CrystalDefinitionProvider implements DefinitionProvider {
 
 			return links;
 		} catch (err) {
-			console.debug(`[Implementations] failed: ${err.message}`);
+			crystalOutputChannel.appendLine(`[Implementations] failed: ${err.message}`);
 			return [];
 		}
 	}

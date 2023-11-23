@@ -2,12 +2,15 @@ import { ChildProcess, ExecException, ExecOptions, exec, spawn } from 'child_pro
 import { existsSync, readFile, readFileSync } from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
-import { Position, TextDocument, WorkspaceFolder, window, workspace } from 'vscode';
+import { Position, TextDocument, WorkspaceFolder, window, workspace, Uri, languages, Range, Diagnostic, DiagnosticSeverity } from 'vscode';
 import * as yaml from 'yaml';
 import * as junit2json from 'junit2json';
 import { tmpdir } from 'os';
 import * as temp from 'temp';
 import { cwd } from 'process';
+import { doc } from 'prettier';
+
+export const crystalOutputChannel = window.createOutputChannel("Crystal", "markdown")
 
 function execWrapper(
 	command: string,
@@ -121,7 +124,7 @@ export function getMainForShard(
 ): string | undefined {
 	const dir = workspace.getWorkspaceFolder(document.uri).uri.fsPath;
 	const fp = path.join(dir, 'lib', name, 'shard.yml');
-	console.debug(fp);
+	crystalOutputChannel.appendLine(fp);
 	if (!existsSync(fp)) return;
 
 	const shard = yaml.parse(fp) as Shard;
@@ -158,10 +161,14 @@ export async function spawnFormatTool(document: TextDocument): Promise<string> {
 
 		child.on('close', () => {
 			if (err.length > 0) {
-				rej(err.join());
+				const err_resp = err.join()
+				findProblemsRaw(err_resp, document.uri)
+				rej(err_resp);
 				return;
 			}
-			res(out.join());
+			const out_resp = out.join()
+			findProblemsRaw(out_resp, document.uri)
+			res(out_resp);
 		})
 	});
 }
@@ -184,8 +191,8 @@ export async function spawnImplTool(
 	const cursor = getCursorPath(document, position);
 	const main = getShardMainPath(document);
 
-	console.debug(
-		`${compiler} tool implementations -c ${cursor} ${main} -f json`
+	crystalOutputChannel.appendLine(
+		`[Implementations] (${workspace.getWorkspaceFolder(document.uri).name}) $ ${compiler} tool implementations -c ${cursor} ${main} -f json`
 	);
 
 	return JSON.parse(
@@ -220,15 +227,17 @@ export async function spawnContextTool(
 	// but are instead their own main files
 	const main = getShardMainPath(document);
 
-	console.debug(`${compiler} tool context -c ${cursor} ${main} -f json`);
+	crystalOutputChannel.appendLine(`[Context] (${workspace.getWorkspaceFolder(document.uri).name}) $ ${compiler} tool context -c ${cursor} ${main} -f json`);
 
-	return JSON.parse(
-		await execAsync(
-			`${compiler} tool context -c ${cursor} ${main} -f json`,
-			workspace.getWorkspaceFolder(document.uri).uri.path
-		),
-
-	);
+	return await execAsync(
+		`${compiler} tool context -c ${cursor} ${main} -f json`,
+		workspace.getWorkspaceFolder(document.uri).uri.path
+	).then((response) => {
+		findProblems(response, document.uri);
+		return JSON.parse(response);
+	}).catch((err) => {
+		findProblems(err.stderr, document.uri);
+	})
 }
 
 export type TestSuite = junit2json.TestSuite & {
@@ -272,12 +281,12 @@ export async function spawnSpecTool(
 	if (paths) {
 		cmd += ` ${paths.join(" ")}`
 	}
-	console.debug("[Spec] executing specs for " + workspace.name + " with command: " + cmd);
+	crystalOutputChannel.appendLine(`[Spec] (${workspace.name}) $ ` + cmd);
 
 	await execAsync(cmd, workspace.uri.path)
 		.catch((err) => {
 			if (err.stderr !== "") {
-				console.debug(`[Spec] Error: ${JSON.stringify(err)}`)
+				crystalOutputChannel.appendLine(`[Spec] Error: ${JSON.stringify(err)}`)
 			}
 		});
 
@@ -327,10 +336,18 @@ export async function spawnMacroExpandTool(document: TextDocument, position: Pos
 
 	const cmd = `${compiler} tool expand ${main} --cursor ${cursor}`
 
-	console.debug(cmd)
+	crystalOutputChannel.appendLine(`[Macro Expansion] (${workspace.getWorkspaceFolder(document.uri).name}) $ ` + cmd)
 	return await execAsync(cmd, folder)
-		.catch((err) => {
-			console.debug(`[Macro Expansion] Error: ${err.message}`)
+		.then((response) => {
+			return response;
+		})
+		.catch(async (err) => {
+			const new_cmd = cmd + ' -f json'
+			await execAsync(new_cmd, folder)
+				.catch((err) => {
+					findProblems(err.stderr, document.uri)
+					crystalOutputChannel.appendLine(`[Macro Expansion] Error: ${err.message}`)
+				})
 		});
 }
 
@@ -351,5 +368,73 @@ async function getCrystalVersion(): Promise<SemVer> {
 		major: Number(match[1]),
 		minor: Number(match[2]),
 		patch: Number(match[3])
+	}
+}
+
+export const diagnosticCollection = languages.createDiagnosticCollection("crystal")
+
+interface ErrorResponse {
+	file: string
+	line: number | null
+	column: number | null
+	size: number | null
+	message: string
+}
+
+export async function findProblems(response: string, uri: Uri): Promise<void> {
+	let diagnostics = []
+	const parsedResponses = JSON.parse(response) as ErrorResponse[]
+
+	if (!JSON.parse(response).status) {
+		for (let resp of parsedResponses) {
+			if (resp.line == null)
+				resp.line = 1
+			if (resp.column == null)
+				resp.column = 1
+			if (resp.size == null)
+				resp.size = 0
+			const range = new Range(resp.line - 1, resp.column - 1, resp.line - 1, (resp.column + resp.size) - 1)
+			const diagnostic = new Diagnostic(range, resp.message, DiagnosticSeverity.Error)
+			diagnostics.push([uri, [diagnostic]])
+		}
+	}
+
+
+	if (diagnostics.length == 0) {
+		diagnosticCollection.clear()
+	} else {
+		diagnosticCollection.set(diagnostics)
+	}
+}
+
+export async function findProblemsRaw(response: string, uri: Uri): Promise<void> {
+	let diagnostics = []
+	const responseData = response.match(/.* in .*?(\d+):\S* (.*)/)
+
+	let parsedLine = 0
+	try {
+		parsedLine = parseInt(responseData[1])
+	} catch { }
+
+	const parsedColumn = 1
+
+	if (parsedLine != 0) {
+		const resp: ErrorResponse = {
+			file: uri.path,
+			line: parsedLine,
+			column: parsedColumn,
+			size: null,
+			message: responseData[2]
+		}
+
+		const range = new Range(resp.line - 1, resp.column - 1, resp.line - 1, resp.column - 1)
+		const diagnostic = new Diagnostic(range, resp.message, DiagnosticSeverity.Error)
+		diagnostics.push([uri, [diagnostic]])
+	}
+
+	if (diagnostics.length == 0) {
+		diagnosticCollection.clear()
+	} else {
+		diagnosticCollection.set(diagnostics)
 	}
 }

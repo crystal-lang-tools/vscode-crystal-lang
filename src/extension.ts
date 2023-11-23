@@ -12,6 +12,7 @@ import { registerDefinitions } from './definitions';
 import { registerSymbols } from './symbols';
 import { CrystalTestingProvider } from './spec';
 import { registerMacroExpansion } from './macro';
+import { crystalOutputChannel } from './tools';
 
 const selector = <DocumentSelector>[{ language: 'crystal', scheme: 'file' }];
 
@@ -51,7 +52,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 	// Register tests/specs
 	new CrystalTestingProvider()
 
-	console.debug('[Crystal] extension loaded');
+	crystalOutputChannel.appendLine('[Crystal] extension loaded');
 }
 
 export function deactivate() { }

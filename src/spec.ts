@@ -1,7 +1,7 @@
 import { tests, TestItem, Range, Position, Uri, WorkspaceFolder, workspace, TestRunProfileKind, TestMessage } from "vscode";
 import * as junit2json from 'junit2json';
 import * as path from 'path';
-import { TestSuite, TestCase, setStatusBar, spawnSpecTool } from "./tools";
+import { TestSuite, TestCase, setStatusBar, spawnSpecTool, crystalOutputChannel } from "./tools";
 import { spawn } from "child_process";
 import { existsSync } from "fs";
 
@@ -33,11 +33,11 @@ export class CrystalTestingProvider {
         workspace.onDidChangeWorkspaceFolders((event) => {
             this.refreshSpecWorkspaceFolders()
             for (var i = 0; i < event.added.length; i += 1) {
-                console.debug("Adding folder to workspace: " + event.added[i].uri.path)
+                crystalOutputChannel.appendLine("Adding folder to workspace: " + event.added[i].uri.path)
                 this.getTestCases(event.added[i])
             }
             event.removed.forEach((folder) => {
-                console.debug("Removing folder from workspace: " + folder.uri.path)
+                crystalOutputChannel.appendLine("Removing folder from workspace: " + folder.uri.path)
                 this.deleteWorkspaceChildren(folder)
             })
         });
@@ -83,7 +83,7 @@ export class CrystalTestingProvider {
                 .then(junit => this.convertJunitTestcases(junit))
                 .catch((err) => {
                     if (err.stderr !== "") {
-                        console.debug("[Spec] Error: " + err.message + "\n" + err.stack);
+                        crystalOutputChannel.appendLine("[Spec] Error: " + err.message + "\n" + err.stack);
                     }
                 })
         } finally {
@@ -141,7 +141,7 @@ export class CrystalTestingProvider {
                 try {
                     result = await this.execTestCases(workspaces[i], args)
                 } catch (err) {
-                    console.debug("[Spec] Error: " + err.message)
+                    crystalOutputChannel.appendLine("[Spec] Error: " + err.message)
                     run.end()
                     return
                 }
@@ -176,7 +176,7 @@ export class CrystalTestingProvider {
                 })
             }
 
-            console.debug(`Finished execution in ${Date.now() - start}ms`)
+            crystalOutputChannel.appendLine(`Finished execution in ${Date.now() - start}ms`)
             run.end();
         }
     );
@@ -232,7 +232,7 @@ export class CrystalTestingProvider {
         return new Promise((resolve, reject) => {
             try {
                 if (testsuite.tests === 0) {
-                    console.debug(`[Spec] Error: No testcases in testsuite ${JSON.stringify(testsuite)}`)
+                    crystalOutputChannel.appendLine(`[Spec] Error: No testcases in testsuite ${JSON.stringify(testsuite)}`)
                     return
                 }
 
@@ -258,14 +258,11 @@ export class CrystalTestingProvider {
                     testcase.file.replace(fullPath, "").split(path.sep).filter((folder => folder !== "")).forEach((node: string) => {
                         // build full path of folder
                         fullPath += path.sep + node
-                        // console.debug("Node: " + node)
-                        // console.debug("fullPath: " + fullPath)
 
                         // check if folder exists in test controller
                         const exists = this.controller.items.get(fullPath)
                         if (exists) {
                             // if it does, get it
-                            // console.debug("Node exists: " + exists.uri.path)
                             parent = exists
                         } else if (parent) {
                             let childMatch = null
@@ -276,18 +273,15 @@ export class CrystalTestingProvider {
                             })
 
                             if (childMatch !== null) {
-                                // console.debug("Found match in parent children: " + childMatch.uri.path)
                                 parent = childMatch
                             } else {
                                 // if it doesn't and has a parent, create an item and make it a child of the parent
                                 let child = this.controller.createTestItem(fullPath, node, Uri.file(fullPath))
-                                // console.debug("Creating node under parent: " + parent.uri.path + " => " + node)
                                 parent.children.add(child)
                                 parent = child
                             }
                         } else {
                             // if don't already have a parent, use controller.items
-                            // console.debug("Creating node under root: " + fullPath)
                             let child = this.controller.createTestItem(fullPath, node, Uri.file(fullPath))
                             this.controller.items.add(child)
                             parent = child
@@ -295,14 +289,12 @@ export class CrystalTestingProvider {
                     })
 
                     // add testcases to last parent
-                    // console.debug("Adding testcase " + testcase.file + " to " + parent.uri.path)
                     parent.children.add(item)
-                    // console.debug("")
                 })
                 resolve()
 
             } catch (err) {
-                console.debug(`[Spec] Error: ${err.message}`)
+                crystalOutputChannel.appendLine(`[Spec] Error: ${err.message}`)
                 reject(err);
             }
         })

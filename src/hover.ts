@@ -16,6 +16,8 @@ import {
 import { KEYWORDS } from './definitions/index';
 import {
 	ContextError,
+	crystalOutputChannel,
+	findProblems,
 	getCrystalLibPath,
 	getMainForShard,
 	setStatusBar,
@@ -23,37 +25,44 @@ import {
 } from './tools';
 
 class CrystalHoverProvider implements HoverProvider {
+	previousDoc = undefined;
+	previousText = "";
+
 	async provideHover(
 		document: TextDocument,
 		position: Position,
 		token: CancellationToken
 	): Promise<Hover> {
-		const line = document.lineAt(position.line);
-		if (!line.text || /^#(?!{).+/.test(line.text)) return;
-		if (/"(\.{1,2}\/[\w\*\/]+)"/.test(line.text))
-			return await this.provideLocalRequireHover(document, line);
-
-		if (/"([\w\/v-]+)"/.test(line.text))
-			return await this.provideShardRequireHover(document, line);
-
 		const pattern = /(?:\.|::)?[\w]+/;
 		const wordRange = document.getWordRangeAtPosition(position, pattern)
 		const text = document.getText(wordRange);
 		if (KEYWORDS.includes(text)) return; // TODO: potential custom keyword highlighting/info support? Rust??
 
+		if (this.previousDoc == document && this.previousText == text) return;
+		this.previousDoc = document;
+		this.previousText = text;
+
+		const line = document.lineAt(position.line);
+		if (!line.text || /^#(?!{).+/.test(line.text)) return;
+		if (/require\s+"(\.{1,2}\/[\w\*\/]+)"/.test(line.text))
+			return await this.provideLocalRequireHover(document, line);
+
+		if (/require\s+"([\w\/v-]+)"/.test(line.text))
+			return await this.provideShardRequireHover(document, line);
+
 		const dispose = setStatusBar('running context tool...');
 		try {
-			console.debug('[Hover] getting context...');
+			crystalOutputChannel.appendLine('[Hover] getting context...');
 			const res = await spawnContextTool(document, position);
 
 			if (res.status !== 'ok') {
-				console.debug(`[Hover] failed: ${JSON.stringify(res)}`);
+				crystalOutputChannel.appendLine(`[Hover] failed: ${res.message}`);
 				return;
 			}
 
 			// TODO: Filter/select based on text around cursor position
 			// will provide multiple contexts / all contexts on line
-			console.debug(`[Hover] context: ${res.message}`)
+			crystalOutputChannel.appendLine(`[Hover] context: ${res.message}`)
 
 			var ctx_key = line.text;
 			var ctx = res.contexts!.find(c => c[ctx_key]);
@@ -84,7 +93,7 @@ class CrystalHoverProvider implements HoverProvider {
 
 			if (ctx === undefined) return;
 
-			console.debug(`[Hover] context: ${ctx_key}: ${JSON.stringify(ctx_value)}`);
+			crystalOutputChannel.appendLine(`[Hover] context: ${ctx_key}: ${JSON.stringify(ctx_value)}`);
 
 			const md = new MarkdownString().appendCodeblock(
 				ctx_key + ": " + ctx_value,
@@ -93,18 +102,10 @@ class CrystalHoverProvider implements HoverProvider {
 			return new Hover(md);
 		} catch (err) {
 			if (err.stderr.includes('cursor location must be')) {
-				console.debug('[Hover] failed to get correct cursor location');
+				crystalOutputChannel.appendLine('[Hover] failed to get correct cursor location');
 				return;
 			}
-			const res = JSON.parse(err.stderr)[0] as ContextError;
-
-			const lines = res.message.split('\n');
-			const msg = 'Error: ' + lines.filter(t => !t.startsWith(' -')).join('\n');
-			const overloads = lines.filter(t => t.startsWith(' -'));
-			const md = new MarkdownString().appendCodeblock(msg, 'text');
-
-			overloads.map(o => md.appendCodeblock(o, 'crystal'));
-			return new Hover(md);
+			findProblems(err.stderr, document.uri)
 		} finally {
 			dispose();
 		}
@@ -119,10 +120,10 @@ class CrystalHoverProvider implements HoverProvider {
 		const dirname = workspace.getWorkspaceFolder(document.uri).name;
 		const md = new MarkdownString();
 		let match = /"(\.{1,2}\/[\w\*\/]+)"/.exec(line.text)[1];
-		console.debug('[Hover] identifying local require');
+		crystalOutputChannel.appendLine('[Hover] identifying local require');
 
 		if (match.includes('*')) {
-			console.debug(`[Hover] globbing: ${path.join('src', match)}`);
+			crystalOutputChannel.appendLine(`[Hover] globbing: ${path.join('src', match)}`);
 			const files = await workspace.findFiles(path.join('src', match));
 			if (!files.length) return;
 			const lines: string[] = [];
@@ -141,7 +142,7 @@ class CrystalHoverProvider implements HoverProvider {
 			const dir = path.dirname(document.fileName);
 			const src = path.resolve(dir, match);
 			if (!existsSync(src)) return;
-			console.debug(`[Hover] resolved: ${src}`);
+			crystalOutputChannel.appendLine(`[Hover] resolved: ${src}`);
 
 			const relative = path
 				.join('.', src.split(dirname)[1])
@@ -161,11 +162,11 @@ class CrystalHoverProvider implements HoverProvider {
 		const dirname = workspace.getWorkspaceFolder(document.uri).name;
 		const md = new MarkdownString();
 		const match = /"([\w\/v-]+)"/.exec(line.text)[1];
-		console.debug('[Hover] identifying shard/lib require');
+		crystalOutputChannel.appendLine('[Hover] identifying shard/lib require');
 
 		const main = getMainForShard(document, match);
 		if (main) {
-			console.debug(`[Hover] resolved: ${main}`);
+			crystalOutputChannel.appendLine(`[Hover] resolved: ${main}`);
 
 			const relative = path
 				.join('.', main.split(dirname)[1])
@@ -176,14 +177,14 @@ class CrystalHoverProvider implements HoverProvider {
 			);
 		} else {
 			try {
-				console.debug('[Hover] getting crystal path...');
+				crystalOutputChannel.appendLine('[Hover] getting crystal path...');
 				const libpath = await getCrystalLibPath();
 				let fp = path.join(libpath, match);
 				if (!existsSync(fp)) {
 					fp += '.cr';
 					if (!existsSync(fp)) return;
 				}
-				console.debug(`[Hover] resolved: ${fp}`);
+				crystalOutputChannel.appendLine(`[Hover] resolved: ${fp}`);
 
 				if (!fp.endsWith('.cr')) {
 					if (existsSync(fp + '.cr')) {
@@ -191,7 +192,7 @@ class CrystalHoverProvider implements HoverProvider {
 					} else {
 						// TODO: levenshtein the fuck out of this
 						fp = path.join(fp, readdirSync(fp)[0]);
-						console.debug(`[Hover] expanded to: ${fp}`);
+						crystalOutputChannel.appendLine(`[Hover] expanded to: ${fp}`);
 					}
 				}
 
@@ -199,7 +200,7 @@ class CrystalHoverProvider implements HoverProvider {
 					`[Go to source](file://${fp})`
 				);
 			} catch (err) {
-				console.debug(`[Hover] failed: ${err.stderr}`);
+				crystalOutputChannel.appendLine(`[Hover] failed: ${JSON.parse(err.stderr).message}`);
 				return;
 			}
 		}

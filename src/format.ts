@@ -10,7 +10,7 @@ import {
 	TextEdit,
 	window,
 } from 'vscode';
-import { setStatusBar, spawnFormatTool } from './tools';
+import { crystalOutputChannel, setStatusBar, spawnFormatTool } from './tools';
 
 export function getFormatRange(document: TextDocument): Range {
 	return new Range(
@@ -29,7 +29,7 @@ class CrystalFormattingEditProvider implements DocumentFormattingEditProvider {
 	): Promise<TextEdit[]> {
 		const dispose = setStatusBar('running format tool...');
 		try {
-			console.debug('[Format] getting formatting...');
+			crystalOutputChannel.appendLine('[Format] formatting...');
 			const format = await spawnFormatTool(document);
 			if (!format.length) return;
 
@@ -37,13 +37,7 @@ class CrystalFormattingEditProvider implements DocumentFormattingEditProvider {
 		} catch (err) {
 			if (!err) return;
 
-			console.debug(`[Format] failed: ${err}`);
-			window.showErrorMessage(
-				`Failed to format document: ${err.replace(
-					/syntax error in '.*':/,
-					''
-				)}.`
-			);
+			crystalOutputChannel.appendLine(`[Format] failed: ${err}`);
 			return [];
 		} finally {
 			dispose();
