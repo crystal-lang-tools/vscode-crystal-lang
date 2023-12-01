@@ -1,10 +1,11 @@
-import { tests, TestItem, Range, Position, Uri, WorkspaceFolder, workspace, TestRunProfileKind, TestMessage } from "vscode";
+import { tests, TestItem, Range, Position, Uri, WorkspaceFolder, workspace, TestRunProfileKind, TestMessage, TestRun, TestRunRequest } from "vscode";
 import * as junit2json from 'junit2json';
 import * as path from 'path';
 import { TestSuite, TestCase, setStatusBar, spawnSpecTool, crystalOutputChannel } from "./tools";
-import { spawn } from "child_process";
 import { existsSync } from "fs";
+import { Mutex } from "async-mutex";
 
+const spec_runner_mutex = new Mutex();
 
 enum ItemType {
     File,
@@ -76,19 +77,24 @@ export class CrystalTestingProvider {
     }
 
     async getTestCases(workspace: WorkspaceFolder, paths?: string[]): Promise<void> {
+        if (spec_runner_mutex.isLocked()) {
+            return;
+        }
+
+        const release = await spec_runner_mutex.acquire();
         const dispose = setStatusBar('searching for specs...');
 
-        try {
-            await spawnSpecTool(workspace, true, paths)
-                .then(junit => this.convertJunitTestcases(junit))
-                .catch((err) => {
-                    if (err.stderr !== "") {
-                        crystalOutputChannel.appendLine("[Spec] Error: " + err.message + "\n" + err.stack);
-                    }
-                })
-        } finally {
-            dispose()
-        }
+        await spawnSpecTool(workspace, true, paths)
+            .then(junit => this.convertJunitTestcases(junit))
+            .catch((err) => {
+                if (err.stderr !== "") {
+                    crystalOutputChannel.appendLine("[Spec] Error: " + err.message + "\n" + err.stack);
+                }
+            })
+            .finally(() => {
+                release()
+                dispose()
+            })
     }
 
     async execTestCases(workspace: WorkspaceFolder, paths?: string[]): Promise<junit2json.TestSuite> {
@@ -110,76 +116,98 @@ export class CrystalTestingProvider {
 
     runProfile = this.controller.createRunProfile('Run', TestRunProfileKind.Run,
         async (request, token) => {
+            if (spec_runner_mutex.isLocked()) {
+                return;
+            }
+
+            const release = await spec_runner_mutex.acquire();
+
             const run = this.controller.createTestRun(request);
             const start = Date.now();
 
-            let runnerArgs = []
-            this.controller.items.forEach((item) => {
-                let generated = this.generateRunnerArgs(item, request.include, request.exclude)
-                if (generated.length > 0) {
-                    runnerArgs = runnerArgs.concat(generated)
-                }
-            })
-
-            let workspaces: WorkspaceFolder[] = []
-            runnerArgs.forEach((arg) => {
-                const uri = Uri.file(arg)
-                const space = workspace.getWorkspaceFolder(uri)
-                if (space !== undefined && !workspaces.includes(space)) {
-                    workspaces.push(space)
-                }
-            })
-
-            for (var i = 0; i < workspaces.length; i++) {
-                let args = []
-                runnerArgs.forEach((arg) => {
-                    if (workspaces[i] == workspace.getWorkspaceFolder(Uri.file(arg))) {
-                        args.push(arg)
+            try {
+                let runnerArgs = []
+                this.controller.items.forEach((item) => {
+                    let generated = this.generateRunnerArgs(item, request.include, request.exclude)
+                    if (generated.length > 0 && !(runnerArgs.includes(generated))) {
+                        runnerArgs = runnerArgs.concat(generated)
                     }
                 })
-                let result: junit2json.TestSuite
-                try {
-                    result = await this.execTestCases(workspaces[i], args)
-                } catch (err) {
-                    crystalOutputChannel.appendLine("[Spec] Error: " + err.message)
-                    run.end()
-                    return
+
+                let workspaces: WorkspaceFolder[] = []
+                runnerArgs.forEach((arg) => {
+                    const uri = Uri.file(arg)
+                    const space = workspace.getWorkspaceFolder(uri)
+                    if (space !== undefined && !workspaces.includes(space)) {
+                        workspaces.push(space)
+                    }
+                })
+
+                if (token.isCancellationRequested) {
+                    return;
                 }
 
-                result.testcase.forEach((testcase: TestCase) => {
-                    let exists = undefined
-                    this.controller.items.forEach((child: TestItem) => {
-                        if (exists === undefined) {
-                            exists = this.getChild(testcase.file + " " + testcase.name, child)
+                for (var i = 0; i < workspaces.length; i++) {
+                    let args = []
+                    runnerArgs.forEach((arg) => {
+                        if (workspaces[i] == workspace.getWorkspaceFolder(Uri.file(arg)) && !(args.includes(arg))) {
+                            args.push(arg)
                         }
                     })
-
-                    if (exists) {
-                        if (!(request.include && request.include.includes(exists)) || !(request.exclude?.includes(exists))) {
-                            if (testcase.error) {
-                                run.failed(exists,
-                                    new TestMessage(
-                                        testcase.error.map((v) => `${v.inner}\n${v.message}`).join("\n\n")
-                                    ),
-                                    testcase.time * 1000)
-                            } else if (testcase.failure) {
-                                run.failed(exists,
-                                    new TestMessage(
-                                        testcase.failure.map((v) => `${v.inner}\n${v.message}`).join("\n\n")
-                                    ),
-                                    testcase.time * 1000)
-                            } else {
-                                run.passed(exists, testcase.time * 1000)
-                            }
-                        }
+                    let result: junit2json.TestSuite
+                    try {
+                        result = await this.execTestCases(workspaces[i], args)
+                    } catch (err) {
+                        crystalOutputChannel.appendLine("[Spec] Error: " + err.message)
+                        run.end()
+                        return
                     }
-                })
+
+                    this.parseTestCaseResults(result, request, run);
+
+                    if (token.isCancellationRequested) {
+                        return;
+                    }
+                }
+            } finally {
+                release();
+                crystalOutputChannel.appendLine(`Finished execution in ${Date.now() - start}ms`)
+                run.end();
             }
 
-            crystalOutputChannel.appendLine(`Finished execution in ${Date.now() - start}ms`)
-            run.end();
         }
     );
+
+    private parseTestCaseResults(result: junit2json.TestSuite, request: TestRunRequest, run: TestRun) {
+        result.testcase.forEach((testcase: TestCase) => {
+            let exists: TestItem = undefined;
+            this.controller.items.forEach((child: TestItem) => {
+                if (exists === undefined) {
+                    exists = this.getChild(testcase.file + " " + testcase.name, child);
+                }
+            });
+
+            if (exists) {
+                if (!(request.include && request.include.includes(exists)) || !(request.exclude?.includes(exists))) {
+                    if (testcase.error) {
+                        run.failed(exists,
+                            new TestMessage(
+                                testcase.error.map((v) => v.message).join("\n\n")
+                            ),
+                            testcase.time * 1000);
+                    } else if (testcase.failure) {
+                        run.failed(exists,
+                            new TestMessage(
+                                testcase.failure.map((v) => v.message).join("\n\n")
+                            ),
+                            testcase.time * 1000);
+                    } else {
+                        run.passed(exists, testcase.time * 1000);
+                    }
+                }
+            }
+        });
+    }
 
     generateRunnerArgs(item: TestItem, includes: readonly TestItem[], excludes: readonly TestItem[]): string[] {
         if (includes) {

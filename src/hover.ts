@@ -22,7 +22,9 @@ import {
 	getMainForShard,
 	setStatusBar,
 	spawnContextTool,
+	compiler_mutex
 } from './tools';
+import { Document } from 'yaml';
 
 class CrystalHoverProvider implements HoverProvider {
 	previousDoc = undefined;
@@ -33,6 +35,8 @@ class CrystalHoverProvider implements HoverProvider {
 		position: Position,
 		token: CancellationToken
 	): Promise<Hover> {
+		if (compiler_mutex.isLocked()) return;
+
 		const line = document.lineAt(position.line);
 		if (!line.text || /^#(?!{).+/.test(line.text)) return;
 		if (/require\s+"(\.{1,2}\/[\w\*\/]+)"/.test(line.text))
@@ -46,17 +50,40 @@ class CrystalHoverProvider implements HoverProvider {
 		const text = document.getText(wordRange);
 		if (KEYWORDS.includes(text)) return; // TODO: potential custom keyword highlighting/info support? Rust??
 
-		// if (this.previousDoc == document && this.previousText == text) return;
-		// this.previousDoc = document;
-		// this.previousText = text;
-
 		const dispose = setStatusBar('running context tool...');
-		try {
+
+		return await compiler_mutex.acquire()
+			.then(async (release) => {
+				return this.provideHoverInternal(document, position, line, text)
+					.catch((err) => {
+						if (err.stderr.includes('cursor location must be')) {
+							crystalOutputChannel.appendLine('[Hover] failed to get correct cursor location');
+							return new Hover('Failed to get correct cursor location');
+						}
+						findProblems(err.stderr, document.uri)
+					})
+					.finally(() => {
+						release()
+					})
+			})
+			.finally(() => {
+				dispose()
+			});
+	}
+
+	private async provideHoverInternal(document: TextDocument, position: Position, line: TextLine, text: string): Promise<Hover> {
+		return new Promise(async (resolve, reject) => {
 			crystalOutputChannel.appendLine('[Hover] getting context...');
 			const res = await spawnContextTool(document, position);
 
+			if (res === undefined) {
+				reject();
+				return;
+			}
+
 			if (res.status !== 'ok') {
 				crystalOutputChannel.appendLine(`[Hover] failed: ${res.message}`);
+				reject();
 				return;
 			}
 
@@ -92,7 +119,10 @@ class CrystalHoverProvider implements HoverProvider {
 				}
 			}
 
-			if (ctx === undefined) return;
+			if (ctx === undefined || ctx_key.includes("\n")) {
+				resolve(undefined);
+				return;
+			}
 
 			crystalOutputChannel.appendLine(`[Hover] context: ${ctx_key}: ${JSON.stringify(ctx_value)}`);
 
@@ -100,19 +130,12 @@ class CrystalHoverProvider implements HoverProvider {
 				ctx_key + ": " + ctx_value,
 				'crystal'
 			);
-			return new Hover(md);
-		} catch (err) {
-			if (err.stderr.includes('cursor location must be')) {
-				crystalOutputChannel.appendLine('[Hover] failed to get correct cursor location');
-				return;
-			}
-			findProblems(err.stderr, document.uri)
-		} finally {
-			dispose();
-		}
-		// TODO: implement symbol check
-		// private provideSymbolContext()
+			resolve(new Hover(md));
+		})
 	}
+
+	// TODO: implement symbol check
+	// private provideSymbolContext()
 
 	private async provideLocalRequireHover(
 		document: TextDocument,

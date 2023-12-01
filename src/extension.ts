@@ -16,6 +16,7 @@ import { crystalOutputChannel } from './tools';
 import { registerTasks } from './tasks';
 import { existsSync } from 'fs';
 import { LanguageClient, LanguageClientOptions, DocumentSelector, MessageTransports, ServerOptions } from "vscode-languageclient/node"
+import { registerProblems } from './problems';
 
 const selector: DocumentSelector = [{ language: 'crystal', scheme: 'file' }];
 
@@ -78,6 +79,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 		registerSymbols(selector, context);
 		registerMacroExpansion();
 		registerTasks(context);
+		registerProblems();
 
 		crystalOutputChannel.appendLine('[Crystal] extension loaded');
 	}

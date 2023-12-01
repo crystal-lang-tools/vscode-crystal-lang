@@ -197,6 +197,7 @@
 		"vscode:prepublish": "tsc -p ./"
 	},
 	"dependencies": {
+		"async-mutex": "^0.4.0",
 		"junit2json": "~3.1.4",
 		"temp": "~0.9.4",
 		"vscode-languageclient": "^8.1.0",
