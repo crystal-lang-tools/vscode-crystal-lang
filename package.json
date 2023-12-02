@@ -168,6 +168,11 @@
 					"default": "",
 					"description": "[Experimental][Reload required]\nAbsolute path for Scry/Crystalline LSP server binary\n(Language Server Protocol for Crystal)."
 				},
+				"crystal-lang.main": {
+					"type": "string",
+					"default": "",
+					"description": "Specify the main file for the tools.\nDoes not work with multi-root workspaces."
+				},
 				"crystal-lang.spec-explorer": {
 					"type": "boolean",
 					"default": "true",

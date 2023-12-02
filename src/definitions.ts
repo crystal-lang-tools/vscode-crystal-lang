@@ -13,7 +13,7 @@ import {
 	TextDocument,
 	Uri,
 } from 'vscode';
-import { crystalOutputChannel, spawnImplTool } from './tools';
+import { crystalOutputChannel, findProblems, spawnImplTool } from './tools';
 
 class CrystalDefinitionProvider implements DefinitionProvider {
 	async provideDefinition(
@@ -62,7 +62,14 @@ class CrystalDefinitionProvider implements DefinitionProvider {
 
 			return links;
 		} catch (err) {
-			crystalOutputChannel.appendLine(`[Implementations] failed: ${err.message}`);
+			if (err.stderr) {
+				findProblems(err.stderr, document.uri)
+				crystalOutputChannel.appendLine(`[Implementations] failed: ${err.stderr}`)
+			} else if (err.message) {
+				crystalOutputChannel.appendLine(`[Implementations] failed: ${err.message}`);
+			} else {
+				crystalOutputChannel.appendLine(`[Implementations] failed: ${JSON.stringify(err)}`);
+			}
 			return [];
 		}
 	}

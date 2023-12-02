@@ -1,7 +1,7 @@
 import { tests, TestItem, Range, Position, Uri, WorkspaceFolder, workspace, TestRunProfileKind, TestMessage, TestRun, TestRunRequest } from "vscode";
 import * as junit2json from 'junit2json';
 import * as path from 'path';
-import { TestSuite, TestCase, setStatusBar, spawnSpecTool, crystalOutputChannel } from "./tools";
+import { TestSuite, TestCase, setStatusBar, spawnSpecTool, crystalOutputChannel, getWorkspaceFolder } from "./tools";
 import { existsSync } from "fs";
 import { Mutex } from "async-mutex";
 
@@ -27,7 +27,7 @@ export class CrystalTestingProvider {
         workspace.onDidSaveTextDocument(e => {
             if (e.uri.scheme === "file" && this.isSpecFile(e.uri.fsPath)) {
                 this.deleteTestItem(e.uri.fsPath);
-                this.getTestCases(workspace.getWorkspaceFolder(e.uri), [e.uri.fsPath])
+                this.getTestCases(getWorkspaceFolder(e.uri), [e.uri.fsPath])
             }
         });
 
@@ -54,7 +54,7 @@ export class CrystalTestingProvider {
 
     isSpecFile(file: string): boolean {
         return file.endsWith('_spec.cr') &&
-            this.workspaceFolders.includes(workspace.getWorkspaceFolder(Uri.file(file)))
+            this.workspaceFolders.includes(getWorkspaceFolder(Uri.file(file)))
     }
 
     refreshSpecWorkspaceFolders(): void {
@@ -133,7 +133,7 @@ export class CrystalTestingProvider {
                 let workspaces: WorkspaceFolder[] = []
                 runnerArgs.forEach((arg) => {
                     const uri = Uri.file(arg)
-                    const space = workspace.getWorkspaceFolder(uri)
+                    const space = getWorkspaceFolder(uri)
                     if (space !== undefined && !workspaces.includes(space)) {
                         workspaces.push(space)
                     }
@@ -146,7 +146,7 @@ export class CrystalTestingProvider {
                 for (var i = 0; i < workspaces.length; i++) {
                     let args = []
                     runnerArgs.forEach((arg) => {
-                        if (workspaces[i] == workspace.getWorkspaceFolder(Uri.file(arg)) && !(args.includes(arg))) {
+                        if (workspaces[i] == getWorkspaceFolder(Uri.file(arg)) && !(args.includes(arg))) {
                             args.push(arg)
                         }
                     })
@@ -280,7 +280,7 @@ export class CrystalTestingProvider {
                         );
                     }
 
-                    let fullPath = workspace.getWorkspaceFolder(Uri.file(testcase.file)).uri.fsPath +
+                    let fullPath = getWorkspaceFolder(Uri.file(testcase.file)).uri.fsPath +
                         path.sep + 'spec';
                     let parent: TestItem | null = null
 

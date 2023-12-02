@@ -1,5 +1,6 @@
-import { ExtensionContext, Task, TaskDefinition, ShellExecution, ShellExecutionOptions, TextDocument, WorkspaceFolder, WorkspaceFoldersChangeEvent, TaskGroup, TaskPresentationOptions, TaskRevealKind, TaskPanelKind, Disposable, Uri, workspace, TaskProvider, tasks } from "vscode"
-import { getCompilerPath, getMainFile, getShardsPath } from "./tools"
+import { ExtensionContext, Task, TaskDefinition, ShellExecution, ShellExecutionOptions, TextDocument, WorkspaceFolder, WorkspaceFoldersChangeEvent, TaskGroup, TaskPresentationOptions, TaskRevealKind, Disposable, Uri, workspace, TaskProvider, tasks, TaskPanelKind } from "vscode"
+import { getCompilerPath, getMainFile, getShardsPath, getWorkspaceFolder } from "./tools"
+import * as path from "path"
 
 // Copy from https://github.com/rust-lang/rls-vscode/blob/master/src/tasks.ts
 export function registerTasks(context: ExtensionContext): void {
@@ -14,7 +15,7 @@ export function DidOpenTextDocument(document: TextDocument, context: ExtensionCo
     }
 
     const uri = document.uri
-    let folder = workspace.getWorkspaceFolder(uri)
+    let folder = getWorkspaceFolder(uri)
     if (!folder) {
         return
     }
@@ -31,11 +32,11 @@ export function getOuterMostWorkspaceFolder(folder: WorkspaceFolder): WorkspaceF
     const sorted = sortedWorkspaceFolders();
     for (const element of sorted) {
         let uri = folder.uri.toString();
-        if (uri.charAt(uri.length - 1) !== '/') {
-            uri = uri + '/';
+        if (uri.charAt(uri.length - 1) !== path.sep) {
+            uri = uri + path.sep;
         }
         if (uri.startsWith(element)) {
-            return workspace.getWorkspaceFolder(Uri.parse(element)) || folder;
+            return getWorkspaceFolder(Uri.parse(element)) || folder;
         }
     }
     return folder;
@@ -49,8 +50,8 @@ export function sortedWorkspaceFolders(): string[] {
     if (!_sortedWorkspaceFolders && workspace.workspaceFolders) {
         _sortedWorkspaceFolders = workspace.workspaceFolders.map(folder => {
             let result = folder.uri.toString();
-            if (result.charAt(result.length - 1) !== '/') {
-                result = result + '/';
+            if (result.charAt(result.length - 1) !== path.sep) {
+                result = result + path.sep;
             }
             return result;
         }).sort(
@@ -209,7 +210,12 @@ const CRYSTAL_TASKS: Array<{ type: string, command: string, args?: Array<string>
     {
         type: 'crystal',
         command: 'tool format',
-        group: TaskGroup.Clean
+        group: TaskGroup.Build
+    },
+    {
+        type: 'crystal',
+        command: 'tool unreachable',
+        group: TaskGroup.Build
     },
     {
         type: 'crystal',

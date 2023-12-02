@@ -122,6 +122,7 @@ interface Shard {
 }
 
 function getShardMainPath(document: TextDocument): string {
+	const config = workspace.getConfiguration('crystal-lang');
 	const space = getWorkspaceFolder(document.uri);
 	const dir = space.uri.fsPath;
 	const fp = path.join(dir, 'shard.yml');
@@ -131,21 +132,32 @@ function getShardMainPath(document: TextDocument): string {
 		return document.fileName;
 	}
 
+	// Use main if provided
+	if (config.has("main")) {
+		return config.get<string>("main").replace("${workspaceRoot}", dir)
+	}
+
 	// If this is a crystal project
 	if (existsSync(fp)) {
 		const shard_yml = readFileSync(fp, 'utf-8')
 		const shard = yaml.parse(shard_yml) as Shard;
+
+		// Use a target with the shard name
 		var main = shard.targets?.[shard.name]?.main;
 		if (main) return path.resolve(dir, main);
 
 		if (shard.targets) {
+			// Use the first target if it exists
 			main = Object.values(shard.targets)[0]?.main;
 			if (main) return path.resolve(dir, main);
 		}
 
 		// Splat all top-level files in source folder,
 		// only if the file is in the /src directory
-		if (document.uri.fsPath.includes(path.join(dir, 'src'))) return space.uri.fsPath + "/src/*.cr";
+		const document_path = document.uri.fsPath;
+		if (document_path.includes(path.join(dir, 'src')) || document_path.includes(path.join(dir, 'lib'))) {
+			return path.join(space.uri.fsPath, "src", "*.cr");
+		}
 	}
 
 	// https://github.com/crystal-lang/crystal/issues/13086
@@ -279,6 +291,7 @@ export async function spawnContextTool(
 			return JSON.parse(response);
 		}).catch((err) => {
 			findProblems(err.stderr, document.uri);
+			crystalOutputChannel.appendLine(`[Context] error: ${err.stderr}`)
 		})
 }
 
@@ -530,7 +543,7 @@ function shellEscape(arg: string): string {
 }
 
 // Handle if the current file isn't in a workspace
-function getWorkspaceFolder(uri: Uri): WorkspaceFolder {
+export function getWorkspaceFolder(uri: Uri): WorkspaceFolder {
 	const folder = workspace.getWorkspaceFolder(uri)
 	if (folder) return folder;
 

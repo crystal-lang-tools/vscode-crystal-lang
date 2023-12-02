@@ -22,7 +22,8 @@ import {
 	getMainForShard,
 	setStatusBar,
 	spawnContextTool,
-	compiler_mutex
+	compiler_mutex,
+	getWorkspaceFolder
 } from './tools';
 import { Document } from 'yaml';
 
@@ -56,11 +57,11 @@ class CrystalHoverProvider implements HoverProvider {
 			.then(async (release) => {
 				return this.provideHoverInternal(document, position, line, text)
 					.catch((err) => {
-						if (err.stderr.includes('cursor location must be')) {
-							crystalOutputChannel.appendLine('[Hover] failed to get correct cursor location');
-							return new Hover('Failed to get correct cursor location');
+						if (err) {
+							findProblems(err.stderr, document.uri)
+							crystalOutputChannel.appendLine(`[Hover] error: ${JSON.stringify(err.stderr)}`);
 						}
-						findProblems(err.stderr, document.uri)
+						return undefined;
 					})
 					.finally(() => {
 						release()
@@ -74,16 +75,16 @@ class CrystalHoverProvider implements HoverProvider {
 	private async provideHoverInternal(document: TextDocument, position: Position, line: TextLine, text: string): Promise<Hover> {
 		return new Promise(async (resolve, reject) => {
 			crystalOutputChannel.appendLine('[Hover] getting context...');
-			const res = await spawnContextTool(document, position);
+			const res = await spawnContextTool(document, position)
 
 			if (res === undefined) {
-				reject();
+				reject(res);
 				return;
 			}
 
 			if (res.status !== 'ok') {
 				crystalOutputChannel.appendLine(`[Hover] failed: ${res.message}`);
-				reject();
+				reject(res);
 				return;
 			}
 
@@ -141,14 +142,16 @@ class CrystalHoverProvider implements HoverProvider {
 		document: TextDocument,
 		line: TextLine
 	): Promise<Hover> {
-		const folder = workspace.getWorkspaceFolder(document.uri);
+		const folder = getWorkspaceFolder(document.uri);
+
 		const md = new MarkdownString();
 		let match = /"(\.{1,2}\/[\w\*\/]+)"/.exec(line.text)[1];
 		crystalOutputChannel.appendLine('[Hover] identifying local require');
 
 		if (match.includes('*')) {
-			crystalOutputChannel.appendLine(`[Hover] globbing: ${path.join('src', match)}`);
-			const files = await workspace.findFiles(path.join('src', match));
+			const glob_path = path.join(path.dirname(document.uri.fsPath).replace(folder.uri.fsPath + path.sep, ""), match)
+			crystalOutputChannel.appendLine(`[Hover] globbing: ${glob_path}`);
+			const files = await workspace.findFiles(glob_path);
 			if (!files.length) return;
 			const lines: string[] = [];
 
@@ -167,8 +170,8 @@ class CrystalHoverProvider implements HoverProvider {
 			const src = path.resolve(dir, match);
 			if (!existsSync(src)) return;
 			crystalOutputChannel.appendLine(`[Hover] resolved: ${src}`);
-
-			md.appendCodeblock(`require "${path.relative(folder.uri.fsPath, src)}"`, 'crystal')
+			const relative = path.relative(folder.uri.fsPath, src)
+			md.appendCodeblock(`require "${relative}"`, 'crystal')
 				.appendMarkdown(`[Go to source](file:${path.sep}${path.sep}${src})`);
 		}
 
@@ -179,7 +182,7 @@ class CrystalHoverProvider implements HoverProvider {
 		document: TextDocument,
 		line: TextLine
 	): Promise<Hover> {
-		const folder = workspace.getWorkspaceFolder(document.uri);
+		const folder = getWorkspaceFolder(document.uri);
 		const md = new MarkdownString();
 		const match = /"([\w\/v-]+)"/.exec(line.text)[1];
 		crystalOutputChannel.appendLine('[Hover] identifying shard/lib require');
