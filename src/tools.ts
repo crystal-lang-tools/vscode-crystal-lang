@@ -476,7 +476,8 @@ export async function findProblems(response: string, uri: Uri): Promise<void> {
 }
 
 export async function findProblemsRaw(response: string, uri: Uri): Promise<void> {
-	let diagnostics = []
+	if (response === undefined) return;
+
 	const responseData = response.match(/(?:.*)in '?(.*):(\d+):(\d+)'?:?([^]*)$/mi)
 
 	let parsedLine = 0
@@ -486,6 +487,7 @@ export async function findProblemsRaw(response: string, uri: Uri): Promise<void>
 		return;
 	}
 
+	let diagnostics = []
 	if (parsedLine != 0) {
 		const resp: ErrorResponse = {
 			file: (uri && uri.fsPath) || responseData[1],
