@@ -25,20 +25,20 @@ export class CrystalTestingProvider {
 
 
         workspace.onDidSaveTextDocument(e => {
-            if (e.uri.scheme === "file" && this.isSpecFile(e.uri.path)) {
-                this.deleteTestItem(e.uri.path);
-                this.getTestCases(workspace.getWorkspaceFolder(e.uri), [e.uri.path])
+            if (e.uri.scheme === "file" && this.isSpecFile(e.uri.fsPath)) {
+                this.deleteTestItem(e.uri.fsPath);
+                this.getTestCases(workspace.getWorkspaceFolder(e.uri), [e.uri.fsPath])
             }
         });
 
         workspace.onDidChangeWorkspaceFolders((event) => {
             this.refreshSpecWorkspaceFolders()
             for (var i = 0; i < event.added.length; i += 1) {
-                crystalOutputChannel.appendLine("Adding folder to workspace: " + event.added[i].uri.path)
+                crystalOutputChannel.appendLine("Adding folder to workspace: " + event.added[i].uri.fsPath)
                 this.getTestCases(event.added[i])
             }
             event.removed.forEach((folder) => {
-                crystalOutputChannel.appendLine("Removing folder from workspace: " + folder.uri.path)
+                crystalOutputChannel.appendLine("Removing folder from workspace: " + folder.uri.fsPath)
                 this.deleteWorkspaceChildren(folder)
             })
         });
@@ -60,8 +60,8 @@ export class CrystalTestingProvider {
     refreshSpecWorkspaceFolders(): void {
         let folders = []
         workspace.workspaceFolders.forEach((folder) => {
-            if (existsSync(`${folder.uri.path}${path.sep}shard.yml`) &&
-                existsSync(`${folder.uri.path}${path.sep}spec`)) {
+            if (existsSync(`${folder.uri.fsPath}${path.sep}shard.yml`) &&
+                existsSync(`${folder.uri.fsPath}${path.sep}spec`)) {
                 folders.push(folder)
             }
         })
@@ -214,7 +214,7 @@ export class CrystalTestingProvider {
     generateRunnerArgs(item: TestItem, includes: readonly TestItem[], excludes: readonly TestItem[]): string[] {
         if (includes) {
             if (includes.includes(item)) {
-                return [item.uri.path]
+                return [item.uri.fsPath]
             } else {
                 let foundChildren = []
                 item.children.forEach((child) => {
@@ -233,14 +233,14 @@ export class CrystalTestingProvider {
                 return foundChildren
             }
         } else {
-            return [item.uri.path]
+            return [item.uri.fsPath]
         }
     }
 
     private deleteWorkspaceChildren(workspace: WorkspaceFolder) {
         this.controller.items.forEach((child) => {
-            if (child.uri.path.startsWith(workspace.uri.path)) {
-                this.deleteTestItem(child.uri.path)
+            if (child.uri.fsPath.startsWith(workspace.uri.fsPath)) {
+                this.deleteTestItem(child.uri.fsPath)
             }
         })
     }
@@ -280,7 +280,7 @@ export class CrystalTestingProvider {
                         );
                     }
 
-                    let fullPath = workspace.getWorkspaceFolder(Uri.file(testcase.file)).uri.path +
+                    let fullPath = workspace.getWorkspaceFolder(Uri.file(testcase.file)).uri.fsPath +
                         path.sep + 'spec';
                     let parent: TestItem | null = null
 

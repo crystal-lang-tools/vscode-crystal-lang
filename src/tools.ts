@@ -89,7 +89,7 @@ export function getMainFile(folder: WorkspaceFolder): string {
 }
 
 function getShardFile(workspace: WorkspaceFolder): string {
-	return workspace.uri.path + path.sep + 'shard.yml'
+	return workspace.uri.fsPath + path.sep + 'shard.yml'
 }
 
 function getCursorPath(document: TextDocument, position: Position): string {
@@ -145,7 +145,7 @@ function getShardMainPath(document: TextDocument): string {
 
 		// Splat all top-level files in source folder,
 		// only if the file is in the /src directory
-		if (document.uri.path.includes(path.join(dir, 'src'))) return space.uri.path + "/src/*.cr";
+		if (document.uri.fsPath.includes(path.join(dir, 'src'))) return space.uri.fsPath + "/src/*.cr";
 	}
 
 	// https://github.com/crystal-lang/crystal/issues/13086
@@ -241,7 +241,7 @@ export async function spawnImplTool(
 	crystalOutputChannel.appendLine(`[Implementations] (${folder.name}) $ ${cmd}`);
 
 	return JSON.parse(
-		await execAsync(cmd, folder.uri.path)
+		await execAsync(cmd, folder.uri.fsPath)
 	);
 }
 
@@ -273,7 +273,7 @@ export async function spawnContextTool(
 
 	crystalOutputChannel.appendLine(`[Context] (${folder.name}) $ ${cmd}`);
 
-	return await execAsync(cmd, folder.uri.path)
+	return await execAsync(cmd, folder.uri.fsPath)
 		.then((response) => {
 			findProblems(response, document.uri);
 			return JSON.parse(response);
@@ -325,7 +325,7 @@ export async function spawnSpecTool(
 	}
 	crystalOutputChannel.appendLine(`[Spec] (${workspace.name}) $ ` + cmd);
 
-	await execAsync(cmd, workspace.uri.path).catch((err) => {
+	await execAsync(cmd, workspace.uri.fsPath).catch((err) => {
 		if (err.stderr) {
 			findProblems(err.stderr, undefined)
 		} else if (err.message) {
@@ -387,13 +387,13 @@ export async function spawnMacroExpandTool(document: TextDocument, position: Pos
 	const cmd = `${shellEscape(compiler)} tool expand ${shellEscape(main)} --cursor ${shellEscape(cursor)}`
 
 	crystalOutputChannel.appendLine(`[Macro Expansion] (${folder.name}) $ ` + cmd)
-	return await execAsync(cmd, folder.uri.path)
+	return await execAsync(cmd, folder.uri.fsPath)
 		.then((response) => {
 			return response;
 		})
 		.catch(async (err) => {
 			const new_cmd = cmd + ' -f json'
-			await execAsync(new_cmd, folder.uri.path)
+			await execAsync(new_cmd, folder.uri.fsPath)
 				.catch((err) => {
 					findProblems(err.stderr, document.uri)
 					crystalOutputChannel.appendLine(`[Macro Expansion] Error: ${err.message}`)
@@ -475,7 +475,7 @@ export async function findProblemsRaw(response: string, uri: Uri): Promise<void>
 
 	if (parsedLine != 0) {
 		const resp: ErrorResponse = {
-			file: (uri && uri.path) || responseData[1],
+			file: (uri && uri.fsPath) || responseData[1],
 			line: parseInt(responseData[2]),
 			column: parseInt(responseData[3]),
 			size: null,
@@ -497,7 +497,7 @@ export async function findProblemsRaw(response: string, uri: Uri): Promise<void>
 export async function spawnProblemsTool(document: TextDocument): Promise<void> {
 	const compiler = await getCompilerPath();
 	const main = getShardMainPath(document);
-	const folder = getWorkspaceFolder(document.uri).uri.path
+	const folder = getWorkspaceFolder(document.uri).uri.fsPath
 	// If document is in a folder of the same name as the document, it will throw an
 	// error about not being able to use an output filename of '...' as it's a folder.
 	// This is probably a bug as the --no-codegen flag is set, there is no output.
@@ -535,8 +535,8 @@ function getWorkspaceFolder(uri: Uri): WorkspaceFolder {
 	if (folder) return folder;
 
 	return {
-		name: path.dirname(uri.path),
-		uri: Uri.file(path.dirname(uri.path)),
+		name: path.dirname(uri.fsPath),
+		uri: Uri.file(path.dirname(uri.fsPath)),
 		index: undefined
 	}
 }

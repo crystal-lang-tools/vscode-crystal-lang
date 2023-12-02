@@ -153,7 +153,7 @@ class CrystalHoverProvider implements HoverProvider {
 			const lines: string[] = [];
 
 			for (let file of files.slice(0, 10)) {
-				lines.push(`- [${path.relative(folder.uri.path, file.path)}](file://${file.path})`);
+				lines.push(`- [${path.relative(folder.uri.fsPath, file.fsPath)}](file:${path.sep}${path.sep}${file.fsPath})`);
 			}
 			lines.sort();
 
@@ -168,8 +168,8 @@ class CrystalHoverProvider implements HoverProvider {
 			if (!existsSync(src)) return;
 			crystalOutputChannel.appendLine(`[Hover] resolved: ${src}`);
 
-			md.appendCodeblock(`require "${path.relative(folder.uri.path, src)}"`, 'crystal')
-				.appendMarkdown(`[Go to source](file://${src})`);
+			md.appendCodeblock(`require "${path.relative(folder.uri.fsPath, src)}"`, 'crystal')
+				.appendMarkdown(`[Go to source](file:${path.sep}${path.sep}${src})`);
 		}
 
 		return new Hover(md, line.range);
@@ -188,8 +188,8 @@ class CrystalHoverProvider implements HoverProvider {
 		if (main) {
 			crystalOutputChannel.appendLine(`[Hover] resolved: ${main}`);
 
-			md.appendCodeblock(`require "${path.relative(folder.uri.path, main)}"`, 'crystal').appendMarkdown(
-				`[Go to source](file://${main})`
+			md.appendCodeblock(`require "${path.relative(folder.uri.fsPath, main)}"`, 'crystal').appendMarkdown(
+				`[Go to source](file:${path.sep}${path.sep}${main})`
 			);
 		} else {
 			try {
@@ -213,7 +213,7 @@ class CrystalHoverProvider implements HoverProvider {
 				}
 
 				md.appendCodeblock(`require "${match}"`, 'crystal').appendMarkdown(
-					`[Go to source](file://${fp})`
+					`[Go to source](file:${path.sep}${path.sep}${fp})`
 				);
 			} catch (err) {
 				crystalOutputChannel.appendLine(`[Hover] failed: ${JSON.parse(err.stderr).message}`);
