@@ -133,7 +133,7 @@ function getShardMainPath(document: TextDocument): string {
 	}
 
 	// Use main if provided
-	if (config.has("main")) {
+	if (config.get("main") !== "") {
 		return config.get<string>("main").replace("${workspaceRoot}", dir)
 	}
 
