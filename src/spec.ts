@@ -186,13 +186,17 @@ export class CrystalTestingProvider {
                     if (testcase.error) {
                         run.failed(exists,
                             new TestMessage(
-                                testcase.error.map((v) => v.message).join("\n\n")
+                                testcase.error.map((v) => {
+                                    return this.formatErrorMessage(v)
+                                }).join("\n\n\n")
                             ),
                             testcase.time * 1000);
                     } else if (testcase.failure) {
                         run.failed(exists,
                             new TestMessage(
-                                testcase.failure.map((v) => v.message).join("\n\n")
+                                testcase.failure.map((v) => {
+                                    return this.formatErrorMessage(v)
+                                }).join("\n\n\n")
                             ),
                             testcase.time * 1000);
                     } else {
@@ -201,6 +205,10 @@ export class CrystalTestingProvider {
                 }
             }
         });
+    }
+
+    private formatErrorMessage(v: junit2json.Details): string {
+        return `\n  ${v.message.replace("\n", "\n  ")}\n\n${v.inner}`
     }
 
     generateRunnerArgs(item: TestItem, includes: readonly TestItem[], excludes: readonly TestItem[]): string[] {
