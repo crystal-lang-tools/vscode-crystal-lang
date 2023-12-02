@@ -121,6 +121,8 @@ interface Shard {
 	license?: string;
 }
 
+// Takes in a vscode TextDocument and returns the relevant
+// entrypoint for it in its workspace folder
 function getShardMainPath(document: TextDocument): string {
 	const config = workspace.getConfiguration('crystal-lang');
 	const space = getWorkspaceFolder(document.uri);
@@ -132,9 +134,10 @@ function getShardMainPath(document: TextDocument): string {
 		return document.fileName;
 	}
 
-	// Use main if provided
+	// Use main if provided and it exists
 	if (config.get("main") !== "") {
-		return config.get<string>("main").replace("${workspaceRoot}", dir)
+		const main = config.get<string>("main").replace("${workspaceRoot}", dir)
+		if (main.includes('*') || existsSync(main)) return main;
 	}
 
 	// If this is a crystal project
@@ -144,12 +147,14 @@ function getShardMainPath(document: TextDocument): string {
 
 		// Use a target with the shard name
 		var main = shard.targets?.[shard.name]?.main;
-		if (main) return path.resolve(dir, main);
+		var fullPath = path.resolve(dir, main)
+		if (main && existsSync(fullPath)) return fullPath;
 
 		if (shard.targets) {
 			// Use the first target if it exists
 			main = Object.values(shard.targets)[0]?.main;
-			if (main) return path.resolve(dir, main);
+			fullPath = path.resolve(dir, main)
+			if (main && existsSync(fullPath)) return fullPath;
 		}
 
 		// Splat all top-level files in source folder,
