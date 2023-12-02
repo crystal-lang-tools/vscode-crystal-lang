@@ -141,7 +141,7 @@ class CrystalHoverProvider implements HoverProvider {
 		document: TextDocument,
 		line: TextLine
 	): Promise<Hover> {
-		const dirname = workspace.getWorkspaceFolder(document.uri).name;
+		const folder = workspace.getWorkspaceFolder(document.uri);
 		const md = new MarkdownString();
 		let match = /"(\.{1,2}\/[\w\*\/]+)"/.exec(line.text)[1];
 		crystalOutputChannel.appendLine('[Hover] identifying local require');
@@ -153,7 +153,7 @@ class CrystalHoverProvider implements HoverProvider {
 			const lines: string[] = [];
 
 			for (let file of files.slice(0, 10)) {
-				lines.push(`- [${file.path}](file://${file.path})`);
+				lines.push(`- [${path.relative(folder.uri.path, file.path)}](file://${file.path})`);
 			}
 			lines.sort();
 
@@ -168,11 +168,7 @@ class CrystalHoverProvider implements HoverProvider {
 			if (!existsSync(src)) return;
 			crystalOutputChannel.appendLine(`[Hover] resolved: ${src}`);
 
-			const relative = path
-				.join('.', src.split(dirname)[1])
-				.replace(/\\+/g, '/');
-
-			md.appendCodeblock(`require "${relative}"`, 'crystal')
+			md.appendCodeblock(`require "${path.relative(folder.uri.path, src)}"`, 'crystal')
 				.appendMarkdown(`[Go to source](file://${src})`);
 		}
 
@@ -183,7 +179,7 @@ class CrystalHoverProvider implements HoverProvider {
 		document: TextDocument,
 		line: TextLine
 	): Promise<Hover> {
-		const dirname = workspace.getWorkspaceFolder(document.uri).name;
+		const folder = workspace.getWorkspaceFolder(document.uri);
 		const md = new MarkdownString();
 		const match = /"([\w\/v-]+)"/.exec(line.text)[1];
 		crystalOutputChannel.appendLine('[Hover] identifying shard/lib require');
@@ -192,11 +188,7 @@ class CrystalHoverProvider implements HoverProvider {
 		if (main) {
 			crystalOutputChannel.appendLine(`[Hover] resolved: ${main}`);
 
-			const relative = path
-				.join('.', main.split(dirname)[1])
-				.replace(/\\+/g, '/');
-
-			md.appendCodeblock(`require "${relative}"`, 'crystal').appendMarkdown(
+			md.appendCodeblock(`require "${path.relative(folder.uri.path, main)}"`, 'crystal').appendMarkdown(
 				`[Go to source](file://${main})`
 			);
 		} else {

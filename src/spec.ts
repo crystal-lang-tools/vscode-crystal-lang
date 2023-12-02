@@ -85,19 +85,15 @@ export class CrystalTestingProvider {
         const dispose = setStatusBar('searching for specs...');
 
         await spawnSpecTool(workspace, true, paths)
-            .then(junit => this.convertJunitTestcases(junit))
-            .catch((err) => {
-                if (err.stderr !== "") {
-                    crystalOutputChannel.appendLine("[Spec] Error: " + err.message + "\n" + err.stack);
-                }
-            })
-            .finally(() => {
+            .then((junit) => {
+                if (junit) this.convertJunitTestcases(junit)
+            }).finally(() => {
                 release()
                 dispose()
             })
     }
 
-    async execTestCases(workspace: WorkspaceFolder, paths?: string[]): Promise<junit2json.TestSuite> {
+    async execTestCases(workspace: WorkspaceFolder, paths?: string[]): Promise<junit2json.TestSuite | void> {
         return spawnSpecTool(workspace, false, paths)
     }
 
@@ -154,7 +150,7 @@ export class CrystalTestingProvider {
                             args.push(arg)
                         }
                     })
-                    let result: junit2json.TestSuite
+                    let result: junit2json.TestSuite | void
                     try {
                         result = await this.execTestCases(workspaces[i], args)
                     } catch (err) {
@@ -163,7 +159,9 @@ export class CrystalTestingProvider {
                         return
                     }
 
-                    this.parseTestCaseResults(result, request, run);
+                    if (result) {
+                        this.parseTestCaseResults(result, request, run);
+                    }
 
                     if (token.isCancellationRequested) {
                         return;

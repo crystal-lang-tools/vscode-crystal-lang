@@ -138,8 +138,10 @@ function getShardMainPath(document: TextDocument): string {
 		var main = shard.targets?.[shard.name]?.main;
 		if (main) return path.resolve(dir, main);
 
-		main = Object.values(shard.targets)[0]?.main;
-		if (main) return path.resolve(dir, main);
+		if (shard.targets) {
+			main = Object.values(shard.targets)[0]?.main;
+			if (main) return path.resolve(dir, main);
+		}
 
 		// Splat all top-level files in source folder,
 		// only if the file is in the /src directory
@@ -233,7 +235,7 @@ export async function spawnImplTool(
 	const compiler = await getCompilerPath();
 	const cursor = getCursorPath(document, position);
 	const main = getShardMainPath(document);
-	const cmd = `${shellEscape(compiler)} tool implementations -c ${cursor} ${shellEscape(main)} -f json --no-color`
+	const cmd = `${shellEscape(compiler)} tool implementations -c ${shellEscape(cursor)} ${shellEscape(main)} -f json --no-color`
 	const folder: WorkspaceFolder = getWorkspaceFolder(document.uri)
 
 	crystalOutputChannel.appendLine(`[Implementations] (${folder.name}) $ ${cmd}`);
@@ -266,7 +268,7 @@ export async function spawnContextTool(
 	// Spec files shouldn't have main set to something in src/
 	// but are instead their own main files
 	const main = getShardMainPath(document);
-	const cmd = `${shellEscape(compiler)} tool context -c ${cursor} ${shellEscape(main)} -f json --no-color`
+	const cmd = `${shellEscape(compiler)} tool context -c ${shellEscape(cursor)} ${shellEscape(main)} -f json --no-color`
 	const folder = getWorkspaceFolder(document.uri)
 
 	crystalOutputChannel.appendLine(`[Context] (${folder.name}) $ ${cmd}`);
@@ -304,7 +306,7 @@ export async function spawnSpecTool(
 	workspace: WorkspaceFolder,
 	dry_run: boolean = false,
 	paths?: string[]
-): Promise<TestSuite> {
+): Promise<TestSuite | void> {
 	// Get compiler stuff
 	const compiler = await getCompilerPath();
 	const compiler_version = await getCrystalVersion();
@@ -323,18 +325,21 @@ export async function spawnSpecTool(
 	}
 	crystalOutputChannel.appendLine(`[Spec] (${workspace.name}) $ ` + cmd);
 
-	await execAsync(cmd, workspace.uri.path)
-		.catch((err) => {
-			if (err.stderr !== "") {
+	return execAsync(cmd, workspace.uri.path)
+		.then(() => {
+			return readSpecResults(tempFile)
+		}).then((results) => {
+			return parseJunit(results);
+		}).catch((err) => {
+			if (err.stderr) {
+				findProblems(err.stderr, undefined)
+				crystalOutputChannel.appendLine(`[Spec] Error: ${err.stderr}`)
+			} else if (err.message) {
+				crystalOutputChannel.appendLine(`[Spec] Error: ${err.message}`)
+			} else {
 				crystalOutputChannel.appendLine(`[Spec] Error: ${JSON.stringify(err)}`)
 			}
 		});
-
-	// read test results
-	const results = await readSpecResults(tempFile);
-
-	// parse junit
-	return await parseJunit(results);
 }
 
 function readSpecResults(file: string): Promise<Buffer> {
@@ -369,13 +374,13 @@ function parseJunit(rawXml: Buffer): Promise<junit2json.TestSuite> {
 	})
 }
 
-export async function spawnMacroExpandTool(document: TextDocument, position: Position) {
+export async function spawnMacroExpandTool(document: TextDocument, position: Position): Promise<string | void> {
 	const compiler = await getCompilerPath();
 	const main = getShardMainPath(document);
 	const cursor = getCursorPath(document, position);
 	const folder = getWorkspaceFolder(document.uri);
 
-	const cmd = `${shellEscape(compiler)} tool expand ${shellEscape(main)} --cursor ${cursor}`
+	const cmd = `${shellEscape(compiler)} tool expand ${shellEscape(main)} --cursor ${shellEscape(cursor)}`
 
 	crystalOutputChannel.appendLine(`[Macro Expansion] (${folder.name}) $ ` + cmd)
 	return await execAsync(cmd, folder.uri.path)
@@ -424,7 +429,12 @@ interface ErrorResponse {
 
 export async function findProblems(response: string, uri: Uri): Promise<void> {
 	let diagnostics = []
-	const parsedResponses = JSON.parse(response) as ErrorResponse[]
+	var parsedResponses: ErrorResponse[];
+	try {
+		parsedResponses = JSON.parse(response)
+	} catch {
+		return await findProblemsRaw(response, uri)
+	}
 
 	if (!JSON.parse(response).status) {
 		for (let resp of parsedResponses) {
@@ -450,27 +460,27 @@ export async function findProblems(response: string, uri: Uri): Promise<void> {
 
 export async function findProblemsRaw(response: string, uri: Uri): Promise<void> {
 	let diagnostics = []
-	const responseData = response.match(/.* in .*?(\d+):\S* (.*)/)
+	const responseData = response.match(/(?:.*)in '?(.*):(\d+):(\d+)'?:?([^]*)$/mi)
 
 	let parsedLine = 0
 	try {
 		parsedLine = parseInt(responseData[1])
-	} catch { }
-
-	const parsedColumn = 1
+	} catch {
+		return;
+	}
 
 	if (parsedLine != 0) {
 		const resp: ErrorResponse = {
-			file: uri.path,
-			line: parsedLine,
-			column: parsedColumn,
+			file: (uri && uri.path) || responseData[1],
+			line: parseInt(responseData[2]),
+			column: parseInt(responseData[3]),
 			size: null,
-			message: responseData[2]
+			message: responseData[4].trim()
 		}
 
 		const range = new Range(resp.line - 1, resp.column - 1, resp.line - 1, resp.column - 1)
 		const diagnostic = new Diagnostic(range, resp.message, DiagnosticSeverity.Error)
-		diagnostics.push([uri, [diagnostic]])
+		diagnostics.push([Uri.file(resp.file), [diagnostic]])
 	}
 
 	if (diagnostics.length == 0) {
@@ -497,10 +507,13 @@ export async function spawnProblemsTool(document: TextDocument): Promise<void> {
 	crystalOutputChannel.appendLine(`[Problems] (${getWorkspaceFolder(document.uri).name}) $ ` + cmd)
 	await execAsync(cmd, folder)
 		.then((response) => {
+			diagnosticCollection.clear()
 			crystalOutputChannel.appendLine("[Problems] No problems found.")
 		}).catch((err) => {
 			findProblems(err.stderr, document.uri)
-			crystalOutputChannel.appendLine(`[Problems] Error: ${JSON.parse(err.stderr)[-1].message}`)
+			if (JSON.parse(err.stderr)[-1]) {
+				crystalOutputChannel.appendLine(`[Problems] Error: ${JSON.parse(err.stderr)[-1].message}`)
+			}
 		});
 
 }
