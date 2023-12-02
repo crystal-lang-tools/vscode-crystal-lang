@@ -290,7 +290,7 @@ export type TestSuite = junit2json.TestSuite & {
 	time?: number;
 	timestamp?: string;
 	hostname?: string;
-	testcase?: TestCase[]
+	testcase?: TestCase[];
 }
 
 export type TestCase = junit2json.TestCase & {
@@ -325,21 +325,25 @@ export async function spawnSpecTool(
 	}
 	crystalOutputChannel.appendLine(`[Spec] (${workspace.name}) $ ` + cmd);
 
-	return execAsync(cmd, workspace.uri.path)
-		.then(() => {
-			return readSpecResults(tempFile)
-		}).then((results) => {
-			return parseJunit(results);
-		}).catch((err) => {
-			if (err.stderr) {
-				findProblems(err.stderr, undefined)
-				crystalOutputChannel.appendLine(`[Spec] Error: ${err.stderr}`)
-			} else if (err.message) {
-				crystalOutputChannel.appendLine(`[Spec] Error: ${err.message}`)
-			} else {
-				crystalOutputChannel.appendLine(`[Spec] Error: ${JSON.stringify(err)}`)
-			}
-		});
+	await execAsync(cmd, workspace.uri.path).catch((err) => {
+		if (err.stderr) {
+			findProblems(err.stderr, undefined)
+		} else if (err.message) {
+			crystalOutputChannel.appendLine(`[Spec] Error: ${err.message}`)
+		} else {
+			crystalOutputChannel.appendLine(`[Spec] Error: ${err.stdout}`)
+		}
+	});
+
+	return readSpecResults(tempFile).then(async (results) => {
+		return parseJunit(results);
+	}).catch((err) => {
+		if (err.message) {
+			crystalOutputChannel.appendLine(`[Spec] Error: ${err.message}`)
+		} else {
+			crystalOutputChannel.appendLine(`[Spec] Error: ${JSON.stringify(err)}`)
+		}
+	});
 }
 
 function readSpecResults(file: string): Promise<Buffer> {

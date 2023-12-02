@@ -150,18 +150,14 @@ export class CrystalTestingProvider {
                             args.push(arg)
                         }
                     })
-                    let result: junit2json.TestSuite | void
-                    try {
-                        result = await this.execTestCases(workspaces[i], args)
-                    } catch (err) {
-                        crystalOutputChannel.appendLine("[Spec] Error: " + err.message)
-                        run.end()
-                        return
-                    }
 
-                    if (result) {
-                        this.parseTestCaseResults(result, request, run);
-                    }
+                    await this.execTestCases(workspaces[i], args)
+                        .then(result => {
+                            if (result) this.parseTestCaseResults(result, request, run);
+                        }).catch(err => {
+                            crystalOutputChannel.appendLine("[Spec] Error: " + err.message)
+                            run.end()
+                        });
 
                     if (token.isCancellationRequested) {
                         return;
@@ -176,7 +172,7 @@ export class CrystalTestingProvider {
         }
     );
 
-    private parseTestCaseResults(result: junit2json.TestSuite, request: TestRunRequest, run: TestRun) {
+    private parseTestCaseResults(result: TestSuite, request: TestRunRequest, run: TestRun) {
         result.testcase.forEach((testcase: TestCase) => {
             let exists: TestItem = undefined;
             this.controller.items.forEach((child: TestItem) => {
