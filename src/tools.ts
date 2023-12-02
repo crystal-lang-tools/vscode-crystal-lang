@@ -145,7 +145,7 @@ function getShardMainPath(document: TextDocument): string {
 
 		// Splat all top-level files in source folder,
 		// only if the file is in the /src directory
-		if (document.uri.path.includes('/src/')) return space.uri.path + "/src/*.cr";
+		if (document.uri.path.includes(path.join(dir, 'src'))) return space.uri.path + "/src/*.cr";
 	}
 
 	// https://github.com/crystal-lang/crystal/issues/13086
