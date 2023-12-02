@@ -10,7 +10,7 @@
 			"command": "npm",
 			"args": [
 				"run",
-				"compile"
+				"esbuild"
 			],
 			"problemMatcher": [
 				"$tsc-watch"
