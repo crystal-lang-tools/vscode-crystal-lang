@@ -26,6 +26,7 @@ import {
 	getWorkspaceFolder
 } from './tools';
 import { Document } from 'yaml';
+import { crystalConfiguration } from './extension';
 
 class CrystalHoverProvider implements HoverProvider {
 	previousDoc = undefined;
@@ -46,7 +47,7 @@ class CrystalHoverProvider implements HoverProvider {
 		if (/require\s+"([\w\/v-]+)"/.test(line.text))
 			return await this.provideShardRequireHover(document, line);
 
-		const pattern = /(?:\.|::)?[\w]+/;
+		const pattern = crystalConfiguration.wordPattern;
 		const wordRange = document.getWordRangeAtPosition(position, pattern)
 		const text = document.getText(wordRange);
 		if (KEYWORDS.includes(text)) return; // TODO: potential custom keyword highlighting/info support? Rust??
@@ -57,9 +58,13 @@ class CrystalHoverProvider implements HoverProvider {
 			.then(async (release) => {
 				return this.provideHoverInternal(document, position, line, text)
 					.catch((err) => {
-						if (err) {
+						if (err && err.stderr) {
 							findProblems(err.stderr, document.uri)
 							crystalOutputChannel.appendLine(`[Hover] error: ${JSON.stringify(err.stderr)}`);
+						} else if (err && err.message) {
+							crystalOutputChannel.appendLine(`[Hover] error: ${err.message}`);
+						} else {
+							crystalOutputChannel.appendLine(`[Hover] error: ${JSON.stringify(err)}`)
 						}
 						return undefined;
 					})
@@ -128,7 +133,7 @@ class CrystalHoverProvider implements HoverProvider {
 			crystalOutputChannel.appendLine(`[Hover] context: ${ctx_key}: ${JSON.stringify(ctx_value)}`);
 
 			const md = new MarkdownString().appendCodeblock(
-				ctx_key + ": " + ctx_value,
+				ctx_key + " : " + ctx_value,
 				'crystal'
 			);
 			resolve(new Hover(md));

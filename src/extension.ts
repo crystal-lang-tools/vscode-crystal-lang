@@ -20,7 +20,7 @@ import { registerProblems } from './problems';
 
 const selector: DocumentSelector = [{ language: 'crystal', scheme: 'file' }];
 
-const configuration = <LanguageConfiguration>{
+export const crystalConfiguration = <LanguageConfiguration>{
 	comments: { lineComment: '#' },
 	indentationRules: {
 		increaseIndentPattern:
@@ -38,7 +38,7 @@ const configuration = <LanguageConfiguration>{
 		},
 	],
 	wordPattern:
-		/(-?\d+(?:\.\d+))|(:?[A-Za-z][^-`~@#%^&()=+[{}|;:'",<>/.*\]\s\\!?]*[!?]?)/,
+		/(-?(?:0(?:b|o|x))?\d+(?:\.\d+)?(?:_?[iuf]\d+)?)|@{0,2}(:?[A-Za-z][^-`~@#%^&()=+[{}|;:'",<>\/.*\]\s\\!?]*[!?]?)/,
 };
 
 let lsp_client: LanguageClient
@@ -47,9 +47,13 @@ export async function activate(context: ExtensionContext): Promise<void> {
 	const config = workspace.getConfiguration("crystal-lang");
 	const lsp = config["server"]
 
-	if (config["spec-explorer"]) {
-		new CrystalTestingProvider()
-	}
+	// Specs enabled regardless of LSP support
+	if (config["spec-explorer"]) new CrystalTestingProvider();
+
+	// Language configuration independent of LSP
+	context.subscriptions.push(
+		languages.setLanguageConfiguration('crystal', crystalConfiguration)
+	);
 
 	if (existsSync(lsp)) {
 		crystalOutputChannel.appendLine(`[Crystal] loading lsp ${lsp}`)
@@ -68,18 +72,14 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
 		return;
 	} else {
-		context.subscriptions.push(
-			languages.setLanguageConfiguration('crystal', configuration)
-		);
-
 		registerCompletion(selector, context);
 		registerFormatter(selector, context);
-		registerHover(selector, context);
-		registerDefinitions(selector, context);
 		registerSymbols(selector, context);
 		registerMacroExpansion();
 		registerTasks(context);
-		registerProblems();
+		if (config["hover"]) registerHover(selector, context);
+		if (config["definitions"]) registerDefinitions(selector, context);
+		if (config["problems"]) registerProblems();
 
 		crystalOutputChannel.appendLine('[Crystal] extension loaded');
 	}

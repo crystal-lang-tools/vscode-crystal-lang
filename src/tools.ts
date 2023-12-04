@@ -123,7 +123,7 @@ interface Shard {
 
 // Takes in a vscode TextDocument and returns the relevant
 // entrypoint for it in its workspace folder
-function getShardMainPath(document: TextDocument): string {
+async function getShardMainPath(document: TextDocument): Promise<string> {
 	const config = workspace.getConfiguration('crystal-lang');
 	const space = getWorkspaceFolder(document.uri);
 	const dir = space.uri.fsPath;
@@ -135,9 +135,14 @@ function getShardMainPath(document: TextDocument): string {
 	}
 
 	// Use main if provided and it exists
-	if (config.get("main") !== "") {
+	if (config.get("main")) {
 		const main = config.get<string>("main").replace("${workspaceRoot}", dir)
 		if (main.includes('*') || existsSync(main)) return main;
+	}
+
+	if (config.get("dependencies")) {
+		const shardTarget = await getShardTargetForFile(document)
+		if (shardTarget) return shardTarget;
 	}
 
 	// If this is a crystal project
@@ -147,14 +152,12 @@ function getShardMainPath(document: TextDocument): string {
 
 		// Use a target with the shard name
 		var main = shard.targets?.[shard.name]?.main;
-		var fullPath = path.resolve(dir, main)
-		if (main && existsSync(fullPath)) return fullPath;
+		if (main && existsSync(path.resolve(dir, main))) return path.resolve(dir, main);
 
 		if (shard.targets) {
 			// Use the first target if it exists
 			main = Object.values(shard.targets)[0]?.main;
-			fullPath = path.resolve(dir, main)
-			if (main && existsSync(fullPath)) return fullPath;
+			if (main && existsSync(path.resolve(dir, main))) return path.resolve(dir, main);
 		}
 
 		// Splat all top-level files in source folder,
@@ -251,7 +254,7 @@ export async function spawnImplTool(
 ): Promise<ImplResponse> {
 	const compiler = await getCompilerPath();
 	const cursor = getCursorPath(document, position);
-	const main = getShardMainPath(document);
+	const main = await getShardMainPath(document);
 	const cmd = `${shellEscape(compiler)} tool implementations -c ${shellEscape(cursor)} ${shellEscape(main)} -f json --no-color`
 	const folder: WorkspaceFolder = getWorkspaceFolder(document.uri)
 
@@ -284,7 +287,7 @@ export async function spawnContextTool(
 	const cursor = getCursorPath(document, position);
 	// Spec files shouldn't have main set to something in src/
 	// but are instead their own main files
-	const main = getShardMainPath(document);
+	const main = await getShardMainPath(document);
 	const cmd = `${shellEscape(compiler)} tool context -c ${shellEscape(cursor)} ${shellEscape(main)} -f json --no-color`
 	const folder = getWorkspaceFolder(document.uri)
 
@@ -398,7 +401,7 @@ function parseJunit(rawXml: Buffer): Promise<junit2json.TestSuite> {
 
 export async function spawnMacroExpandTool(document: TextDocument, position: Position): Promise<string | void> {
 	const compiler = await getCompilerPath();
-	const main = getShardMainPath(document);
+	const main = await getShardMainPath(document);
 	const cursor = getCursorPath(document, position);
 	const folder = getWorkspaceFolder(document.uri);
 
@@ -516,7 +519,7 @@ export async function findProblemsRaw(response: string, uri: Uri): Promise<void>
 
 export async function spawnProblemsTool(document: TextDocument): Promise<void> {
 	const compiler = await getCompilerPath();
-	const main = getShardMainPath(document);
+	const main = await getShardMainPath(document);
 	const folder = getWorkspaceFolder(document.uri).uri.fsPath
 	// If document is in a folder of the same name as the document, it will throw an
 	// error about not being able to use an output filename of '...' as it's a folder.
@@ -535,11 +538,13 @@ export async function spawnProblemsTool(document: TextDocument): Promise<void> {
 			crystalOutputChannel.appendLine("[Problems] No problems found.")
 		}).catch((err) => {
 			findProblems(err.stderr, document.uri)
-			if (JSON.parse(err.stderr)[-1]) {
-				crystalOutputChannel.appendLine(`[Problems] Error: ${JSON.parse(err.stderr)[-1].message}`)
+			try {
+				const parsed = JSON.parse(err.stderr)
+				crystalOutputChannel.appendLine(`[Problems] Error: ${parsed}`)
+			} catch {
+				crystalOutputChannel.appendLine(`[Problems] Error: ${JSON.stringify(err)}`)
 			}
 		});
-
 }
 
 // Borrowed from https://taozhi.medium.com/escape-shell-command-in-nodejs-629ded063535.
@@ -559,4 +564,53 @@ export function getWorkspaceFolder(uri: Uri): WorkspaceFolder {
 		uri: Uri.file(path.dirname(uri.fsPath)),
 		index: undefined
 	}
+}
+
+export async function getShardTargetForFile(document: TextDocument): Promise<string> {
+	const compiler = await getCompilerPath();
+	const space = getWorkspaceFolder(document.uri);
+	const targets = getShardYmlTargets(space);
+
+	if (!targets) return;
+
+	for (const target of targets) {
+		const targetPath = path.resolve(space.uri.fsPath, target)
+		if (!existsSync(targetPath)) continue;
+
+		const cmd = `${shellEscape(compiler)} tool dependencies ${shellEscape(targetPath)} -f flat --no-color`
+		crystalOutputChannel.appendLine(`[Dependencies] ${space.name} $ ${cmd}`)
+
+		const response = await execAsync(cmd, space.uri.fsPath)
+			.catch((err) => {
+				findProblems(err, document.uri);
+				crystalOutputChannel.appendLine(`[Dependencies] error: ${JSON.stringify(err)}`);
+			})
+
+		if (!response) continue;
+		const dependencies = response.split(/\r?\n/)
+
+		for (const line of dependencies) {
+			if (path.resolve(space.uri.fsPath, line) == document.uri.fsPath) {
+				return path.resolve(space.uri.fsPath, line);
+			}
+		}
+	}
+
+	return
+}
+
+function getShardYmlTargets(space: WorkspaceFolder): string[] {
+	const shardFile = getShardFile(space)
+
+	if (existsSync(shardFile)) {
+		const io = readFileSync(shardFile, 'utf8')
+		const data = yaml.parse(io)
+
+		if (data.targets !== undefined) {
+			const values = Object.keys(data.targets).map(key => data.targets[key])
+			return values.map(v => v.main)
+		}
+	}
+
+	return []
 }

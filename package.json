@@ -170,13 +170,33 @@
 				},
 				"crystal-lang.main": {
 					"type": "string",
-					"default": "",
+					"default": null,
 					"description": "Specify the main file for the tools.\nDoes not work with multi-root workspaces."
 				},
 				"crystal-lang.spec-explorer": {
 					"type": "boolean",
-					"default": "true",
+					"default": false,
 					"description": "[Reload required]\nShow specs in the Test Explorer."
+				},
+				"crystal-lang.hover": {
+					"type": "boolean",
+					"default": true,
+					"description": "[Reload required]\nShow type information on hover."
+				},
+				"crystal-lang.definitions": {
+					"type": "boolean",
+					"default": true,
+					"description": "[Reload required]\nEnables jump to definition."
+				},
+				"crystal-lang.problems": {
+					"type": "boolean",
+					"default": true,
+					"description": "[Reload required]\nEnable problems finder. Runs the Crystal compiler on save and reports any problems found."
+				},
+				"crystal-lang.dependencies": {
+					"type": "boolean",
+					"default": true,
+					"description": "Use the dependencies tool to determine main for each file. Can be slow."
 				}
 			}
 		},

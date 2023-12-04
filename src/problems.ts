@@ -1,5 +1,5 @@
 import { workspace } from "vscode";
-import { setStatusBar, spawnProblemsTool, compiler_mutex } from "./tools";
+import { setStatusBar, spawnProblemsTool, compiler_mutex, crystalOutputChannel } from "./tools";
 
 export function registerProblems(): void {
     workspace.onDidSaveTextDocument((e) => {
@@ -11,6 +11,9 @@ export function registerProblems(): void {
             compiler_mutex.acquire()
                 .then((release) => {
                     spawnProblemsTool(e)
+                        .catch((err) => {
+                            crystalOutputChannel.appendLine(`[Problems] Error: ${JSON.stringify(err)}`)
+                        })
                         .finally(() => {
                             release()
                         })
