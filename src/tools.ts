@@ -484,7 +484,7 @@ export async function findProblems(response: string, uri: Uri): Promise<void> {
 }
 
 export async function findProblemsRaw(response: string, uri: Uri): Promise<void> {
-	if (response === undefined) return;
+	if (!response) return;
 
 	const responseData = response.match(/(?:.*)in '?(.*):(\d+):(\d+)'?:?([^]*)$/mi)
 
@@ -540,7 +540,7 @@ export async function spawnProblemsTool(document: TextDocument): Promise<void> {
 			findProblems(err.stderr, document.uri)
 			try {
 				const parsed = JSON.parse(err.stderr)
-				crystalOutputChannel.appendLine(`[Problems] Error: ${parsed}`)
+				crystalOutputChannel.appendLine(`[Problems] Error: ${err.stderr}`)
 			} catch {
 				crystalOutputChannel.appendLine(`[Problems] Error: ${JSON.stringify(err)}`)
 			}
@@ -582,8 +582,8 @@ export async function getShardTargetForFile(document: TextDocument): Promise<str
 
 		const response = await execAsync(cmd, space.uri.fsPath)
 			.catch((err) => {
-				findProblems(err, document.uri);
-				crystalOutputChannel.appendLine(`[Dependencies] error: ${JSON.stringify(err)}`);
+				findProblems(err.stderr, document.uri);
+				crystalOutputChannel.appendLine(`[Dependencies] error: ${err.stderr}`);
 			})
 
 		if (!response) continue;
