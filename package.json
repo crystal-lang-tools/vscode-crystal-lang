@@ -178,6 +178,11 @@
 					"default": false,
 					"description": "[Reload required]\nShow specs in the Test Explorer."
 				},
+				"crystal-lang.spec-tags": {
+					"type": "string",
+					"default": "",
+					"description": "Tags to pass to the spec runner, i.e. '--tag hello --tag ~world'"
+				},
 				"crystal-lang.hover": {
 					"type": "boolean",
 					"default": true,
@@ -197,6 +202,11 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Use the dependencies tool to determine main for each file. Can be slow."
+				},
+				"crystal-lang.flags": {
+					"type": "string",
+					"default": "",
+					"description": "Compile-time flags to pass to the compiler, i.e. '-Dflag1 -Dflag2'.\nFlags are shared across multi-root workspaces."
 				}
 			}
 		},

@@ -84,7 +84,7 @@ export function getMainFile(folder: WorkspaceFolder): string {
 		}
 	}
 
-	const defaultMainFile = workspace.getConfiguration('crystal-lang', folder.uri).get<string>('mainFile', 'main.cr')
+	const defaultMainFile = workspace.getConfiguration('crystal-lang', folder.uri).get<string>('main', 'src/*.cr')
 	return defaultMainFile
 }
 
@@ -253,9 +253,10 @@ export async function spawnImplTool(
 	position: Position
 ): Promise<ImplResponse> {
 	const compiler = await getCompilerPath();
+	const config = workspace.getConfiguration('crystal-lang');
 	const cursor = getCursorPath(document, position);
 	const main = await getShardMainPath(document);
-	const cmd = `${shellEscape(compiler)} tool implementations -c ${shellEscape(cursor)} ${shellEscape(main)} -f json --no-color`
+	const cmd = `${shellEscape(compiler)} tool implementations -c ${shellEscape(cursor)} ${shellEscape(main)} -f json --no-color ${config.get<string>("flags")}`
 	const folder: WorkspaceFolder = getWorkspaceFolder(document.uri)
 
 	crystalOutputChannel.appendLine(`[Implementations] (${folder.name}) $ ${cmd}`);
@@ -285,10 +286,11 @@ export async function spawnContextTool(
 ): Promise<ContextResponse> {
 	const compiler = await getCompilerPath();
 	const cursor = getCursorPath(document, position);
+	const config = workspace.getConfiguration('crystal-lang');
 	// Spec files shouldn't have main set to something in src/
 	// but are instead their own main files
 	const main = await getShardMainPath(document);
-	const cmd = `${shellEscape(compiler)} tool context -c ${shellEscape(cursor)} ${shellEscape(main)} -f json --no-color`
+	const cmd = `${shellEscape(compiler)} tool context -c ${shellEscape(cursor)} ${shellEscape(main)} -f json --no-color  ${config.get<string>("flags")}`
 	const folder = getWorkspaceFolder(document.uri)
 
 	crystalOutputChannel.appendLine(`[Context] (${folder.name}) $ ${cmd}`);
@@ -324,19 +326,20 @@ export type TestCase = junit2json.TestCase & {
 
 // Runs `crystal spec --junit temp_file`
 export async function spawnSpecTool(
-	workspace: WorkspaceFolder,
+	space: WorkspaceFolder,
 	dry_run: boolean = false,
 	paths?: string[]
 ): Promise<TestSuite | void> {
 	// Get compiler stuff
 	const compiler = await getCompilerPath();
 	const compiler_version = await getCrystalVersion();
+	const config = workspace.getConfiguration('crystal-lang');
 
 	// create a tempfile
 	const tempFile = temp.path({ suffix: ".xml" })
 
 	// execute crystal spec
-	var cmd = `${shellEscape(compiler)} spec --junit_output ${shellEscape(tempFile)} --no-color`;
+	var cmd = `${shellEscape(compiler)} spec --junit_output ${shellEscape(tempFile)} --no-color ${config.get<string>("flags")} ${config.get<string>("spec-tags")}`;
 	// Only valid for Crystal >= 1.11
 	if (dry_run && compiler_version.minor > 10) {
 		cmd += ` --dry-run`
@@ -344,9 +347,9 @@ export async function spawnSpecTool(
 	if (paths) {
 		cmd += ` ${paths.map((i) => shellEscape(i)).join(" ")}`
 	}
-	crystalOutputChannel.appendLine(`[Spec] (${workspace.name}) $ ` + cmd);
+	crystalOutputChannel.appendLine(`[Spec] (${space.name}) $ ` + cmd);
 
-	await execAsync(cmd, workspace.uri.fsPath).catch((err) => {
+	await execAsync(cmd, space.uri.fsPath).catch((err) => {
 		if (err.stderr) {
 			findProblems(err.stderr, undefined)
 		} else if (err.message) {
@@ -404,8 +407,9 @@ export async function spawnMacroExpandTool(document: TextDocument, position: Pos
 	const main = await getShardMainPath(document);
 	const cursor = getCursorPath(document, position);
 	const folder = getWorkspaceFolder(document.uri);
+	const config = workspace.getConfiguration('crystal-lang');
 
-	const cmd = `${shellEscape(compiler)} tool expand ${shellEscape(main)} --cursor ${shellEscape(cursor)}`
+	const cmd = `${shellEscape(compiler)} tool expand ${shellEscape(main)} --cursor ${shellEscape(cursor)} ${config.get<string>("flags")}`
 
 	crystalOutputChannel.appendLine(`[Macro Expansion] (${folder.name}) $ ` + cmd)
 	return await execAsync(cmd, folder.uri.fsPath)
@@ -520,7 +524,9 @@ export async function findProblemsRaw(response: string, uri: Uri): Promise<void>
 export async function spawnProblemsTool(document: TextDocument): Promise<void> {
 	const compiler = await getCompilerPath();
 	const main = await getShardMainPath(document);
-	const folder = getWorkspaceFolder(document.uri).uri.fsPath
+	const folder = getWorkspaceFolder(document.uri).uri.fsPath;
+	const config = workspace.getConfiguration('crystal-lang');
+
 	// If document is in a folder of the same name as the document, it will throw an
 	// error about not being able to use an output filename of '...' as it's a folder.
 	// This is probably a bug as the --no-codegen flag is set, there is no output.
@@ -529,7 +535,7 @@ export async function spawnProblemsTool(document: TextDocument): Promise<void> {
 	//
 	const output = process.platform === "win32" ? "nul" : "/dev/null"
 
-	const cmd = `${shellEscape(compiler)} build ${shellEscape(main)} --no-debug --no-color --no-codegen --error-trace -f json -o ${output}`
+	const cmd = `${shellEscape(compiler)} build ${shellEscape(main)} --no-debug --no-color --no-codegen --error-trace -f json -o ${output} ${config.get<string>("flags")}`
 
 	crystalOutputChannel.appendLine(`[Problems] (${getWorkspaceFolder(document.uri).name}) $ ` + cmd)
 	await execAsync(cmd, folder)
@@ -570,6 +576,7 @@ export async function getShardTargetForFile(document: TextDocument): Promise<str
 	const compiler = await getCompilerPath();
 	const space = getWorkspaceFolder(document.uri);
 	const targets = getShardYmlTargets(space);
+	const config = workspace.getConfiguration('crystal-lang');
 
 	if (!targets) return;
 
@@ -577,7 +584,7 @@ export async function getShardTargetForFile(document: TextDocument): Promise<str
 		const targetPath = path.resolve(space.uri.fsPath, target)
 		if (!existsSync(targetPath)) continue;
 
-		const cmd = `${shellEscape(compiler)} tool dependencies ${shellEscape(targetPath)} -f flat --no-color`
+		const cmd = `${shellEscape(compiler)} tool dependencies ${shellEscape(targetPath)} -f flat --no-color ${config.get<string>("flags")}`
 		crystalOutputChannel.appendLine(`[Dependencies] ${space.name} $ ${cmd}`)
 
 		const response = await execAsync(cmd, space.uri.fsPath)
