@@ -10,7 +10,8 @@ import {
 	TextEdit,
 	window,
 } from 'vscode';
-import { crystalOutputChannel, setStatusBar, spawnFormatTool } from './tools';
+import { crystalOutputChannel, findProblemsRaw, getCompilerPath, setStatusBar } from './tools';
+import { spawn } from 'child_process';
 
 export function getFormatRange(document: TextDocument): Range {
 	return new Range(
@@ -55,4 +56,42 @@ export function registerFormatter(
 			new CrystalFormattingEditProvider()
 		)
 	);
+}
+
+async function spawnFormatTool(document: TextDocument): Promise<string> {
+	const compiler = await getCompilerPath();
+
+	return await new Promise((res, rej) => {
+		const child = spawn(
+			compiler,
+			['tool', 'format', '--no-color', '-'],
+			{ shell: process.platform == "win32" }
+		);
+
+		child.stdin.write(document.getText());
+		child.stdin.end();
+
+		const out: string[] = [];
+		const err: string[] = [];
+
+		child.stdout
+			.setEncoding('utf-8')
+			.on('data', d => out.push(d));
+
+		child.stderr
+			.setEncoding('utf-8')
+			.on('data', d => err.push(d));
+
+		child.on('close', () => {
+			if (err.length > 0) {
+				const err_resp = err.join('')
+				findProblemsRaw(err_resp, document.uri)
+				rej(err_resp);
+				return;
+			}
+			const out_resp = out.join('')
+			findProblemsRaw(out_resp, document.uri)
+			res(out_resp);
+		})
+	});
 }

@@ -26,10 +26,13 @@ class CrystalCompletionItemProvider implements CompletionItemProvider {
 		context: CompletionContext
 	): Promise<CompletionItem[] | CompletionList<CompletionItem>> {
 		this.completions = [];
+
 		// TODO: These should be added where types or classes are appropriate
-		// this.push(globals.CLASSES, SymbolKind.Class);
-		// this.push(globals.MODULES, SymbolKind.Module);
-		// this.push(globals.STRUCTS, SymbolKind.Struct);
+		if (context.triggerCharacter == " ") {
+			this.push(globals.CLASSES, SymbolKind.Class);
+			this.push(globals.MODULES, SymbolKind.Module);
+			this.push(globals.STRUCTS, SymbolKind.Struct);
+		}
 
 		const line = document.lineAt(position.line);
 		if (!line || /^#(?!{).+/.test(line.text)) return [];
@@ -120,7 +123,8 @@ export function registerCompletion(
 			selector,
 			new CrystalCompletionItemProvider(),
 			'.',
-			'::'
+			'::',
+			' '
 		)
 	);
 }

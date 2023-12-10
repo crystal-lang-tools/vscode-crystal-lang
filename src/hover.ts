@@ -15,17 +15,19 @@ import {
 } from 'vscode';
 import { KEYWORDS } from './definitions/index';
 import {
-	ContextError,
 	crystalOutputChannel,
 	findProblems,
 	getCrystalLibPath,
 	getMainForShard,
 	setStatusBar,
-	spawnContextTool,
 	compiler_mutex,
-	getWorkspaceFolder
+	getWorkspaceFolder,
+	getCompilerPath,
+	execAsync,
+	getCursorPath,
+	getShardMainPath,
+	shellEscape
 } from './tools';
-import { Document } from 'yaml';
 import { crystalConfiguration } from './extension';
 
 class CrystalHoverProvider implements HoverProvider {
@@ -240,4 +242,44 @@ export function registerHover(
 	context.subscriptions.push(
 		languages.registerHoverProvider(selector, new CrystalHoverProvider())
 	);
+}
+
+
+interface ContextResponse {
+	status: string;
+	message: string;
+	contexts?: Record<string, string>[];
+}
+
+interface ContextError {
+	file: string;
+	line: number;
+	column: number;
+	message: string;
+}
+
+async function spawnContextTool(
+	document: TextDocument,
+	position: Position,
+	dry_run: boolean = false
+): Promise<ContextResponse> {
+	const compiler = await getCompilerPath();
+	const cursor = getCursorPath(document, position);
+	const config = workspace.getConfiguration('crystal-lang');
+	// Spec files shouldn't have main set to something in src/
+	// but are instead their own main files
+	const main = await getShardMainPath(document);
+	const cmd = `${shellEscape(compiler)} tool context -c ${shellEscape(cursor)} ${shellEscape(main)} -f json --no-color  ${config.get<string>("flags")}`
+	const folder = getWorkspaceFolder(document.uri)
+
+	crystalOutputChannel.appendLine(`[Context] (${folder.name}) $ ${cmd}`);
+
+	return await execAsync(cmd, folder.uri.fsPath)
+		.then((response) => {
+			findProblems(response, document.uri);
+			return JSON.parse(response);
+		}).catch((err) => {
+			findProblems(err.stderr, document.uri);
+			crystalOutputChannel.appendLine(`[Context] error: ${err.stderr}`)
+		})
 }

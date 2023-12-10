@@ -12,8 +12,10 @@ import {
 	Position,
 	TextDocument,
 	Uri,
+	workspace,
+	WorkspaceFolder,
 } from 'vscode';
-import { crystalOutputChannel, findProblems, spawnImplTool } from './tools';
+import { crystalOutputChannel, execAsync, findProblems, getCompilerPath, getCursorPath, getShardMainPath, getWorkspaceFolder, shellEscape } from './tools';
 
 class CrystalDefinitionProvider implements DefinitionProvider {
 	async provideDefinition(
@@ -84,5 +86,33 @@ export function registerDefinitions(
 			selector,
 			new CrystalDefinitionProvider()
 		)
+	);
+}
+
+interface ImplResponse {
+	status: string;
+	message: string;
+	implementations?: {
+		line: number;
+		column: number;
+		filename: string;
+	}[];
+}
+
+async function spawnImplTool(
+	document: TextDocument,
+	position: Position
+): Promise<ImplResponse> {
+	const compiler = await getCompilerPath();
+	const config = workspace.getConfiguration('crystal-lang');
+	const cursor = getCursorPath(document, position);
+	const main = await getShardMainPath(document);
+	const cmd = `${shellEscape(compiler)} tool implementations -c ${shellEscape(cursor)} ${shellEscape(main)} -f json --no-color ${config.get<string>("flags")}`
+	const folder: WorkspaceFolder = getWorkspaceFolder(document.uri)
+
+	crystalOutputChannel.appendLine(`[Implementations] (${folder.name}) $ ${cmd}`);
+
+	return JSON.parse(
+		await execAsync(cmd, folder.uri.fsPath)
 	);
 }

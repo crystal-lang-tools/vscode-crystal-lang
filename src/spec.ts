@@ -1,9 +1,10 @@
 import { tests, TestItem, Range, Position, Uri, WorkspaceFolder, workspace, TestRunProfileKind, TestMessage, TestRun, TestRunRequest } from "vscode";
 import * as junit2json from 'junit2json';
 import * as path from 'path';
-import { TestSuite, TestCase, setStatusBar, spawnSpecTool, crystalOutputChannel, getWorkspaceFolder } from "./tools";
-import { existsSync } from "fs";
+import { setStatusBar, crystalOutputChannel, getWorkspaceFolder, execAsync, findProblems, getCompilerPath, shellEscape, getCrystalVersion } from "./tools";
+import { existsSync, readFile } from "fs";
 import { Mutex } from "async-mutex";
+import temp = require("temp");
 
 const spec_runner_mutex = new Mutex();
 
@@ -329,4 +330,102 @@ export class CrystalTestingProvider {
             }
         })
     }
+}
+
+
+export type TestSuite = junit2json.TestSuite & {
+    tests?: number;
+    skipped?: number;
+    errors?: number;
+    failures?: number;
+    time?: number;
+    timestamp?: string;
+    hostname?: string;
+    testcase?: TestCase[];
+}
+
+export type TestCase = junit2json.TestCase & {
+    file?: string;
+    classname?: string;
+    name?: string;
+    line?: number;
+    time?: number;
+}
+
+// Runs `crystal spec --junit temp_file`
+export async function spawnSpecTool(
+    space: WorkspaceFolder,
+    dry_run: boolean = false,
+    paths?: string[]
+): Promise<TestSuite | void> {
+    // Get compiler stuff
+    const compiler = await getCompilerPath();
+    const compiler_version = await getCrystalVersion();
+    const config = workspace.getConfiguration('crystal-lang');
+
+    // create a tempfile
+    const tempFile = temp.path({ suffix: ".xml" })
+
+    // execute crystal spec
+    var cmd = `${shellEscape(compiler)} spec --junit_output ${shellEscape(tempFile)} --no-color ${config.get<string>("flags")} ${config.get<string>("spec-tags")}`;
+    // Only valid for Crystal >= 1.11
+    if (dry_run && compiler_version.minor > 10) {
+        cmd += ` --dry-run`
+    }
+    if (paths) {
+        cmd += ` ${paths.map((i) => shellEscape(i)).join(" ")}`
+    }
+    crystalOutputChannel.appendLine(`[Spec] (${space.name}) $ ` + cmd);
+
+    await execAsync(cmd, space.uri.fsPath).catch((err) => {
+        if (err.stderr) {
+            findProblems(err.stderr, undefined)
+        } else if (err.message) {
+            crystalOutputChannel.appendLine(`[Spec] Error: ${err.message}`)
+        } else {
+            crystalOutputChannel.appendLine(`[Spec] Error: ${err.stdout}`)
+        }
+    });
+
+    return readSpecResults(tempFile).then(async (results) => {
+        return parseJunit(results);
+    }).catch((err) => {
+        if (err.message) {
+            crystalOutputChannel.appendLine(`[Spec] Error: ${err.message}`)
+        } else {
+            crystalOutputChannel.appendLine(`[Spec] Error: ${JSON.stringify(err)}`)
+        }
+    });
+}
+
+function readSpecResults(file: string): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+        try {
+            if (!existsSync(file)) {
+                reject(new Error("Test results file doesn't exist"));
+                return;
+            }
+
+            readFile(file, (error, data) => {
+                if (error) {
+                    reject(new Error("Error reading test results file: " + error.message));
+                } else {
+                    resolve(data);
+                }
+            })
+        } catch (err) {
+            reject(err);
+        }
+    })
+}
+
+function parseJunit(rawXml: Buffer): Promise<junit2json.TestSuite> {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const output = await junit2json.parse(rawXml);
+            resolve(output as TestSuite);
+        } catch (err) {
+            reject(err)
+        }
+    })
 }
