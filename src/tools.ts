@@ -226,12 +226,12 @@ export async function spawnFormatTool(document: TextDocument): Promise<string> {
 
 		child.on('close', () => {
 			if (err.length > 0) {
-				const err_resp = err.join()
+				const err_resp = err.join('')
 				findProblemsRaw(err_resp, document.uri)
 				rej(err_resp);
 				return;
 			}
-			const out_resp = out.join()
+			const out_resp = out.join('')
 			findProblemsRaw(out_resp, document.uri)
 			res(out_resp);
 		})
