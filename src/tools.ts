@@ -1,11 +1,9 @@
-import { ChildProcess, ExecException, exec, spawn } from 'child_process';
-import { existsSync, readFile, readFileSync } from 'fs';
+import { ChildProcess, ExecException, exec } from 'child_process';
+import { existsSync, readFileSync } from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
 import { Position, TextDocument, WorkspaceFolder, window, workspace, Uri, languages, Range, Diagnostic, DiagnosticSeverity } from 'vscode';
 import * as yaml from 'yaml';
-import * as junit2json from 'junit2json';
-import * as temp from 'temp';
 import { cwd } from 'process';
 import { Mutex } from 'async-mutex';
 
@@ -349,6 +347,8 @@ interface ErrorResponse {
  * @return {*}  {Promise<void>}
  */
 export async function findProblems(response: string, uri: Uri): Promise<void> {
+	const space = getWorkspaceFolder(uri);
+
 	let diagnostics = []
 	var parsedResponses: ErrorResponse[];
 	try {
@@ -367,7 +367,12 @@ export async function findProblems(response: string, uri: Uri): Promise<void> {
 				resp.size = 0
 			const range = new Range(resp.line - 1, resp.column - 1, resp.line - 1, (resp.column + resp.size) - 1)
 			const diagnostic = new Diagnostic(range, resp.message, DiagnosticSeverity.Error)
-			diagnostics.push([Uri.file(resp.file), [diagnostic]])
+			var diag_uri = Uri.file(resp.file)
+			if (!path.isAbsolute(resp.file)) {
+				diag_uri = Uri.file(path.resolve(space.uri.fsPath, resp.file))
+			}
+
+			diagnostics.push([diag_uri, [diagnostic]])
 		}
 	}
 
@@ -390,12 +395,14 @@ export async function findProblems(response: string, uri: Uri): Promise<void> {
 export async function findProblemsRaw(response: string, uri: Uri): Promise<void> {
 	if (!response) return;
 
+	const space = getWorkspaceFolder(uri);
 	const responseData = response.match(/(?:.*)in '?(.*):(\d+):(\d+)'?:?([^]*)$/mi)
 
 	let parsedLine = 0
 	try {
 		parsedLine = parseInt(responseData[1])
 	} catch {
+		diagnosticCollection.delete(uri)
 		return;
 	}
 
@@ -411,7 +418,12 @@ export async function findProblemsRaw(response: string, uri: Uri): Promise<void>
 
 		const range = new Range(resp.line - 1, resp.column - 1, resp.line - 1, resp.column - 1)
 		const diagnostic = new Diagnostic(range, resp.message, DiagnosticSeverity.Error)
-		diagnostics.push([Uri.file(resp.file), [diagnostic]])
+		var diag_uri = Uri.file(resp.file)
+		if (!path.isAbsolute(resp.file)) {
+			diag_uri = Uri.file(path.resolve(space.uri.fsPath, resp.file))
+		}
+
+		diagnostics.push([diag_uri, [diagnostic]])
 	}
 
 	if (diagnostics.length == 0) {
@@ -491,7 +503,7 @@ export async function getShardTargetForFile(document: TextDocument): Promise<str
 
 		for (const line of dependencies) {
 			if (path.resolve(space.uri.fsPath, line) == document.uri.fsPath) {
-				return path.resolve(space.uri.fsPath, line);
+				return path.resolve(space.uri.fsPath, target);
 			}
 		}
 	}

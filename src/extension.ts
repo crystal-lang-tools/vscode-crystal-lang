@@ -18,7 +18,10 @@ import { existsSync } from 'fs';
 import { LanguageClient, LanguageClientOptions, DocumentSelector, MessageTransports, ServerOptions } from "vscode-languageclient/node"
 import { registerProblems } from './problems';
 
-const selector: DocumentSelector = [{ language: 'crystal', scheme: 'file' }];
+const selector: DocumentSelector = [
+	{ language: 'crystal', scheme: 'file' },
+	{ language: 'ecr', scheme: 'file' }
+];
 
 export const crystalConfiguration = <LanguageConfiguration>{
 	comments: { lineComment: '#' },

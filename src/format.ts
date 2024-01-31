@@ -8,7 +8,6 @@ import {
 	Range,
 	TextDocument,
 	TextEdit,
-	window,
 } from 'vscode';
 import { crystalOutputChannel, findProblemsRaw, getCompilerPath, setStatusBar } from './tools';
 import { spawn } from 'child_process';
@@ -28,6 +27,8 @@ class CrystalFormattingEditProvider implements DocumentFormattingEditProvider {
 		options: FormattingOptions,
 		token: CancellationToken
 	): Promise<TextEdit[]> {
+		if (document.fileName.endsWith(".ecr")) return;
+
 		const dispose = setStatusBar('running format tool...');
 		try {
 			crystalOutputChannel.appendLine('[Format] formatting...');

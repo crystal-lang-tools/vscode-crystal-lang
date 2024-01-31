@@ -44,6 +44,8 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
 		this.symbols = [];
 		this.container = [];
 
+		if (document.fileName.endsWith(".ecr")) return;
+
 		const lines = document
 			.getText()
 			.split(/\r?\n/);
