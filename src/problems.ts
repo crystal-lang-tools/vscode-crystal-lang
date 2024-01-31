@@ -3,7 +3,7 @@ import { setStatusBar, compiler_mutex, crystalOutputChannel, diagnosticCollectio
 
 export function registerProblems(): void {
     workspace.onDidSaveTextDocument((e) => {
-        if (e.uri.scheme === "file" && (e.fileName.endsWith(".cr") || e.fileName.endsWith(".ecr"))) {
+        if (e.uri && e.uri.scheme === "file" && (e.fileName.endsWith(".cr") || e.fileName.endsWith(".ecr"))) {
             if (compiler_mutex.isLocked()) return;
 
             const dispose = setStatusBar('finding problems...');

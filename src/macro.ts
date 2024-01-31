@@ -1,6 +1,8 @@
 import { Position, TextDocument, commands, window, workspace } from 'vscode';
 import { crystalOutputChannel, execAsync, findProblems, getCompilerPath, getCursorPath, getShardMainPath, getWorkspaceFolder, shellEscape } from './tools';
 
+export const macroOutputChannel = window.createOutputChannel("Crystal Macro", "markdown")
+
 export function registerMacroExpansion() {
     commands.registerCommand('crystal-lang.showMacroExpansion', async function () {
         const activeEditor = window.activeTextEditor;
@@ -17,11 +19,11 @@ export function registerMacroExpansion() {
             })
 
         if (response) {
-            crystalOutputChannel.appendLine("```crystal\n" + response + "\n```")
+            macroOutputChannel.appendLine("```crystal\n" + response + "```\n")
         } else {
-            crystalOutputChannel.appendLine("# No macro expansion found")
+            macroOutputChannel.appendLine("# No macro expansion found")
         }
-        crystalOutputChannel.show()
+        macroOutputChannel.show()
     })
 }
 
