@@ -1,10 +1,30 @@
 # Change Log
 
-## [Unreleased]
-The Changelog will be updated on the upcoming v1.0 release
+## [0.9.0] - 2024-02-01
 
-### Todo
-- See [roadmap](https://github.com/crystal-lang-tools/vscode-crystal-lang/wiki/Roadmap).
+### Fix
+
+- Color change when adding return type to class method [#157](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/157)
+- Error executing Crystal plugin. spawn crystal ENOENT [#102](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/102),
+  Error executing Crystal plugin. spawn bash ENOENT in Windows [#172](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/172)
+- Auto-formatting issue with some keywords [#158](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/102)
+- Hover feature does not work with Windows11 PC and v0.8.4 of the extension (Native Windows Crystal, not WSL) [#176](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/176)
+- With compiler path set properly still get error upon opening first .cr file [#177](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/177)
+- Max processes not respected (there's now only one instance of the compiler running at once) [#122](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/122)
+- Use a separate task provider for shards (thanks @refi64) [#145](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/145)
+- Stop the LSP when the extension is shutting down, where previously it would just stay on / active
+
+### Add
+
+- Ability to view and debug expanded source code from macros [#4](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/4)
+- Add support for Jump to Definition [#42](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/42)
+- Crystal support in Markdown code blocks [#56](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/56)
+- Add Crystal Specs to native Testing UI (disabled by default for user-experience) [#163](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/163)
+- Supporting mutiple main files (entry points) for a single project [#175](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/175)
+- Add unused variable highlighting (thanks @grkek) [#155](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/155)
+- make Crystal grammar compatible with TextMate (thanks @WhereIsX) [#150](https://github.com/crystal-lang-tools/vscode-crystal-lang/pull/150)
+- GitHub Codespaces support (as long as Crystal is installed)
+- Show problems in ECR files
 
 ## [0.6.0] - 2020-09-19
 
