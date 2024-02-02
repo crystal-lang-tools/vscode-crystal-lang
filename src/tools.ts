@@ -219,10 +219,7 @@ export async function getShardMainPath(document: TextDocument): Promise<string> 
 	if (config.get("dependencies")) {
 		const shardTarget = await getShardTargetForFile(document)
 		if (shardTarget) return shardTarget;
-	}
-
-	// If this is a crystal project
-	if (existsSync(fp)) {
+	} else if (existsSync(fp)) {
 		const shard_yml = readFileSync(fp, 'utf-8')
 		const shard = yaml.parse(shard_yml) as Shard;
 
@@ -502,7 +499,7 @@ export async function getShardTargetForFile(document: TextDocument): Promise<str
 		const dependencies = response.split(/\r?\n/)
 
 		for (const line of dependencies) {
-			if (path.resolve(space.uri.fsPath, line) == document.uri.fsPath) {
+			if (path.resolve(space.uri.fsPath, line.trim()) == document.uri.fsPath) {
 				return path.resolve(space.uri.fsPath, target);
 			}
 		}
