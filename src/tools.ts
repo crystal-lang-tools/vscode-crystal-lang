@@ -6,6 +6,7 @@ import { Position, TextDocument, WorkspaceFolder, window, workspace, Uri, langua
 import * as yaml from 'yaml';
 import { cwd } from 'process';
 import { Mutex } from 'async-mutex';
+import { spawnProblemsTool } from './problems';
 
 export const crystalOutputChannel = window.createOutputChannel("Crystal", "log")
 
@@ -218,7 +219,8 @@ export async function getShardMainPath(document: TextDocument): Promise<string> 
 
 	if (config.get("dependencies")) {
 		const shardTarget = await getShardTargetForFile(document)
-		if (shardTarget) return shardTarget;
+		if (shardTarget.response) return shardTarget.response;
+		if (shardTarget.error) return;
 	} else if (existsSync(fp)) {
 		const shard_yml = readFileSync(fp, 'utf-8')
 		const shard = yaml.parse(shard_yml) as Shard;
@@ -474,7 +476,7 @@ export function getWorkspaceFolder(uri: Uri): WorkspaceFolder {
  * @param {TextDocument} document
  * @return {*}  {Promise<string>}
  */
-export async function getShardTargetForFile(document: TextDocument): Promise<string> {
+export async function getShardTargetForFile(document: TextDocument): Promise<{ response, error }> {
 	const compiler = await getCompilerPath();
 	const space = getWorkspaceFolder(document.uri);
 	const targets = getShardYmlTargets(space);
@@ -488,24 +490,30 @@ export async function getShardTargetForFile(document: TextDocument): Promise<str
 
 		const cmd = `${shellEscape(compiler)} tool dependencies ${shellEscape(targetPath)} -f flat --no-color ${config.get<string>("flags")}`
 		crystalOutputChannel.appendLine(`[Dependencies] ${space.name} $ ${cmd}`)
+		const targetDocument = await workspace.openTextDocument(Uri.parse(targetPath))
 
-		const response = await execAsync(cmd, space.uri.fsPath)
+		const result = await execAsync(cmd, space.uri.fsPath)
+			.then((resp) => {
+				return { response: resp, error: undefined };
+			})
 			.catch((err) => {
-				findProblems(err.stderr, document.uri);
+				spawnProblemsTool(targetDocument, target);
 				crystalOutputChannel.appendLine(`[Dependencies] error: ${err.stderr}`);
+				return { response: undefined, error: err };
 			})
 
-		if (!response) continue;
-		const dependencies = response.split(/\r?\n/)
+		if (result.error) return { response: undefined, error: result.error };
+		if (!result) continue;
+		const dependencies = result.response.split(/\r?\n/)
 
 		for (const line of dependencies) {
 			if (path.resolve(space.uri.fsPath, line.trim()) == document.uri.fsPath) {
-				return path.resolve(space.uri.fsPath, target);
+				return { response: path.resolve(space.uri.fsPath, target), error: undefined };
 			}
 		}
 	}
 
-	return
+	return { response: undefined, error: true };
 }
 
 /**

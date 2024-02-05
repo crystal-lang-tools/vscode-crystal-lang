@@ -37,9 +37,11 @@ async function handleDocument(document: TextDocument): Promise<void> {
   }
 }
 
-async function spawnProblemsTool(document: TextDocument): Promise<void> {
+export async function spawnProblemsTool(document: TextDocument, mainFile: string = undefined): Promise<void> {
   const compiler = await getCompilerPath();
-  const main = await getShardMainPath(document);
+  const main = mainFile || await getShardMainPath(document);
+  if (!main) return;
+
   const folder = getWorkspaceFolder(document.uri).uri.fsPath;
   const config = workspace.getConfiguration('crystal-lang');
 

@@ -30,6 +30,8 @@ export function registerMacroExpansion() {
 export async function spawnMacroExpandTool(document: TextDocument, position: Position): Promise<string | void> {
   const compiler = await getCompilerPath();
   const main = await getShardMainPath(document);
+  if (!main) return;
+
   const cursor = getCursorPath(document, position);
   const folder = getWorkspaceFolder(document.uri);
   const config = workspace.getConfiguration('crystal-lang');
