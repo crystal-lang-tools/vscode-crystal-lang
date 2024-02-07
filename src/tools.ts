@@ -214,7 +214,7 @@ export async function getShardMainPath(document: TextDocument): Promise<string> 
 	// Use main if provided and it exists
 	if (config.get("main")) {
 		const main = config.get<string>("main").replace("${workspaceRoot}", dir)
-		if (main.includes('*') || existsSync(main)) return main;
+		if (main.includes('*') || existsSync(path.resolve(dir, main))) return main;
 	}
 
 	if (config.get("dependencies")) {
