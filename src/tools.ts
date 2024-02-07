@@ -221,7 +221,9 @@ export async function getShardMainPath(document: TextDocument): Promise<string> 
 		const shardTarget = await getShardTargetForFile(document)
 		if (shardTarget.response) return shardTarget.response;
 		if (shardTarget.error) return;
-	} else if (existsSync(fp)) {
+	}
+
+	if (existsSync(fp)) {
 		const shard_yml = readFileSync(fp, 'utf-8')
 		const shard = yaml.parse(shard_yml) as Shard;
 
@@ -513,7 +515,7 @@ export async function getShardTargetForFile(document: TextDocument): Promise<{ r
 		}
 	}
 
-	return { response: undefined, error: true };
+	return { response: undefined, error: false };
 }
 
 /**

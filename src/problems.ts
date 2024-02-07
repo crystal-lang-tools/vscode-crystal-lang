@@ -1,9 +1,9 @@
-import { TextDocument, workspace } from "vscode";
+import { ExtensionContext, TextDocument, workspace } from "vscode";
 import { setStatusBar, compiler_mutex, crystalOutputChannel, diagnosticCollection, execAsync, findProblems, getCompilerPath, getShardMainPath, getWorkspaceFolder, shellEscape } from "./tools";
 
-export function registerProblems(): void {
-  workspace.onDidOpenTextDocument((e) => handleDocument(e))
-  workspace.onDidSaveTextDocument((e) => handleDocument(e))
+export function registerProblems(context: ExtensionContext): void {
+  workspace.onDidOpenTextDocument((e) => handleDocument(e), null, context.subscriptions)
+  workspace.onDidSaveTextDocument((e) => handleDocument(e), null, context.subscriptions)
 
   return;
 }

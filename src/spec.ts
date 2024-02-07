@@ -1,4 +1,4 @@
-import { tests, TestItem, Range, Position, Uri, WorkspaceFolder, workspace, TestRunProfileKind, TestMessage, TestRun, TestRunRequest } from "vscode";
+import { tests, TestItem, Range, Position, Uri, WorkspaceFolder, workspace, TestRunProfileKind, TestMessage, TestRun, TestRunRequest, ExtensionContext } from "vscode";
 import * as junit2json from 'junit2json';
 import * as path from 'path';
 import { setStatusBar, crystalOutputChannel, getWorkspaceFolder, execAsync, findProblems, getCompilerPath, shellEscape, getCrystalVersion } from "./tools";
@@ -20,7 +20,7 @@ export class CrystalTestingProvider {
     'Crystal Specs'
   )
 
-  constructor() {
+  constructor(context: ExtensionContext) {
     this.refreshSpecWorkspaceFolders()
     this.refreshTestCases()
 
@@ -30,7 +30,7 @@ export class CrystalTestingProvider {
         this.deleteTestItem(e.uri.fsPath);
         this.getTestCases(getWorkspaceFolder(e.uri), [e.uri.fsPath])
       }
-    });
+    }, null, context.subscriptions);
 
     workspace.onDidChangeWorkspaceFolders((event) => {
       this.refreshSpecWorkspaceFolders()

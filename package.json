@@ -207,6 +207,11 @@
 					"type": "string",
 					"default": "",
 					"description": "Compile-time flags to pass to the compiler, i.e. '-Dflag1 -Dflag2'.\nFlags are shared across multi-root workspaces."
+				},
+				"crystal-lang.usages": {
+					"type": "boolean",
+					"default": true,
+					"description": "[Reload required]\nShow method usages count next to their definitions."
 				}
 			}
 		},

@@ -4,9 +4,9 @@ import * as path from "path"
 
 // Copy from https://github.com/rust-lang/rls-vscode/blob/master/src/tasks.ts
 export function registerTasks(context: ExtensionContext): void {
-  workspace.onDidOpenTextDocument((doc) => DidOpenTextDocument(doc, context))
+  workspace.onDidOpenTextDocument((doc) => DidOpenTextDocument(doc, context), null, context.subscriptions)
   workspace.textDocuments.forEach((doc) => DidOpenTextDocument(doc, context))
-  workspace.onDidChangeWorkspaceFolders((e) => didChangeWorkspaceFolders(e, context));
+  workspace.onDidChangeWorkspaceFolders((e) => didChangeWorkspaceFolders(e, context), null, context.subscriptions);
 }
 
 export function DidOpenTextDocument(document: TextDocument, context: ExtensionContext): void {

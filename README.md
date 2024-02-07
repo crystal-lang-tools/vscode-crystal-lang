@@ -45,6 +45,7 @@ For debugging support, it's recommended to follow the guide [here](https://dev.t
 - `shards` - set a custom absolute path for the shards executable
 - `spec-explorer` - enable the built-in testing UI for specs, recommended for Crystal >= 1.11 due to `--dry-run` flag (reload required)
 - `spec-tags` - specific tags to pass to the spec runner
+- `usages` - show method usage counts next to their definitions
 
 By default, the problems runner, hover provider, and definitions provider are turned on. This may not be ideal for larger projects due to compile times and memory usage, so it is recommended to turn them off in the vscode settings. That can be done per-project by creating a `.vscode/settings.json` file with:
 
@@ -57,6 +58,7 @@ By default, the problems runner, hover provider, and definitions provider are tu
   "crystal-lang.hover": false,
   "crystal-lang.problems": false,
   "crystal-lang.spec-explorer": false,
+  "crystal-lang.usages": false,
 }
 ```
 

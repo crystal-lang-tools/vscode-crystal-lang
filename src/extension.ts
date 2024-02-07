@@ -17,6 +17,7 @@ import { registerTasks } from './tasks';
 import { existsSync } from 'fs';
 import { LanguageClient, LanguageClientOptions, DocumentSelector, MessageTransports, ServerOptions } from "vscode-languageclient/node"
 import { registerProblems } from './problems';
+import { registerUnreachable } from './unreachable';
 
 const selector: DocumentSelector = [
 	{ language: 'crystal', scheme: 'file' },
@@ -51,7 +52,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 	const lsp = config["server"]
 
 	// Specs enabled regardless of LSP support
-	if (config["spec-explorer"]) new CrystalTestingProvider();
+	if (config["spec-explorer"]) new CrystalTestingProvider(context);
 
 	// Language configuration independent of LSP
 	context.subscriptions.push(
@@ -82,7 +83,8 @@ export async function activate(context: ExtensionContext): Promise<void> {
 		registerTasks(context);
 		if (config["hover"]) registerHover(selector, context);
 		if (config["definitions"]) registerDefinitions(selector, context);
-		if (config["problems"]) registerProblems();
+		if (config["problems"]) registerProblems(context);
+		if (config["usages"]) registerUnreachable(selector, context);
 
 		crystalOutputChannel.appendLine('[Crystal] extension loaded');
 	}
