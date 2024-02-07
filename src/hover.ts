@@ -269,6 +269,8 @@ async function spawnContextTool(
 	// Spec files shouldn't have main set to something in src/
 	// but are instead their own main files
 	const main = await getShardMainPath(document);
+	if (!main) return;
+
 	const cmd = `${shellEscape(compiler)} tool context -c ${shellEscape(cursor)} ${shellEscape(main)} -f json --no-color  ${config.get<string>("flags")}`
 	const folder = getWorkspaceFolder(document.uri)
 

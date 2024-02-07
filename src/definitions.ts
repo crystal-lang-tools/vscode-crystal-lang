@@ -107,6 +107,8 @@ async function spawnImplTool(
 	const config = workspace.getConfiguration('crystal-lang');
 	const cursor = getCursorPath(document, position);
 	const main = await getShardMainPath(document);
+	if (!main) return;
+
 	const cmd = `${shellEscape(compiler)} tool implementations -c ${shellEscape(cursor)} ${shellEscape(main)} -f json --no-color ${config.get<string>("flags")}`
 	const folder: WorkspaceFolder = getWorkspaceFolder(document.uri)
 

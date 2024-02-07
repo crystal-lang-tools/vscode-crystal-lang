@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.9.1] - 2024-02-06
+
+### Fix
+
+- V 0.9 won't catch some errors [#183](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/183)
+- Spawn problem tool if `crystal tool dependencies` failed
+- General formatting
+
 ## [0.9.0] - 2024-02-01
 
 ### Fix
