@@ -7,11 +7,17 @@ export function registerUnreachable(
   context: ExtensionContext) {
   workspace.onDidOpenTextDocument((e) => handleDocument(e), null, context.subscriptions)
   workspace.onDidSaveTextDocument((e) => handleDocument(e), null, context.subscriptions)
+  window.onDidChangeActiveTextEditor(e => { if (e) handleDocument(e.document) }, null, context.subscriptions);
 }
 
 const decorationType = window.createTextEditorDecorationType({
-  textDecoration: 'underline #aaaaaa',
-  rangeBehavior: DecorationRangeBehavior.ClosedClosed
+  isWholeLine: true,
+  rangeBehavior: DecorationRangeBehavior.OpenOpen,
+  after: {
+    margin: '0 0 0 1em',
+    color: '#999',
+    fontStyle: 'italic',
+  }
 });
 
 interface UnreachableCode {
@@ -23,8 +29,6 @@ interface UnreachableCode {
 
 async function handleDocument(document: TextDocument) {
   if (document.uri && document.uri.scheme === "file" && (document.fileName.endsWith(".cr") || document.fileName.endsWith(".ecr"))) {
-    if (compiler_mutex.isLocked()) return;
-
     const dispose = setStatusBar('finding unreachable code...');
 
     compiler_mutex.acquire()
@@ -93,7 +97,16 @@ async function decorate(document: TextDocument, values: UnreachableCode[]) {
       new Position(line, col + methodSize)
     )
 
-    decorationsArray.push({ range, hoverMessage: `${value.count} usages` })
+    const decoration = {
+      range: range,
+      renderOptions: {
+        after: {
+          contentText: `# ${value.count} usages`
+        }
+      }
+    }
+
+    decorationsArray.push(decoration)
   }
 
   editor.setDecorations(decorationType, decorationsArray)
