@@ -30,6 +30,9 @@ class CrystalCompletionItemProvider implements CompletionItemProvider {
 	): Promise<CompletionItem[] | CompletionList<CompletionItem>> {
 		this.completions = [];
 
+		const line = document.lineAt(position.line);
+		if (!line || /^[ ]*#[ ]*(?!{).+/.test(line.text)) return [];
+
 		// TODO: These should be added where types or classes are appropriate
 		if (context.triggerCharacter == " ") {
 			this.push(COMPLETION_KEYWORDS, SymbolKind.Key);
@@ -37,9 +40,6 @@ class CrystalCompletionItemProvider implements CompletionItemProvider {
 			this.push(globals.MODULES, SymbolKind.Module);
 			this.push(globals.STRUCTS, SymbolKind.Struct);
 		}
-
-		const line = document.lineAt(position.line);
-		if (!line || /^#(?!{).+/.test(line.text)) return [];
 
 		const column = new Position(
 			position.line,
