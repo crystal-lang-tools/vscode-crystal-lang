@@ -379,7 +379,7 @@ export async function spawnSpecTool(
 
   await execAsync(cmd, space.uri.fsPath).catch((err) => {
     if (err.stderr) {
-      findProblems(err.stderr, undefined)
+      findProblems(err.stderr, space.uri)
     } else if (err.message) {
       crystalOutputChannel.appendLine(`[Spec] Error: ${err.message}`)
     } else {
