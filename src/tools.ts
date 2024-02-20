@@ -458,6 +458,8 @@ export function shellEscape(arg: string): string {
  * @return {*}  {WorkspaceFolder}
  */
 export function getWorkspaceFolder(uri: Uri): WorkspaceFolder {
+	if (!uri) throw new Error("Undefined URI");
+
 	const folder = workspace.getWorkspaceFolder(uri)
 	if (folder) return folder;
 
