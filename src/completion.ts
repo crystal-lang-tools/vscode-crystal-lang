@@ -15,6 +15,9 @@ import {
 } from 'vscode';
 import globals from './definitions/globals';
 import methods from './definitions/methods';
+import { KEYWORDS } from './definitions/index';
+
+const COMPLETION_KEYWORDS: string[][] = KEYWORDS.map((kw) => [kw, ""])
 
 class CrystalCompletionItemProvider implements CompletionItemProvider {
 	private completions: CompletionItem[];
@@ -29,6 +32,7 @@ class CrystalCompletionItemProvider implements CompletionItemProvider {
 
 		// TODO: These should be added where types or classes are appropriate
 		if (context.triggerCharacter == " ") {
+			this.push(COMPLETION_KEYWORDS, SymbolKind.Key);
 			this.push(globals.CLASSES, SymbolKind.Class);
 			this.push(globals.MODULES, SymbolKind.Module);
 			this.push(globals.STRUCTS, SymbolKind.Struct);
