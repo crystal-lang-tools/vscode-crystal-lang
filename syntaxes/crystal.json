@@ -129,14 +129,19 @@
 			"name": "meta.lib.type.crystal"
 		},
 		{
-			"comment": "everything being a reserved word, not a value and needing a 'end' is a..",
+			"comment": "everything being a reserved word, not a value, and needing a 'end' is a..",
 			"match": "(?<!\\.)\\b(fun|begin|case|class|else|elsif|end|ensure|enum|for|if|macro|module|rescue|struct|then|union|unless|until|when|while)\\b(?![?!:])",
 			"name": "keyword.control.crystal"
 		},
 		{
-			"comment": "everything being a reserved word, not a value and not needing a 'end' is a..",
+			"comment": "everything being a reserved word, not a value, and not needing a 'end' is a..",
 			"match": "(?<!\\.)\\b(abstract|alias|asm|break|extend|in|include|next|of|private|protected|struct|return|select|super|with|yield)\\b(?![?!:])",
 			"name": "keyword.control.primary.crystal"
+		},
+		{
+			"comment": "everything being a spec keyword, not a value, and needing a block is a..",
+			"match": "(?<!\\.)\\b(describe|context|it|expect_raises)\\b(?![?!:])",
+			"name": "keyword.control.crystal"
 		},
 		{
 			"comment": "contextual smart pair support for block parameters",
