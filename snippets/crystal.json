@@ -2,37 +2,37 @@
 	"HTTP simple server": {
 		"prefix": "http server",
 		"body": [
-				"server = HTTP::Server.new do |context|",
-					"\tcontext.response.content_type = \"text/plain\"",
-					"\tcontext.response.print \"Hello world!\"",
-				"end",
-				"\nserver.bind_tcp ${1:\"0.0.0.0\"}, ${2:8080}",
-				"server.listen"
-			],
+			"server = HTTP::Server.new do |context|",
+			"  context.response.content_type = \"text/plain\"",
+			"  context.response.print \"Hello world!\"",
+			"end",
+			"\nserver.bind_tcp ${1:\"0.0.0.0\"}, ${2:8080}",
+			"server.listen"
+		],
 		"description": "HTTP Server example."
 	},
 	"HTTP server with handlers": {
 		"prefix": "http server with handlers",
 		"body": [
-				"server = HTTP::Server.new([",
-					"\tHTTP::ErrorHandler.new,",
-					"\tHTTP::LogHandler.new,",
-					"\tHTTP::StaticFileHandler.new(\".\"),",
-				"])",
-				"\nserver.bind_tcp ${1:\"0.0.0.0\"}, ${2:8080}",
-				"server.listen"
-			],
+			"server = HTTP::Server.new([",
+			"  HTTP::ErrorHandler.new,",
+			"  HTTP::LogHandler.new,",
+			"  HTTP::StaticFileHandler.new(\".\"),",
+			"])",
+			"\nserver.bind_tcp ${1:\"0.0.0.0\"}, ${2:8080}",
+			"server.listen"
+		],
 		"description": "HTTP Server example with error, logs and static handler."
 	},
 	"HTTP handler": {
 		"prefix": "http handler",
 		"body": [
 			"class ${1:HTTPHandler}",
-			"\tinclude HTTP::Handler",
+			"  include HTTP::Handler",
 			"",
-			"\tdef call(context)",
-			"\t\t$0",
-			"\tend",
+			"  def call(context)",
+			"    $0",
+			"  end",
 			"end"
 		],
 		"description": "HTTP Handler example."
@@ -41,9 +41,9 @@
 		"prefix": "begin",
 		"body": [
 			"begin",
-			"\t$1",
+			"  $1",
 			"rescue exception",
-			"\t",
+			"  ",
 			"end"
 		],
 		"description": "Rescue any exception and access the rescued exception using exception variable in the rescue clause."
@@ -52,11 +52,11 @@
 		"prefix": "beginen",
 		"body": [
 			"begin",
-			"\t$1",
+			"  $1",
 			"rescue exception",
-			"\t",
+			"  ",
 			"ensure",
-			"\t",
+			"  ",
 			"end"
 		],
 		"description": "Rescue with ensure clause executed at the end, expression regardless of whether an exception was raised or not."
@@ -65,11 +65,11 @@
 		"prefix": "beginel",
 		"body": [
 			"begin",
-			"\t$1",
+			"  $1",
 			"rescue exception",
-			"\t",
+			"  ",
 			"else",
-			"\t",
+			"  ",
 			"end"
 		],
 		"description": "An else clause is executed only if no exceptions were rescued."
@@ -78,13 +78,13 @@
 		"prefix": "beginelen",
 		"body": [
 			"begin",
-			"\t$1",
+			"  $1",
 			"rescue exception",
-			"\t",
+			"  ",
 			"else",
-			"\t",
+			"  ",
 			"ensure",
-			"\t",
+			"  ",
 			"end"
 		],
 		"description": "Exception block with ensure and else."
@@ -93,7 +93,7 @@
 		"prefix": "module",
 		"body": [
 			"module ${1:ModuleName}",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "Module as namespaces for defining other types, methods and constants or as partial types that can be mixed in other types."
@@ -102,7 +102,7 @@
 		"prefix": "class",
 		"body": [
 			"class ${1:ClassName}",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "A class is a blueprint from which individual objects are created. Class names, and indeed all type names, begin with a capital letter in Crystal."
@@ -111,9 +111,9 @@
 		"prefix": "classi",
 		"body": [
 			"class ${1:ClassName}",
-			"\tdef initialize",
-			"\t\t$0",
-			"\tend",
+			"  def initialize",
+			"    $0",
+			"  end",
 			"end"
 		],
 		"description": "Use initialize method as constructor for a class instance."
@@ -122,7 +122,7 @@
 		"prefix": "init",
 		"body": [
 			"def initialize",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "Constructor method for an Object."
@@ -131,7 +131,7 @@
 		"prefix": "pro",
 		"body": [
 			"protected def ${1:method_name}",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "Protected method for an Object, can only be referenced inside the namespace where they are defined."
@@ -140,7 +140,7 @@
 		"prefix": "pri",
 		"body": [
 			"private def ${1:method_name}",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "Private method for an Object, can only be invoked without a receiver."
@@ -149,7 +149,7 @@
 		"prefix": "def",
 		"body": [
 			"def ${1:method_name}",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "Method names begin with a lowercase letter and, as a convention, only use lowercase letters, underscores and numbers."
@@ -179,7 +179,7 @@
 		"prefix": "struct",
 		"body": [
 			"struct ${1:StructName}",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "Struct allocates it on the stack instead of the heap and  is passed by value."
@@ -188,7 +188,7 @@
 		"prefix": "union",
 		"body": [
 			"union ${1:UnionName}",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "Allocates the union on the stack."
@@ -197,7 +197,7 @@
 		"prefix": "enum",
 		"body": [
 			"enum ${1:EnumName}",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "An enum is a set of integer values, where each value has an associated name."
@@ -206,7 +206,7 @@
 		"prefix": "lib",
 		"body": [
 			"lib ${1:LibName}",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "A lib declaration groups C functions and types that belong to a library."
@@ -215,7 +215,7 @@
 		"prefix": "fun",
 		"body": [
 			"fun ${1:fun_name}",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "A fun declaration is a primitive function that support primitive types only and inside a lib binds to a C function."
@@ -224,7 +224,7 @@
 		"prefix": "macro",
 		"body": [
 			"macro ${1:macro_name}",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "Macros are methods that receive AST nodes at compile-time and produce code that is pasted into a program."
@@ -233,7 +233,7 @@
 		"prefix": "if",
 		"body": [
 			"if ${1:foo}",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "An if evaluates the given branch if its condition is truthy."
@@ -242,9 +242,9 @@
 		"prefix": "ife",
 		"body": [
 			"if ${1:foo}",
-			"\t$0",
+			"  $0",
 			"else",
-			"\t",
+			"  ",
 			"end"
 		],
 		"description": "It evaluates if when condition is true and the else branch when condition is false."
@@ -253,9 +253,9 @@
 		"prefix": "ifei",
 		"body": [
 			"if ${1:foo}",
-			"\t$0",
+			"  $0",
 			"elsif ",
-			"\t",
+			"  ",
 			"end"
 		],
 		"description": "To write a chain of if-else-if you use elsif."
@@ -264,11 +264,11 @@
 		"prefix": "ifeie",
 		"body": [
 			"if ${1:foo}",
-			"\t$0",
+			"  $0",
 			"elsif ",
-			"\t",
+			"  ",
 			"else",
-			"\t",
+			"  ",
 			"end"
 		],
 		"description": "Add elif and else to conditional structure."
@@ -277,7 +277,7 @@
 		"prefix": "unless",
 		"body": [
 			"unless ${1:foo}",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": " That is, it behaves in the opposite way of an if."
@@ -286,7 +286,7 @@
 		"prefix": "until",
 		"body": [
 			"until ${1:foo}",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "An until is just syntax sugar for a while with the condition negate."
@@ -295,7 +295,7 @@
 		"prefix": "while",
 		"body": [
 			"while ${1:foo}",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "A while executes its body as long as its condition is truthy."
@@ -304,7 +304,7 @@
 		"prefix": "loop",
 		"body": [
 			"loop do",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "A loop executes its body forever until a break."
@@ -313,7 +313,7 @@
 		"prefix": "spawn",
 		"body": [
 			"spawn do",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "Spawns a fiber."
@@ -329,7 +329,7 @@
 		"prefix": "do",
 		"body": [
 			"do",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "Create a block without arguments"
@@ -338,7 +338,7 @@
 		"prefix": "dop",
 		"body": [
 			"do |$1|",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "Create a block with arguments"
@@ -348,9 +348,9 @@
 		"body": [
 			"case ${1:exp}",
 			"when ${2:value}",
-			"\t$0",
+			"  $0",
 			"else",
-			"\t",
+			"  ",
 			"end"
 		],
 		"description": "A case is a control expression which functions a bit like pattern matching."
@@ -360,16 +360,16 @@
 		"body": [
 			"select",
 			"when ${1:ch.receive}",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "Wait for channels messages using a case statement."
 	},
 	"Spec description": {
-		"prefix": "desc",
+		"prefix": "describe",
 		"body": [
 			"describe $1 do",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "Creates a test group block"
@@ -378,7 +378,7 @@
 		"prefix": "context",
 		"body": [
 			"context \"${1:when }\" do",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "Creates a test context block"
@@ -387,7 +387,7 @@
 		"prefix": "it",
 		"body": [
 			"it $1 do",
-			"\t$0",
+			"  $0",
 			"end"
 		],
 		"description": "Creates a concrete test case block"
