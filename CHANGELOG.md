@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.9.2] - 2024-02-20
+
+### Fix
+
+- Add highlighting for built-in spec keywords [#186](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/186)
+- Add keywords to autocomplete [#187](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/187)
+- Don't highlight method calls as unused [#188](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/188)
+
 ## [0.9.1] - 2024-02-06
 
 ### Fix
