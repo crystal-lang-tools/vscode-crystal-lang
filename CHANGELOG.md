@@ -1,5 +1,14 @@
 # Change Log
 
+## [0.9.3] - 2024-03-01
+
+### Fix
+
+- Don't highlight unused after macro interp [#190](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/190)
+- Don't autocomplete in comments [#178](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/178)
+- Spec bug fix
+- Improve word pattern regex to not match colons preceding namespaces
+
 ## [0.9.2] - 2024-02-20
 
 ### Fix
