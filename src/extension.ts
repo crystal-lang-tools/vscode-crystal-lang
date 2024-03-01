@@ -41,7 +41,7 @@ export const crystalConfiguration = <LanguageConfiguration>{
 		},
 	],
 	wordPattern:
-		/(-?(?:0(?:b|o|x))?\d+(?:\.\d+)?(?:_?[iuf]\d+)?)|@{0,2}(:?[A-Za-z][^-`~@#%^&()=+[{}|;:'",<>\/.*\]\s\\!?]*[!?]?)/,
+		/(?:-?(?:0(?:b|o|x))?\d+(?:\.\d+)?(?:_?[iuf]\d+)?)|@{0,2}(?:(?:(?<!:):)?[A-Za-z][^-`~@#%^&()=+[{}|;:'",<>\/.*\]\s\\!?]*[!?]?)/,
 };
 
 let lsp_client: LanguageClient
