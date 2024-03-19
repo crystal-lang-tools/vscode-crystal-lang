@@ -203,8 +203,8 @@ interface Shard {
 export async function getShardMainPath(document: TextDocument): Promise<string> {
 	const config = workspace.getConfiguration('crystal-lang');
 	const space = getWorkspaceFolder(document.uri);
-	const dir = space.uri.fsPath;
-	const fp = path.join(dir, 'shard.yml');
+	const fp = findShardYml(document.uri);
+	const fpParent = path.resolve(fp.fsPath, '..')
 
 	// Specs are their own main files
 	if (document.fileName.endsWith('_spec.cr')) {
@@ -213,33 +213,37 @@ export async function getShardMainPath(document: TextDocument): Promise<string> 
 
 	// Use main if provided and it exists
 	if (config.get("main")) {
-		const main = config.get<string>("main").replace("${workspaceRoot}", dir)
+		const main = config.get<string>("main").replace("${workspaceRoot}", space.uri.fsPath)
 		if (main.includes('*') || existsSync(main)) return main;
 	}
 
-	if (config.get("dependencies")) {
-		const shardTarget = await getShardTargetForFile(document)
-		if (shardTarget.response) return shardTarget.response;
-		if (shardTarget.error) return;
-	} else if (existsSync(fp)) {
-		const shard_yml = readFileSync(fp, 'utf-8')
+	if (fp) {
+		if (config.get("dependencies")) {
+			const shardTarget = await getShardTargetForFile(document)
+			if (shardTarget) {
+				if (shardTarget.response) return shardTarget.response;
+				if (shardTarget.error) return;
+			}
+		}
+
+		const shard_yml = readFileSync(fp.fsPath, 'utf-8')
 		const shard = yaml.parse(shard_yml) as Shard;
 
 		// Use a target with the shard name
 		var main = shard.targets?.[shard.name]?.main;
-		if (main && existsSync(path.resolve(dir, main))) return path.resolve(dir, main);
+		if (main && existsSync(path.resolve(fpParent, main))) return path.resolve(fpParent, main);
 
 		if (shard.targets) {
 			// Use the first target if it exists
 			main = Object.values(shard.targets)[0]?.main;
-			if (main && existsSync(path.resolve(dir, main))) return path.resolve(dir, main);
+			if (main && existsSync(path.resolve(fpParent, main))) return path.resolve(fpParent, main);
 		}
 
 		// Splat all top-level files in source folder,
 		// only if the file is in the /src directory
 		const document_path = document.uri.fsPath;
-		if (document_path.includes(path.join(dir, 'src')) || document_path.includes(path.join(dir, 'lib'))) {
-			return path.join(space.uri.fsPath, "src", "*.cr");
+		if (document_path.includes(path.join(fpParent, 'src')) || document_path.includes(path.join(fpParent, 'lib'))) {
+			return path.join(fpParent, "src", "*.cr");
 		}
 	}
 
@@ -458,15 +462,28 @@ export function shellEscape(arg: string): string {
  * @return {*}  {WorkspaceFolder}
  */
 export function getWorkspaceFolder(uri: Uri): WorkspaceFolder {
-	if (!uri) throw new Error("Undefined URI");
+	if (existsSync(path.resolve(uri.fsPath, 'shard.yml'))) {
+		if (!uri) throw new Error("Undefined URI");
 
-	const folder = workspace.getWorkspaceFolder(uri)
-	if (folder) return folder;
+		const folder = workspace.getWorkspaceFolder(uri)
+		if (folder) return folder;
 
-	return {
-		name: path.dirname(uri.fsPath),
-		uri: Uri.file(path.dirname(uri.fsPath)),
-		index: undefined
+		return {
+			name: path.dirname(uri.fsPath),
+			uri: Uri.file(path.dirname(uri.fsPath)),
+			index: undefined
+		}
+	} else {
+		const shardYml = findShardYml(uri);
+
+		if (shardYml === undefined) return;
+
+		const folder = Uri.file(path.resolve(shardYml.fsPath, '..'))
+		return {
+			name: path.basename(folder.fsPath),
+			uri: folder,
+			index: undefined
+		}
 	}
 }
 
@@ -480,21 +497,21 @@ export function getWorkspaceFolder(uri: Uri): WorkspaceFolder {
  */
 export async function getShardTargetForFile(document: TextDocument): Promise<{ response, error }> {
 	const compiler = await getCompilerPath();
-	const space = getWorkspaceFolder(document.uri);
-	const targets = getShardYmlTargets(space);
+	const targets = getShardYmlTargets(document);
+	const space = Uri.file(path.resolve(targets[1].fsPath, '..'));
 	const config = workspace.getConfiguration('crystal-lang');
 
-	if (!targets) return;
+	if (!targets || targets[0].length == 0) return;
 
-	for (const target of targets) {
-		const targetPath = path.resolve(space.uri.fsPath, target)
+	for (const target of targets[0]) {
+		const targetPath = path.resolve(space.fsPath, target)
 		if (!existsSync(targetPath)) continue;
 
 		const cmd = `${shellEscape(compiler)} tool dependencies ${shellEscape(targetPath)} -f flat --no-color ${config.get<string>("flags")}`
-		crystalOutputChannel.appendLine(`[Dependencies] ${space.name} $ ${cmd}`)
+		crystalOutputChannel.appendLine(`[Dependencies] ${path.basename(space.fsPath)} $ ${cmd}`)
 		const targetDocument = await workspace.openTextDocument(Uri.parse(targetPath))
 
-		const result = await execAsync(cmd, space.uri.fsPath)
+		const result = await execAsync(cmd, space.fsPath)
 			.then((resp) => {
 				return { response: resp, error: undefined };
 			})
@@ -509,8 +526,8 @@ export async function getShardTargetForFile(document: TextDocument): Promise<{ r
 		const dependencies = result.response.split(/\r?\n/)
 
 		for (const line of dependencies) {
-			if (path.resolve(space.uri.fsPath, line.trim()) == document.uri.fsPath) {
-				return { response: path.resolve(space.uri.fsPath, target), error: undefined };
+			if (path.resolve(space.fsPath, line.trim()) == document.uri.fsPath) {
+				return { response: path.resolve(space.fsPath, target), error: undefined };
 			}
 		}
 	}
@@ -524,18 +541,45 @@ export async function getShardTargetForFile(document: TextDocument): Promise<{ r
  * @param {WorkspaceFolder} space
  * @return {*}  {string[]}
  */
-function getShardYmlTargets(space: WorkspaceFolder): string[] {
-	const shardFile = getShardFile(space)
+function getShardYmlTargets(document: TextDocument): [string[], Uri] {
+	const shardFile = findShardYml(document.uri)
 
-	if (existsSync(shardFile)) {
-		const io = readFileSync(shardFile, 'utf8')
+	if (shardFile) {
+		const io = readFileSync(shardFile.fsPath, 'utf8')
 		const data = yaml.parse(io)
 
 		if (data.targets !== undefined) {
 			const values = Object.keys(data.targets).map(key => data.targets[key])
-			return values.map(v => v.main)
+			return [values.map(v => v.main), shardFile]
 		}
 	}
 
-	return []
+	return [[], shardFile]
+}
+
+export function findShardYml(startUri: Uri, maxDepth = 5): Uri | null {
+	let currentUri = startUri;
+
+	for (let depth = 0; depth < maxDepth; depth++) {
+		const shardYmlUri = Uri.joinPath(currentUri, 'shard.yml')
+		if (existsSync(shardYmlUri.fsPath)) {
+			return shardYmlUri;
+		}
+
+		// // Check if we're in the Crystal source code / stdlib
+		// const compilerUri = Uri.joinPath(currentUri, "src", "compiler", "crystal.cr")
+		// if (existsSync(compilerUri.fsPath)) {
+		// 	return currentUri;
+		// }
+
+		const parentUri = Uri.file(path.resolve(currentUri.fsPath, '..'));
+		// Root directory check
+		if (parentUri.fsPath === currentUri.fsPath) {
+			return;
+		}
+
+		currentUri = parentUri
+	}
+
+	return;
 }

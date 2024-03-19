@@ -47,7 +47,10 @@ class CrystalDefinitionProvider implements DefinitionProvider {
 		try {
 			crystalOutputChannel.appendLine('[Implementations] getting implementations...');
 			const res = await spawnImplTool(document, position);
-			if (res.status !== 'ok') {
+			if (res === undefined) {
+				crystalOutputChannel.appendLine(`[Implementations] failed (possible issue with selecting main file)`);
+				return [];
+			} else if (res.status !== 'ok') {
 				crystalOutputChannel.appendLine(`[Implementations] failed: ${res.message}`);
 				return [];
 			}
