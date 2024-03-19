@@ -495,7 +495,7 @@ export function getWorkspaceFolder(uri: Uri): WorkspaceFolder {
  * @param {TextDocument} document
  * @return {*}  {Promise<string>}
  */
-export async function getShardTargetForFile(document: TextDocument): Promise<{ response, error }> {
+export async function getShardTargetForFile(document: TextDocument): Promise<{ response: string, error: boolean }> {
 	const compiler = await getCompilerPath();
 	const targets = getShardYmlTargets(document);
 	const space = Uri.file(path.resolve(targets[1].fsPath, '..'));
@@ -506,6 +506,7 @@ export async function getShardTargetForFile(document: TextDocument): Promise<{ r
 	for (const target of targets[0]) {
 		const targetPath = path.resolve(space.fsPath, target)
 		if (!existsSync(targetPath)) continue;
+		if (targetPath == document.uri.fsPath) return { response: document.uri.fsPath, error: false };
 
 		const cmd = `${shellEscape(compiler)} tool dependencies ${shellEscape(targetPath)} -f flat --no-color ${config.get<string>("flags")}`
 		crystalOutputChannel.appendLine(`[Dependencies] ${path.basename(space.fsPath)} $ ${cmd}`)
@@ -521,8 +522,8 @@ export async function getShardTargetForFile(document: TextDocument): Promise<{ r
 				return { response: undefined, error: err };
 			})
 
-		if (result.error) return { response: undefined, error: result.error };
 		if (!result) continue;
+		if (result.error) return { response: undefined, error: result.error };
 		const dependencies = result.response.split(/\r?\n/)
 
 		for (const line of dependencies) {
