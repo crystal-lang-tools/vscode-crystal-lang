@@ -268,6 +268,11 @@ export class CrystalTestingProvider {
         }
 
         testsuite.testcase.forEach((testcase: TestCase) => {
+          if (!path.isAbsolute(testcase.file)) {
+            crystalOutputChannel.appendLine(`[Spec] Error: testcase with relative file: ${testcase.file} ${testcase.name}`)
+            return;
+          }
+
           const item = this.controller.createTestItem(
             testcase.file + " " + testcase.name,
             testcase.name,
@@ -281,8 +286,7 @@ export class CrystalTestingProvider {
             );
           }
 
-          let fullPath = getWorkspaceFolder(Uri.file(testcase.file)).uri.fsPath +
-            path.sep + 'spec';
+          let fullPath = getWorkspaceFolder(Uri.file(testcase.file)).uri.fsPath + path.sep + 'spec';
           let parent: TestItem | null = null
 
           // split the testcase.file and iterate over every folder in workspace
