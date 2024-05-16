@@ -34,7 +34,11 @@ function execWrapper(
 	) => void
 ): ChildProcess {
 	const disable_gc = workspace.getConfiguration('crystal-lang').get<boolean>('disable-gc', false);
-	const env = { ...process.env, 'GC_DONT_GC': disable_gc ? '1' : '0' }
+	const env = { ...process.env }
+
+	if (disable_gc) {
+		env['GC_DONT_GC'] = '1'
+	}
 
 	const response = exec(command, { 'cwd': cwd, env }, (err, stdout, stderr) => {
 		if (err) {
