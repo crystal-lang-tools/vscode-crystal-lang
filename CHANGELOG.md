@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.9.4] - 2024-05-16
+
+### Add
+
+- Add configuration option `crystal-lang.disable-gc` to disable the garbage collector when running compiler tools.
+
 ## [0.9.3] - 2024-03-01
 
 ### Fix
