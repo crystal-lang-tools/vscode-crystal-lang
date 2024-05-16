@@ -207,6 +207,11 @@
 					"type": "string",
 					"default": "",
 					"description": "Compile-time flags to pass to the compiler, i.e. '-Dflag1 -Dflag2'.\nFlags are shared across multi-root workspaces."
+				},
+				"crystal-lang.disable-gc": {
+					"type": "boolean",
+					"default": false,
+					"description": "Disable garbage collection for running the compiler tools. Can improve performance at the expense of memory."
 				}
 			}
 		},
