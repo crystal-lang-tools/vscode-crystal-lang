@@ -1,13 +1,47 @@
-import { existsSync } from "fs";
-import { Diagnostic, DiagnosticCollection, DiagnosticSeverity, Range, Uri, languages, workspace } from "vscode";
+import { existsSync, readFileSync } from "fs";
+import { Diagnostic, DiagnosticCollection, DiagnosticSeverity, Range, TextDocument, Uri, WorkspaceFolder, languages, workspace } from "vscode";
 import path = require("path");
+import * as yaml from 'yaml';
 
-import { execAsync } from "./tools";
-import { getWorkspaceFolder } from "./vscode";
+import { execAsync, shellEscape } from "./tools";
+import { getProjectRoot, outputChannel } from "./vscode";
+import { spawnProblemsTool } from "./problems";
+import { Mutex } from "async-mutex";
 
 
+export const compilerMutex = new Mutex();
 export const diagnosticCollection: DiagnosticCollection = languages.createDiagnosticCollection("crystal")
 
+
+/**
+ * Format for an individual dependency in a `shard.yml`.
+ *
+ * @interface Dependency
+ */
+interface Dependency {
+  git?: string;
+  github?: string;
+  gitlab: string;
+  branch?: string;
+  version?: string;
+}
+
+/**
+ * Format of a `shard.yml` file.
+ *
+ * @interface Shard
+ */
+interface Shard {
+  name: string;
+  description?: string;
+  version: string;
+  crystal?: string;
+  repository?: string;
+  authors?: string[];
+  dependencies?: Record<string, Dependency>;
+  targets?: Record<string, Record<string, string>>;
+  license?: string;
+}
 
 export async function getCompilerPath(): Promise<string> {
   const config = workspace.getConfiguration('crystal-lang');
@@ -23,6 +57,124 @@ export async function getCompilerPath(): Promise<string> {
   return (await execAsync(command, process.cwd())).trim();
 }
 
+export async function getDocumentMainFile(document: TextDocument): Promise<string> {
+  const config = workspace.getConfiguration('crystal-lang');
+  const projectRoot = getProjectRoot(document.uri);
+
+  // Specs are their own main files
+  if (document.fileName.endsWith('_spec.cr')) {
+    return document.fileName;
+  }
+
+  // Use main if provided and it exists
+  if (config.get<string>("main")) {
+    const mainFile = config.get<string>("main").replace(
+      "${workspaceRoot}", projectRoot.uri.fsPath
+    )
+    if (mainFile.includes('*') || existsSync(mainFile)) return mainFile;
+    outputChannel.appendLine(`[Crystal] Main file ${mainFile} doesn't exist, using fallbacks`)
+  }
+
+  if (config.get<boolean>("dependencies")) {
+    const shardTarget = await getDocumentShardTarget(document);
+    if (shardTarget.response) return shardTarget.response;
+    if (shardTarget.error) return;
+  }
+
+  const shardYmlPath = path.join(projectRoot.uri.fsPath, "shard.yml")
+  if (existsSync(shardYmlPath)) {
+    const shardYml = readFileSync(shardYmlPath, 'utf-8');
+    const shard = yaml.parse(shardYml) as Shard
+
+    // Use a target with the shard name
+    var main = shard.targets?.[shard.name]?.main;
+    if (main && existsSync(path.resolve(projectRoot.uri.fsPath, main)))
+      return path.resolve(projectRoot.uri.fsPath, main);
+
+    if (shard.targets) {
+      // Use the first target if it exists
+      main = Object.values(shard.targets)[0]?.main;
+      if (main && existsSync(path.resolve(projectRoot.uri.fsPath, main)))
+        return path.resolve(projectRoot.uri.fsPath, main);
+    }
+
+    // Splat all top-level files in source folder,
+    // only if the file is in the /src or /lib directories
+    if (document.uri.fsPath.includes(path.join(projectRoot.uri.fsPath, 'src')) ||
+      document.uri.fsPath.includes(path.join(projectRoot.uri.fsPath, 'lib'))) {
+      return path.join(projectRoot.uri.fsPath, 'src', '*.cr')
+    }
+  }
+
+  // single independent file (like a script)
+  return document.fileName;
+}
+
+async function getDocumentShardTarget(document: TextDocument): Promise<{ response: string, error }> {
+  const compiler = await getCompilerPath();
+  const projectRoot = getProjectRoot(document.uri);
+  const config = workspace.getConfiguration('crystal-lang');
+
+  const targets = getShardYmlTargets(projectRoot);
+
+  if (!targets) return;
+
+  for (const target of targets) {
+    const targetPath = path.resolve(projectRoot.uri.fsPath, target);
+    if (!existsSync(targetPath)) continue;
+
+    const cmd = `${shellEscape(compiler)} tool dependencies ${shellEscape(targetPath)} -f flat --no-color ${config.get<string>("flags")}`
+    outputChannel.appendLine(`[Dependencies] (${projectRoot.name}) $ ${cmd}`)
+
+    const targetDocument = await workspace.openTextDocument(Uri.parse(targetPath))
+
+    const result = await execAsync(cmd, projectRoot.uri.fsPath)
+      .then((resp) => {
+        return { response: resp, error: false }
+      })
+      .catch((err) => {
+        spawnProblemsTool(targetDocument, target, projectRoot);
+        return { response: undefined, error: err }
+      })
+
+    if (result.error) return result;
+    if (result.response.trim.size === 0) continue;
+    const dependencies = result.response.split(/\r?\n/)
+
+    for (const line of dependencies) {
+      const linePath = path.resolve(projectRoot.uri.fsPath, line.trim())
+      if (linePath === document.uri.fsPath) {
+        return { response: linePath, error: false }
+      }
+    }
+  }
+
+  return { response: undefined, error: false };
+}
+
+/**
+ * Gets the paths to each target in the `shard.yml` of a workspace.
+ *
+ * @param {WorkspaceFolder} space
+ * @return {*}  {string[]}
+ */
+function getShardYmlTargets(space: WorkspaceFolder): string[] {
+  const shardFile = path.join(space.uri.fsPath, 'shard.yml')
+
+  if (existsSync(shardFile)) {
+    const io = readFileSync(shardFile, 'utf8')
+    const data = yaml.parse(io)
+
+    if (data.targets !== undefined) {
+      const values = Object.keys(data.targets).map(key => data.targets[key])
+      return values.map(v => v.main)
+    }
+  }
+
+  return []
+}
+
+
 interface ErrorResponse {
   file: string
   line: number | null
@@ -31,10 +183,47 @@ interface ErrorResponse {
   message: string
 }
 
+export async function findProblems(response: string, uri: Uri): Promise<void> {
+  const projectRoot = getProjectRoot(uri);
+
+  let parsedResponses: ErrorResponse[];
+  try {
+    parsedResponses = JSON.parse(response)
+  } catch {
+    return findProblemsRaw(response, uri);
+  }
+
+  let diagnostics = []
+  if (!JSON.parse(response).status) {
+    for (let resp of parsedResponses) {
+      if (resp.line == null)
+        resp.line = 1
+      if (resp.column == null)
+        resp.column = 1
+      if (resp.size == null)
+        resp.size = 0
+      const range = new Range(resp.line - 1, resp.column - 1, resp.line - 1, (resp.column + resp.size) - 1)
+      const diagnostic = new Diagnostic(range, resp.message, DiagnosticSeverity.Error)
+      var diag_uri = Uri.file(resp.file)
+      if (!path.isAbsolute(resp.file)) {
+        diag_uri = Uri.file(path.resolve(projectRoot.uri.fsPath, resp.file))
+      }
+
+      diagnostics.push([diag_uri, [diagnostic]])
+    }
+  }
+
+  if (diagnostics.length == 0) {
+    diagnosticCollection.clear()
+  } else {
+    diagnosticCollection.set(diagnostics)
+  }
+}
+
 export async function findProblemsRaw(response: string, uri: Uri): Promise<void> {
   if (!response) return;
 
-  const space = getWorkspaceFolder(uri);
+  const projectRoot = getProjectRoot(uri);
   const responseData = response.match(/(?:.*)in '?(.*):(\d+):(\d+)'?:?([^]*)$/mi)
 
   let parsedLine = 0
@@ -59,7 +248,7 @@ export async function findProblemsRaw(response: string, uri: Uri): Promise<void>
     const diagnostic = new Diagnostic(range, resp.message, DiagnosticSeverity.Error)
     var diag_uri = Uri.file(resp.file)
     if (!path.isAbsolute(resp.file)) {
-      diag_uri = Uri.file(path.resolve(space.uri.fsPath, resp.file))
+      diag_uri = Uri.file(path.resolve(projectRoot.uri.fsPath, resp.file))
     }
 
     diagnostics.push([diag_uri, [diagnostic]])

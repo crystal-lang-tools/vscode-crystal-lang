@@ -1,14 +1,19 @@
-import { Disposable, ConfigurationChangeEvent, DocumentFormattingEditProvider, ExtensionContext, workspace } from "vscode";
+import { Disposable, ConfigurationChangeEvent, DocumentFormattingEditProvider, ExtensionContext, workspace, TextDocument } from "vscode";
 import { DocumentSelector, LanguageClient, LanguageClientOptions, ServerOptions } from "vscode-languageclient/node";
 import { existsSync } from "fs";
+import { E_CANCELED } from "async-mutex";
 
-import { outputChannel } from "./vscode";
+import { getProjectRoot, outputChannel } from "./vscode";
 import { registerFormatter } from "./format";
+import { handleDocumentProblems } from "./problems";
+import { compilerMutex, getDocumentMainFile } from "./compiler";
 
 
 let languageContext: ExtensionContext
 let lspClient: LanguageClient
+
 let disposeFormat: Disposable
+let disposeSave: Disposable
 
 const selector: DocumentSelector = [
   { language: 'crystal', scheme: 'file' },
@@ -78,12 +83,21 @@ async function activateLanguageFeatures(context: ExtensionContext) {
   if (disposeFormat === undefined) {
     disposeFormat = registerFormatter(selector, context)
   }
+
+  if (disposeSave === undefined) {
+    disposeSave = workspace.onDidSaveTextDocument((e) => handleSaveDocument(e))
+  }
 }
 
 async function deactivateLanguageFeatures() {
   if (disposeFormat) {
     disposeFormat.dispose()
     disposeFormat = undefined
+  }
+
+  if (disposeSave) {
+    disposeSave.dispose()
+    disposeSave = undefined
   }
 }
 
@@ -113,4 +127,26 @@ async function handleConfigChange(e: ConfigurationChangeEvent) {
       }
     }
   }
+}
+
+async function handleSaveDocument(e: TextDocument): Promise<void> {
+  compilerMutex.cancel()
+  compilerMutex.acquire()
+    .then(async (release) => {
+      try {
+        const config = workspace.getConfiguration("crystal-lang");
+        const mainFile = await getDocumentMainFile(e);
+        const projectRoot = getProjectRoot(e.uri);
+
+        if (config.get<boolean>("problems")) {
+          await handleDocumentProblems(e, mainFile, projectRoot)
+        }
+      } finally {
+        release()
+      }
+    })
+    .catch(e => {
+      if (e === E_CANCELED) return;
+      throw e;
+    });
 }

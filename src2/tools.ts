@@ -32,3 +32,17 @@ function execWrapper(
 }
 
 export const execAsync = promisify(execWrapper);
+
+/**
+ * Escape characters for passing to `exec`. Does not escape '*' as it's needed for some shard mainfiles.
+ * Borrowed from https://taozhi.medium.com/escape-shell-command-in-nodejs-629ded063535.
+ *
+ * @export
+ * @param {string} arg
+ * @return {*}  {string}
+ */
+export function shellEscape(arg: string): string {
+  if (arg === null || arg === undefined) return;
+  if (/[^A-Za-z0-9_\/:=-]/.test(arg)) return arg.replace(/([$!'"();`?{}[\]<>&%#~@\\ ])/g, '\\$1')
+  return arg
+}
