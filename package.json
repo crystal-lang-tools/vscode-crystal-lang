@@ -46,7 +46,7 @@
 				"extensions": [
 					".cr"
 				],
-				"configuration": "./crystal-configuration.json"
+				"configuration": "./config/crystal-language-configuration.json"
 			},
 			{
 				"id": "ecr",
@@ -56,7 +56,7 @@
 				"extensions": [
 					".ecr"
 				],
-				"configuration": "./ecr-configuration.json"
+				"configuration": "./config/ecr-language-configuration.json"
 			},
 			{
 				"id": "slang",
@@ -66,7 +66,7 @@
 				"extensions": [
 					".slang"
 				],
-				"configuration": "./slang-configuration.json"
+				"configuration": "./config/slang-language-configuration.json"
 			},
 			{
 				"id": "crystal-markdown-injection"
