@@ -10,7 +10,7 @@
 		"ecr_tag": {
 			"patterns": [
 				{
-					"begin": "<%(=|-)?",
+					"begin": "<%(?!#)(=|-)?",
 					"end": "%>",
 					"name": "source.embed.crystal",
 					"patterns": [
@@ -18,6 +18,11 @@
 							"include": "source.crystal"
 						}
 					]
+				},
+				{
+					"begin": "<%#",
+					"end": "%>",
+					"name": "comment.block.ecr"
 				}
 			]
 		}
