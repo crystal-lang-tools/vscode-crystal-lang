@@ -1,8 +1,8 @@
 {
 	"comments": {
 		"blockComment": [
-			"<!--",
-			"-->"
+			"<%#",
+			"%>"
 		]
 	},
 	"brackets": [
@@ -28,51 +28,130 @@
 		]
 	],
 	"autoClosingPairs": [
-		{
-			"open": "{",
-			"close": "}"
-		},
-		{
-			"open": "[",
-			"close": "]"
-		},
-		{
-			"open": "(",
-			"close": ")"
-		},
+		[
+			"<%",
+			"%>"
+		],
+		[
+			"<%=",
+			"%>"
+		],
+		[
+			"<%#",
+			"%>"
+		],
+		[
+			"{",
+			"}"
+		],
+		[
+			"[",
+			"]"
+		],
+		[
+			"(",
+			")"
+		],
+		[
+			"`",
+			"`"
+		],
 		{
 			"open": "'",
-			"close": "'"
+			"close": "'",
+			"notIn": [
+				"string",
+				"comment"
+			]
 		},
 		{
 			"open": "\"",
-			"close": "\""
+			"close": "\"",
+			"notIn": [
+				"string"
+			]
+		},
+		[
+			"<",
+			">"
+		],
+		{
+			"open": "%",
+			"close": "%",
+			"notIn": [
+				"string",
+				"comment"
+			]
 		}
 	],
 	"surroundingPairs": [
+		[
+			"<%",
+			"%>"
+		],
+		[
+			"<%=",
+			"%>"
+		],
+		[
+			"<%#",
+			"%>"
+		],
+		[
+			"{",
+			"}"
+		],
+		[
+			"[",
+			"]"
+		],
+		[
+			"(",
+			")"
+		],
+		[
+			"\"",
+			"\""
+		],
+		[
+			"'",
+			"'"
+		],
+		[
+			"`",
+			"`"
+		],
+		[
+			"<",
+			">"
+		],
+		[
+			"%",
+			"%"
+		]
+	],
+	"onEnterRules": [
 		{
-			"open": "'",
-			"close": "'"
+			"beforeText": {
+				"pattern": "<(?!(?:area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr))([_:\\w][_:\\w-.\\d]*)(?:(?:[^'\"/>]|\"[^\"]*\"|'[^']*')*?(?!\\/)>)[^<]*$",
+				"flags": "i"
+			},
+			"afterText": {
+				"pattern": "^<\\/([_:\\w][_:\\w-.\\d]*)\\s*>",
+				"flags": "i"
+			},
+			"action": {
+				"indent": "indentOutdent"
+			}
 		},
 		{
-			"open": "\"",
-			"close": "\""
-		},
-		{
-			"open": "{",
-			"close": "}"
-		},
-		{
-			"open": "[",
-			"close": "]"
-		},
-		{
-			"open": "(",
-			"close": ")"
-		},
-		{
-			"open": "<",
-			"close": ">"
+			"beforeText": {
+				"pattern": "<(?!(?:area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr))([_:\\w][_:\\w-.\\d]*)(?:(?:[^'\"/>]|\"[^\"]*\"|'[^']*')*?(?!\\/)>)[^<]*$",
+				"flags": "i"
+			},
+			"action": {
+				"indent": "indent"
+			}
 		}
 	]
 }
