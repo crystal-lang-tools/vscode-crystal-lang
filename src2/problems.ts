@@ -38,6 +38,8 @@ export async function spawnProblemsTool(document: TextDocument, mainFile: string
     })
     .catch((err) => {
       findProblems(err.stderr, document.uri);
+      if (err?.signal === "SIGKILL") return;
+
       try {
         outputChannel.appendLine(`[Problems] Error: ${err.stderr}`)
       } catch {
