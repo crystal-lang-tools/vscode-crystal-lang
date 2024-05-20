@@ -1,6 +1,7 @@
 import { ChildProcess, ExecException, exec } from "child_process";
+import terminate from "terminate";
 import { promisify } from "util";
-import { workspace } from "vscode";
+import { CancellationToken, workspace } from "vscode";
 
 
 function execWrapper(
@@ -31,7 +32,23 @@ function execWrapper(
   return response;
 }
 
-export const execAsync = promisify(execWrapper);
+// export const execAsync = promisify(execWrapper);
+export async function execAsync(command: string, cwd: string, token: CancellationToken = undefined): Promise<{ stdout: string, stderr: string }> {
+  return new Promise((resolve, reject) => {
+    const child = execWrapper(command, cwd, (error, stdout, stderr) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+
+      resolve({ stdout, stderr });
+    })
+
+    token?.onCancellationRequested(() => {
+      terminate(child.pid)
+    })
+  })
+}
 
 /**
  * Escape characters for passing to `exec`. Does not escape '*' as it's needed for some shard mainfiles.

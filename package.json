@@ -248,6 +248,7 @@
 		"async-mutex": "^0.4.0",
 		"junit2json": "~3.1.4",
 		"temp": "~0.9.4",
+		"terminate": "^2.6.1",
 		"vscode-languageclient": "^8.1.0",
 		"yaml": "^2.1.1"
 	},

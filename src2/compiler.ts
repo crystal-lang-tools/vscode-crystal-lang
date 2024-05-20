@@ -54,7 +54,7 @@ export async function getCompilerPath(): Promise<string> {
   const command =
     (process.platform === 'win32' ? 'where' : 'which') + ' crystal';
 
-  return (await execAsync(command, process.cwd())).trim();
+  return (await execAsync(command, process.cwd())).stdout.trim();
 }
 
 export async function getDocumentMainFile(document: TextDocument): Promise<string> {
@@ -137,14 +137,14 @@ async function getDocumentShardTarget(document: TextDocument): Promise<{ respons
         return { response: undefined, error: err }
       })
 
-    if (result.error) return result;
-    if (result.response.trim.size === 0) continue;
-    const dependencies = result.response.split(/\r?\n/)
+    if (result.error) return result.response.stderr;
+    if (result.response.stdout.trim.size === 0) continue;
+    const dependencies = result.response.stdout.split(/\r?\n/)
 
     for (const line of dependencies) {
       const linePath = path.resolve(projectRoot.uri.fsPath, line.trim())
       if (linePath === document.uri.fsPath) {
-        return { response: linePath, error: false }
+        return { response: targetPath, error: false }
       }
     }
   }

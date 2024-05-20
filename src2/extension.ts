@@ -1,4 +1,4 @@
-import { Disposable, ConfigurationChangeEvent, DocumentFormattingEditProvider, ExtensionContext, workspace, TextDocument } from "vscode";
+import { Disposable, ConfigurationChangeEvent, DocumentFormattingEditProvider, ExtensionContext, workspace, TextDocument, CancellationToken } from "vscode";
 import { DocumentSelector, LanguageClient, LanguageClientOptions, ServerOptions } from "vscode-languageclient/node";
 import { existsSync } from "fs";
 import { E_CANCELED } from "async-mutex";
@@ -7,6 +7,7 @@ import { getProjectRoot, outputChannel } from "./vscode";
 import { registerFormatter } from "./format";
 import { handleDocumentProblems } from "./problems";
 import { compilerMutex, getDocumentMainFile } from "./compiler";
+import { registerDefinitions } from "./definitions";
 
 
 let languageContext: ExtensionContext
@@ -14,6 +15,7 @@ let lspClient: LanguageClient
 
 let disposeFormat: Disposable
 let disposeSave: Disposable
+let disposeDefinitions: Disposable
 
 const selector: DocumentSelector = [
   { language: 'crystal', scheme: 'file' },
@@ -86,6 +88,7 @@ async function activateLanguageFeatures(context: ExtensionContext) {
 
   if (disposeSave === undefined) {
     disposeSave = workspace.onDidSaveTextDocument((e) => handleSaveDocument(e))
+    disposeDefinitions = registerDefinitions(selector, context)
   }
 }
 
@@ -98,6 +101,11 @@ async function deactivateLanguageFeatures() {
   if (disposeSave) {
     disposeSave.dispose()
     disposeSave = undefined
+  }
+
+  if (disposeDefinitions) {
+    disposeDefinitions.dispose()
+    disposeDefinitions = undefined
   }
 }
 
