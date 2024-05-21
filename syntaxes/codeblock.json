@@ -1,4 +1,5 @@
 {
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
     "fileTypes": [],
     "injectionSelector": "L:text.html.markdown",
     "patterns": [
@@ -41,5 +42,5 @@
             ]
         }
     },
-    "scopeName": "markdown.crystal.codeblock"
+    "scopeName": "source.markdown.crystal.codeblock"
 }
