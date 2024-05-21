@@ -195,7 +195,24 @@ export async function findProblems(response: string, uri: Uri): Promise<void> {
 
   let diagnostics = []
   if (!JSON.parse(response).status) {
-    for (let resp of parsedResponses) {
+    let lastIdx = -1
+
+    for (let i = 0; i < parsedResponses.length; i++) {
+      const response = parsedResponses[i];
+      let uri = Uri.file(response.file)
+
+      if (uri.fsPath.startsWith(projectRoot.uri.fsPath)) {
+        lastIdx = i
+      }
+    }
+
+    if (lastIdx === -1) {
+      lastIdx = 0
+    }
+
+    for (let i = lastIdx; i < parsedResponses.length; i++) {
+      const resp = parsedResponses[i];
+
       if (resp.line == null)
         resp.line = 1
       if (resp.column == null)
@@ -213,9 +230,9 @@ export async function findProblems(response: string, uri: Uri): Promise<void> {
     }
   }
 
-  if (diagnostics.length == 0) {
-    diagnosticCollection.clear()
-  } else {
+  diagnosticCollection.clear()
+
+  if (diagnostics.length > 0) {
     diagnosticCollection.set(diagnostics)
   }
 }
