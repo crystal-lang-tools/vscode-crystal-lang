@@ -1,12 +1,13 @@
 import { existsSync, readFileSync } from "fs";
 import { Diagnostic, DiagnosticCollection, DiagnosticSeverity, Range, TextDocument, Uri, WorkspaceFolder, languages, workspace } from "vscode";
+import { Mutex } from "async-mutex";
+import { cwd } from "process";
 import path = require("path");
 import * as yaml from 'yaml';
 
 import { execAsync, shellEscape } from "./tools";
-import { getProjectRoot, outputChannel } from "./vscode";
+import { getProjectRoot, get_config, outputChannel } from "./vscode";
 import { spawnProblemsTool } from "./problems";
-import { Mutex } from "async-mutex";
 
 
 export const compilerMutex = new Mutex();
@@ -44,7 +45,7 @@ interface Shard {
 }
 
 export async function getCompilerPath(): Promise<string> {
-  const config = workspace.getConfiguration('crystal-lang');
+  const config = get_config();
 
   if (config.has('compiler')) {
     const exe = config.get<string>('compiler');
@@ -58,7 +59,7 @@ export async function getCompilerPath(): Promise<string> {
 }
 
 export async function getDocumentMainFile(document: TextDocument): Promise<string> {
-  const config = workspace.getConfiguration('crystal-lang');
+  const config = get_config();
   const projectRoot = getProjectRoot(document.uri);
 
   // Specs are their own main files
@@ -113,7 +114,8 @@ export async function getDocumentMainFile(document: TextDocument): Promise<strin
 async function getDocumentShardTarget(document: TextDocument): Promise<{ response: string, error }> {
   const compiler = await getCompilerPath();
   const projectRoot = getProjectRoot(document.uri);
-  const config = workspace.getConfiguration('crystal-lang');
+  const config = get_config();
+
 
   const targets = getShardYmlTargets(projectRoot);
 
@@ -245,16 +247,21 @@ export async function findProblemsRaw(response: string, uri: Uri): Promise<void>
 
   let parsedLine = 0
   try {
-    parsedLine = parseInt(responseData[1])
+    parsedLine = parseInt(responseData[2])
   } catch {
     diagnosticCollection.delete(uri)
     return;
   }
 
+  let errorPath: string = path.join(uri.fsPath, responseData[1])
+  if (!existsSync(errorPath)) {
+    errorPath = uri.fsPath
+  }
+
   let diagnostics = []
-  if (parsedLine != 0) {
+  if (parsedLine !== 0) {
     const resp: ErrorResponse = {
-      file: (uri && uri.fsPath) || responseData[1],
+      file: errorPath,
       line: parseInt(responseData[2]),
       column: parseInt(responseData[3]),
       size: null,
@@ -275,5 +282,37 @@ export async function findProblemsRaw(response: string, uri: Uri): Promise<void>
     diagnosticCollection.clear()
   } else {
     diagnosticCollection.set(diagnostics)
+  }
+}
+
+/**
+ * Semantic version of Crystal
+ *
+ * @export
+ * @interface SemVer
+ */
+export interface SemVer {
+  major: number,
+  minor: number,
+  patch: number
+}
+
+/**
+ * Gets the version of the Crystal compiler.
+ *
+ * @export
+ * @return {*}  {Promise<SemVer>}
+ */
+export async function getCrystalVersion(): Promise<SemVer> {
+  const compiler = await getCompilerPath();
+  const cmd = `${shellEscape(compiler)} --version`
+  const response = await execAsync(cmd, cwd())
+
+  const match = response.stdout.match(/Crystal (\d+)\.(\d+)\.(\d+)/)
+
+  return {
+    major: Number(match[1]),
+    minor: Number(match[2]),
+    patch: Number(match[3])
   }
 }

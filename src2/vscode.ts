@@ -1,5 +1,5 @@
 import { existsSync } from "fs";
-import { Position, TextDocument, Uri, WorkspaceFolder, window } from "vscode";
+import { Position, TextDocument, Uri, WorkspaceConfiguration, WorkspaceFolder, window, workspace } from "vscode";
 import path = require("path");
 
 
@@ -18,13 +18,13 @@ export function getProjectRoot(uri: Uri): WorkspaceFolder {
 
   if (result) {
     return {
-      name: result.fsPath,
+      name: path.basename(result.fsPath),
       uri: result,
       index: undefined
     }
   } else {
     return {
-      name: path.dirname(uri.fsPath),
+      name: path.basename(path.dirname(uri.fsPath)),
       uri: Uri.file(path.dirname(uri.fsPath)),
       index: undefined
     }
@@ -61,4 +61,8 @@ export function getCursorPath(document: TextDocument, position: Position): strin
     }`;
   if (/^\w:\\/.test(path)) return path.slice(2);
   return path;
+}
+
+export function get_config(): WorkspaceConfiguration {
+  return workspace.getConfiguration('crystal-lang');
 }

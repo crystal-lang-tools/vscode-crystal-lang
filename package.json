@@ -245,7 +245,9 @@
 		"test-compile": "tsc -p ./"
 	},
 	"dependencies": {
+		"@types/glob": "^8.1.0",
 		"async-mutex": "^0.4.0",
+		"glob": "^10.3.15",
 		"junit2json": "~3.1.4",
 		"temp": "~0.9.4",
 		"terminate": "^2.6.1",

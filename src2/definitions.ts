@@ -1,9 +1,9 @@
 import { CancellationToken, Definition, DefinitionProvider, Disposable, DocumentSelector, ExtensionContext, Location, LocationLink, Position, TextDocument, Uri, languages, workspace } from "vscode";
 import path = require("path");
 import * as crypto from 'crypto';
-
-import { getCursorPath, getProjectRoot, outputChannel } from "./vscode";
 import { existsSync } from "fs";
+
+import { getCursorPath, getProjectRoot, get_config, outputChannel } from "./vscode";
 import { findProblems, getCompilerPath, getDocumentMainFile } from "./compiler";
 import { execAsync, shellEscape } from "./tools";
 
@@ -38,7 +38,7 @@ class CrystalDefinitionProvider implements DefinitionProvider {
     position: Position,
     token: CancellationToken
   ): Promise<Definition | LocationLink[]> {
-    const config = workspace.getConfiguration('crystal-lang');
+    const config = get_config();
     if (!config.get<boolean>("definitions")) return;
 
     const hash = this.computeHash(document, position);
@@ -115,7 +115,7 @@ async function spawnImplTool(
   token: CancellationToken
 ): Promise<ImplResponse> {
   const compiler = await getCompilerPath();
-  const config = workspace.getConfiguration('crystal-lang');
+  const config = get_config();
   const cursor = getCursorPath(document, position);
   const mainFile = await getDocumentMainFile(document);
   const projectRoot = getProjectRoot(document.uri);
