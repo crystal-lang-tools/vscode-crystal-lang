@@ -32,6 +32,9 @@ export function getProjectRoot(uri: Uri): WorkspaceFolder {
 }
 
 function findClosestShardYml(uri: Uri): Uri | null {
+  if (existsSync(path.join(uri.fsPath, 'shard.yml')))
+    return Uri.file(uri.fsPath);
+
   let currentDir = path.dirname(uri.fsPath);
 
   while (currentDir !== path.parse(currentDir).root) {
