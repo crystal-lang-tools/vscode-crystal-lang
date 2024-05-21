@@ -91,7 +91,8 @@ export class CrystalTestingProvider {
 
           for (let arg of runnerArgs) {
             const argProjectRoot = getProjectRoot(Uri.file(arg))
-            if (workspace.uri.fsPath == argProjectRoot.uri.fsPath && !(args.includes(arg))) {
+            if (workspace.uri.fsPath === argProjectRoot.uri.fsPath &&
+              workspace.uri.fsPath !== arg && !(args.includes(arg))) {
               args.push(arg)
             }
           }
@@ -109,6 +110,8 @@ export class CrystalTestingProvider {
             return;
           }
         }
+      } catch (err) {
+        console.log(`[Spec] Error: ${JSON.stringify(err)}`)
       } finally {
         release()
         outputChannel.appendLine(`[Spec] Finished execution in ${Date.now() - start} ms`)
@@ -197,14 +200,16 @@ export class CrystalTestingProvider {
         return foundChildren
       }
     } else if (excludes.length > 0) {
-      if (excludes.includes(item)) {
+      if (excludes.map(m => m.id).includes(item.id)) {
         return []
-      } else {
+      } else if (item.children.size) {
         let foundChildren = []
         item.children.forEach((child) => {
           foundChildren = foundChildren.concat(this.generateRunnerArgs(child, includes, excludes))
         })
         return foundChildren
+      } else {
+        return [item.uri.fsPath]
       }
     } else {
       return [item.uri.fsPath]
