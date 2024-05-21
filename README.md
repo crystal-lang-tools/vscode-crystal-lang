@@ -35,16 +35,16 @@ For debugging support, it's recommended to follow the guide [here](https://dev.t
 ## Settings
 
 - `compiler` - set a custom absolute path for the Crystal compiler
-- `definitions` - enables jump-to-definition (reload required)
+- `definitions` - enables jump-to-definition
 - `dependencies` - use the dependencies tool to determine the main for each file, required if there's multiple entrypoints to the project, can be slow
 - `flags` - flags to pass to the compiler
-- `hover` - show type information on hover (reload required)
+- `hover` - show type information on hover
 - `main` - set a main executable to use for the current project (`${workspaceRoot}/src/main.cr`)
-- `problems` - runs the compiler on save and reports any issues (reload required)
-- `server` - absolute path to an LSP executable to use instead of the custom features provided by this extension, like [Crystalline](https://github.com/elbywan/crystalline) (reload required)
+- `problems` - runs the compiler on save and reports any issues
+- `server` - absolute path to an LSP executable to use instead of the custom features provided by this extension, like [Crystalline](https://github.com/elbywan/crystalline)
 - `server-env` - object defining env variables to pass to the LSP (reload required)
 - `shards` - set a custom absolute path for the shards executable
-- `spec-explorer` - enable the built-in testing UI for specs, recommended for Crystal >= 1.11 due to `--dry-run` flag (reload required)
+- `spec-explorer` - enable the built-in testing UI for specs, recommended for Crystal >= 1.11 due to `--dry-run` flag
 - `spec-tags` - specific tags to pass to the spec runner
 - `disable-gc` - disable the garbage collector when running compiler tools, can provide increased performance at the cost of increased memory usage, defaults to false
 
