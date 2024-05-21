@@ -103,7 +103,9 @@ async function activateLanguageFeatures(context: ExtensionContext) {
 }
 
 function activateSpecExplorer() {
-  if (disposeSpecs === undefined && getConfig().get<boolean>("spec-explorer")) {
+  const config = getConfig();
+
+  if (disposeSpecs === undefined && config.get<boolean>("spec-explorer")) {
     disposeSpecs = new CrystalTestingProvider();
   }
 }

@@ -4,7 +4,7 @@ import * as crypto from 'crypto';
 import { existsSync } from "fs";
 
 import { getCursorPath, getProjectRoot, get_config, outputChannel } from "./vscode";
-import { findProblems, getCompilerPath, getDocumentMainFile } from "./compiler";
+import { findProblems, getCompilerPath, getCrystalLibraryPath, getDocumentMainFile } from "./compiler";
 import { execAsync, shellEscape } from "./tools";
 
 export function registerDefinitions(selector: DocumentSelector, context: ExtensionContext): Disposable {
@@ -67,7 +67,15 @@ class CrystalDefinitionProvider implements DefinitionProvider {
         return result;
       }
 
-      // TODO: implement shard lookup
+      // Search CRYSTAL_PATH for the library
+      const projectRoot = getProjectRoot(document.uri);
+      const libraryPath = await getCrystalLibraryPath(text, projectRoot)
+      if (libraryPath) {
+        const result = new Location(Uri.file(libraryPath), new Position(0, 0))
+        this.cache.set(hash, result)
+        return result
+      }
+
       return [];
     }
 
