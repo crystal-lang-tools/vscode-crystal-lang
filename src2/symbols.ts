@@ -36,8 +36,8 @@ const PROPERTY_PATTERN =
 const IVAR_PATTERN = /^\s*(@\w+)\s+[:=].+[\r\n;]?$/;
 const CLASS_IVAR_PATTERN = /^\s*(@@\w+)\s+[:=].+[\r\n;]?$/;
 const VARIABLE_PATTERN = /^\s*(\w+)\s+[:=].+[\r\n;]?$/;
-const CONTROL_PATTERN = /^\s*(switch|case|if|unless|until|while|begin)\s+.*$/;
-const DO_BLOCK_START_PATTERN = /^\s*.*\s+(do)\s*(?:\|[^|]*\|)?\s*$/;
+const CONTROL_PATTERN = /^\s*(?:.*=\s+)?(select|case|if|unless|until|while|begin)(?:\s+.*)?$/;
+const BLOCK_START_PATTERN = /^\s*.*\s+(do|begin)\s*(?:\|[^|]*\|)?\s*$/;
 
 
 interface SymbolLoc {
@@ -180,7 +180,7 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
         }
 
         // Need to just match the end, there's no symbol for a case statement
-        matches = CONTROL_PATTERN.exec(line) || DO_BLOCK_START_PATTERN.exec(line);
+        matches = CONTROL_PATTERN.exec(line) || BLOCK_START_PATTERN.exec(line);
         if (matches && matches.length) {
           const symbol = {
             name: matches[1],
