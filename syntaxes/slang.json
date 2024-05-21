@@ -1,4 +1,5 @@
 {
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
 	"fileTypes": [
 		"slang"
 	],
@@ -363,17 +364,17 @@
 		},
 		"embedded-crystal": {
 			"begin": "(?<!\\\\)#\\{{1,2}",
-			"beginCaptures": [
-				{
+			"beginCaptures": {
+				"1": {
 					"name": "punctuation.section.embedded.crystal"
 				}
-			],
+			},
 			"end": "\\}{1,2}",
-			"endCaptures": [
-				{
+			"endCaptures": {
+				"1": {
 					"name": "punctuation.section.embedded.crystal"
 				}
-			],
+			},
 			"name": "source.crystal.embedded.html",
 			"patterns": [
 				{
@@ -438,18 +439,18 @@
 		},
 		"string-double-quoted": {
 			"begin": "(\")(?=.*\")",
-			"beginCaptures": [
-				{
+			"beginCaptures": {
+				"1": {
 					"name": "punctuation.definition.string.begin.html"
 				}
-			],
+			},
 			"contentName": "meta.toc-list.id.html",
 			"end": "\"",
-			"endCaptures": [
-				{
+			"endCaptures": {
+				"1": {
 					"name": "punctuation.definition.string.end.html"
 				}
-			],
+			},
 			"name": "string.quoted.double.html",
 			"patterns": [
 				{
@@ -462,18 +463,18 @@
 		},
 		"string-single-quoted": {
 			"begin": "(')(?=.*')",
-			"beginCaptures": [
-				{
+			"beginCaptures": {
+				"1": {
 					"name": "punctuation.definition.string.begin.html"
 				}
-			],
+			},
 			"contentName": "meta.toc-list.id.html",
 			"end": "'",
-			"endCaptures": [
-				{
+			"endCaptures": {
+				"1": {
 					"name": "punctuation.definition.string.end.html"
 				}
-			],
+			},
 			"name": "string.quoted.single.html",
 			"patterns": [
 				{
