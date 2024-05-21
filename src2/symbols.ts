@@ -183,8 +183,8 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
         matches = CONTROL_PATTERN.exec(line) || BLOCK_START_PATTERN.exec(line);
         if (matches && matches.length) {
           const symbol = {
-            name: matches[1],
-            kind: SymbolKind.Operator,
+            name: null,
+            kind: null,
             start: index,
             endLine: null,
             endCol: line.length
