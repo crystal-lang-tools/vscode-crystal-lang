@@ -2,6 +2,7 @@ import { ChildProcess, ExecException, exec } from "child_process";
 import terminate from "terminate";
 import { promisify } from "util";
 import { CancellationToken, workspace } from "vscode";
+import { outputChannel } from "./vscode";
 
 
 function execWrapper(
@@ -45,7 +46,9 @@ export async function execAsync(command: string, cwd: string, token: Cancellatio
     })
 
     token?.onCancellationRequested(() => {
-      terminate(child.pid)
+      terminate(child.pid, () => {
+        outputChannel.appendLine(`[Terminate] ${child.pid} killed successfully`)
+      })
     })
   })
 }
