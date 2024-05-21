@@ -1,5 +1,6 @@
-import { existsSync, readFileSync } from "fs";
+import { existsSync, readFileSync, readdirSync } from "fs";
 import { Diagnostic, DiagnosticCollection, DiagnosticSeverity, Range, TextDocument, Uri, WorkspaceFolder, languages, workspace } from "vscode";
+import { execSync } from "child_process";
 import { Mutex } from "async-mutex";
 import { cwd } from "process";
 import path = require("path");
@@ -315,4 +316,48 @@ export async function getCrystalVersion(): Promise<SemVer> {
     minor: Number(match[2]),
     patch: Number(match[3])
   }
+}
+
+const CRYSTAL_PATH = process.env.CRYSTAL_PATH || '';
+
+async function getCrystalEnv(): Promise<{ [key: string]: string; }> {
+  const compiler = await getCompilerPath();
+  const output = execSync(`${shellEscape(compiler)} env`).toString()
+  const lines = output.split(/\r?\n/)
+  const env: { [key: string]: string } = {}
+
+  lines.forEach((line) => {
+    const [key, value] = line.split("=");
+    if (key && value) {
+      env[key.trim()] = value.trim().replace(/^['"]|['"]$/g, '');
+    }
+  })
+
+  return env;
+}
+
+export async function getCrystalLibraryPath(
+  library: string, project: WorkspaceFolder
+): Promise<string> {
+  try {
+    const crystalPath = (await getCrystalEnv()).CRYSTAL_PATH;
+    if (!crystalPath) return;
+
+    if (!library.endsWith(".cr"))
+      library += ".cr";
+
+    for (let dir of crystalPath.split(":")) {
+      if (!path.isAbsolute(dir))
+        dir = path.join(project.uri.fsPath, dir)
+
+      const libraryPath = path.join(dir, library)
+      if (existsSync(libraryPath)) {
+        return libraryPath;
+      }
+    }
+  } catch (err) {
+    outputChannel.appendLine(JSON.stringify(err))
+  }
+
+  return;
 }
