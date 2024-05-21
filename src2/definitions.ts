@@ -1,7 +1,8 @@
-import { CancellationToken, Definition, DefinitionProvider, Disposable, DocumentSelector, ExtensionContext, Location, LocationLink, Position, TextDocument, Uri, languages, workspace } from "vscode";
+import { CancellationToken, Definition, DefinitionProvider, Disposable, DocumentSelector, ExtensionContext, Location, LocationLink, Position, Range, TextDocument, Uri, languages } from "vscode";
 import path = require("path");
 import * as crypto from 'crypto';
 import { existsSync } from "fs";
+import glob = require("glob");
 
 import { getCursorPath, getProjectRoot, get_config, outputChannel } from "./vscode";
 import { findProblems, getCompilerPath, getCrystalLibraryPath, getDocumentMainFile } from "./compiler";
@@ -47,11 +48,31 @@ class CrystalDefinitionProvider implements DefinitionProvider {
     }
 
     const line = document.lineAt(position.line);
-    const requireMatches = /^require\s+"(.+)"\s*$/.exec(line.text);
+    const projectRoot = getProjectRoot(document.uri);
+    const requireMatches = /^\s*require\s+"(.+)"\s*$/.exec(line.text);
 
     if (requireMatches?.length > 1) {
+      const textRange = document.getWordRangeAtPosition(position, /[^\"]+/)
+
       let text = requireMatches[1];
-      if (text.includes('*')) return [];
+      if (text.includes('*')) {
+        const list = glob.sync(text, { cwd: projectRoot.uri.fsPath, ignore: 'lib/**' })
+        const items: LocationLink[] = []
+
+        for (let item of list) {
+          if (!item.endsWith(".cr"))
+            continue;
+
+          const itemPath = path.join(projectRoot.uri.fsPath, item)
+          items.push({
+            targetUri: Uri.file(itemPath),
+            targetRange: new Range(new Position(0, 0), new Position(0, 0)),
+            originSelectionRange: textRange
+          })
+        }
+
+        return items;
+      };
 
       outputChannel.appendLine(`[Impl] Identified: ${text}`)
 
@@ -62,16 +83,23 @@ class CrystalDefinitionProvider implements DefinitionProvider {
         const loc = path.join(dir, text);
         if (!existsSync(loc)) return [];
 
-        const result = new Location(Uri.file(loc), new Position(0, 0))
+        const result: LocationLink[] = [{
+          targetUri: Uri.file(loc),
+          targetRange: new Range(new Position(0, 0), new Position(0, 0)),
+          originSelectionRange: textRange
+        }]
         this.cache.set(hash, result)
         return result;
       }
 
       // Search CRYSTAL_PATH for the library
-      const projectRoot = getProjectRoot(document.uri);
       const libraryPath = await getCrystalLibraryPath(text, projectRoot)
       if (libraryPath) {
-        const result = new Location(Uri.file(libraryPath), new Position(0, 0))
+        const result: LocationLink[] = [{
+          targetUri: Uri.file(libraryPath),
+          targetRange: new Range(new Position(0, 0), new Position(0, 0)),
+          originSelectionRange: textRange
+        }]
         this.cache.set(hash, result)
         return result
       }
