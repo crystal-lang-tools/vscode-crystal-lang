@@ -1,13 +1,14 @@
-import { Disposable, ConfigurationChangeEvent, DocumentFormattingEditProvider, ExtensionContext, workspace, TextDocument, CancellationToken } from "vscode";
+import { Disposable, ConfigurationChangeEvent, ExtensionContext, workspace, TextDocument } from "vscode";
 import { DocumentSelector, LanguageClient, LanguageClientOptions, ServerOptions } from "vscode-languageclient/node";
 import { existsSync } from "fs";
 import { E_CANCELED } from "async-mutex";
 
-import { getProjectRoot, outputChannel } from "./vscode";
+import { getProjectRoot, get_config as getConfig, outputChannel } from "./vscode";
 import { registerFormatter } from "./format";
 import { handleDocumentProblems } from "./problems";
 import { compilerMutex, getDocumentMainFile } from "./compiler";
 import { registerDefinitions } from "./definitions";
+import { CrystalTestingProvider } from "./spec";
 
 
 let languageContext: ExtensionContext
@@ -16,6 +17,7 @@ let lspClient: LanguageClient
 let disposeFormat: Disposable
 let disposeSave: Disposable
 let disposeDefinitions: Disposable
+let disposeSpecs: CrystalTestingProvider
 
 const selector: DocumentSelector = [
   { language: 'crystal', scheme: 'file' },
@@ -27,7 +29,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   outputChannel.appendLine("[Crystal] Loading extension...")
   languageContext = context
 
-  const config = workspace.getConfiguration("crystal-lang");
+  const config = getConfig();
   const lspExecutable = config.get<string>("server");
 
   workspace.onDidChangeConfiguration((e) => handleConfigChange(e))
@@ -80,7 +82,7 @@ async function deactivateLanguageServer() {
 
 
 async function activateLanguageFeatures(context: ExtensionContext) {
-  const config = workspace.getConfiguration("crystal-lang");
+  const config = getConfig();
 
   if (disposeFormat === undefined) {
     disposeFormat = registerFormatter(selector, context)
@@ -89,6 +91,14 @@ async function activateLanguageFeatures(context: ExtensionContext) {
   if (disposeSave === undefined) {
     disposeSave = workspace.onDidSaveTextDocument((e) => handleSaveDocument(e))
     disposeDefinitions = registerDefinitions(selector, context)
+  }
+
+  activateSpecExplorer();
+}
+
+function activateSpecExplorer() {
+  if (disposeSpecs === undefined && getConfig().get<boolean>("spec-explorer")) {
+    disposeSpecs = new CrystalTestingProvider();
   }
 }
 
@@ -107,11 +117,20 @@ async function deactivateLanguageFeatures() {
     disposeDefinitions.dispose()
     disposeDefinitions = undefined
   }
+
+  deactivateSpecExplorer();
+}
+
+function deactivateSpecExplorer() {
+  if (disposeSpecs) {
+    disposeSpecs.controller.dispose();
+    disposeSpecs = undefined;
+  }
 }
 
 
 async function handleConfigChange(e: ConfigurationChangeEvent) {
-  const config = workspace.getConfiguration("crystal-lang");
+  const config = getConfig();
 
   // Check if LSP config changed and auto-stop/start LSP
   if (e.affectsConfiguration("crystal-lang.server")) {
@@ -135,19 +154,42 @@ async function handleConfigChange(e: ConfigurationChangeEvent) {
       }
     }
   }
+
+  if (e.affectsConfiguration("crystal-lang.spec-explorer")) {
+    const specExplorer = config.get<boolean>("spec-explorer")
+
+    if (disposeSpecs === undefined) {
+      if (specExplorer) {
+        outputChannel.appendLine(`[Crystal] Activating spec explorer`)
+        activateSpecExplorer();
+      }
+    } else {
+      if (!specExplorer) {
+        outputChannel.appendLine(`[Crystal] Deactivating spec explorer`)
+        deactivateSpecExplorer();
+      }
+    }
+  }
 }
 
 async function handleSaveDocument(e: TextDocument): Promise<void> {
+  if (e.uri.scheme !== "file" || !(e.fileName.endsWith(".cr") || e.fileName.endsWith(".ecr")))
+    return;
+
   compilerMutex.cancel()
   compilerMutex.acquire()
     .then(async (release) => {
       try {
-        const config = workspace.getConfiguration("crystal-lang");
+        const config = getConfig();
         const mainFile = await getDocumentMainFile(e);
         const projectRoot = getProjectRoot(e.uri);
 
         if (config.get<boolean>("problems")) {
           await handleDocumentProblems(e, mainFile, projectRoot)
+        }
+
+        if (config.get<boolean>("spec-explorer")) {
+          await disposeSpecs.handleDocumentSpecs(e)
         }
       } finally {
         release()
