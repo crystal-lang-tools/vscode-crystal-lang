@@ -1,5 +1,6 @@
 import { CancellationToken, Definition, DefinitionProvider, Disposable, DocumentSelector, ExtensionContext, Location, LocationLink, Position, TextDocument, Uri, languages, workspace } from "vscode";
 import path = require("path");
+import * as crypto from 'crypto';
 
 import { getCursorPath, getProjectRoot, outputChannel } from "./vscode";
 import { existsSync } from "fs";
@@ -17,6 +18,21 @@ export function registerDefinitions(selector: DocumentSelector, context: Extensi
 }
 
 class CrystalDefinitionProvider implements DefinitionProvider {
+  private cache: Map<string, Definition | LocationLink[]> = new Map();
+
+  private computeHash(document: TextDocument, position: Position): string {
+    const wordRange = document.getWordRangeAtPosition(position);
+    const wordStart = wordRange ? wordRange.start : position;
+    const content = document.getText();
+    const hash = crypto.createHash('sha256');
+
+    hash.update(content);
+    hash.update(wordStart.line.toString());
+    hash.update(wordStart.character.toString());
+
+    return hash.digest('hex');
+  }
+
   async provideDefinition(
     document: TextDocument,
     position: Position,
@@ -24,6 +40,11 @@ class CrystalDefinitionProvider implements DefinitionProvider {
   ): Promise<Definition | LocationLink[]> {
     const config = workspace.getConfiguration('crystal-lang');
     if (!config.get<boolean>("definitions")) return;
+
+    const hash = this.computeHash(document, position);
+    if (this.cache.has(hash)) {
+      return this.cache.get(hash)!
+    }
 
     const line = document.lineAt(position.line);
     const requireMatches = /^require\s+"(.+)"\s*$/.exec(line.text);
@@ -41,7 +62,9 @@ class CrystalDefinitionProvider implements DefinitionProvider {
         const loc = path.join(dir, text);
         if (!existsSync(loc)) return [];
 
-        return new Location(Uri.file(loc), new Position(0, 0));
+        const result = new Location(Uri.file(loc), new Position(0, 0))
+        this.cache.set(hash, result)
+        return result;
       }
 
       // TODO: implement shard lookup
@@ -49,10 +72,11 @@ class CrystalDefinitionProvider implements DefinitionProvider {
     }
 
     outputChannel.appendLine('[Impl] Getting implementations...')
-    const result = await spawnImplTool(document, position, token);
+    const result = await spawnImplTool(document, position, token)
 
     if (result === undefined || result.status !== 'ok') {
       outputChannel.appendLine(`[Impl] No implementation found.`)
+      this.cache.set(hash, [])
       return [];
     }
 
@@ -70,6 +94,7 @@ class CrystalDefinitionProvider implements DefinitionProvider {
       outputChannel.appendLine(`[Implementations] No implementation found.`)
     }
 
+    this.cache.set(hash, links)
     return links;
   }
 }
