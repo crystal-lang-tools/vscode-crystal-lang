@@ -90,7 +90,7 @@
 			},
 			{
 				"language": "crystal-markdown-injection",
-				"scopeName": "markdown.crystal.codeblock",
+				"scopeName": "source.markdown.crystal.codeblock",
 				"path": "./syntaxes/codeblock.json",
 				"injectTo": [
 					"text.html.markdown"
