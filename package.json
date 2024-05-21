@@ -166,7 +166,7 @@
 				"crystal-lang.server": {
 					"type": "string",
 					"default": "",
-					"description": "[Experimental][Reload required]\nAbsolute path for Scry/Crystalline LSP server binary\n(Language Server Protocol for Crystal)."
+					"description": "Absolute path for Scry/Crystalline LSP server binary\n(Language Server Protocol for Crystal)."
 				},
 				"crystal-lang.server-env": {
 					"type": "object",
@@ -181,7 +181,7 @@
 				"crystal-lang.spec-explorer": {
 					"type": "boolean",
 					"default": false,
-					"description": "[Reload required]\nShow specs in the Test Explorer."
+					"description": "Show specs in the Test Explorer."
 				},
 				"crystal-lang.spec-tags": {
 					"type": "string",
@@ -191,17 +191,17 @@
 				"crystal-lang.hover": {
 					"type": "boolean",
 					"default": true,
-					"description": "[Reload required]\nShow type information on hover."
+					"description": "Show type information on hover."
 				},
 				"crystal-lang.definitions": {
 					"type": "boolean",
 					"default": true,
-					"description": "[Reload required]\nEnables jump to definition."
+					"description": "Enables jump to definition."
 				},
 				"crystal-lang.problems": {
 					"type": "boolean",
 					"default": true,
-					"description": "[Reload required]\nEnable problems finder. Runs the Crystal compiler on save and reports any problems found."
+					"description": "Enable problems finder. Runs the Crystal compiler on save and reports any problems found."
 				},
 				"crystal-lang.dependencies": {
 					"type": "boolean",
