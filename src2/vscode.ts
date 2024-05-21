@@ -1,5 +1,5 @@
 import { existsSync } from "fs";
-import { Position, TextDocument, Uri, WorkspaceConfiguration, WorkspaceFolder, window, workspace } from "vscode";
+import { Position, TextDocument, Uri, WorkspaceConfiguration, WorkspaceFolder, window, workspace, ConfigurationScope } from "vscode";
 import path = require("path");
 
 
@@ -66,6 +66,10 @@ export function getCursorPath(document: TextDocument, position: Position): strin
   return path;
 }
 
-export function get_config(): WorkspaceConfiguration {
-  return workspace.getConfiguration('crystal-lang');
+export function get_config(uri: Uri = undefined): WorkspaceConfiguration {
+  let scope: ConfigurationScope = {
+    uri: uri,
+    languageId: 'crystal'
+  }
+  return workspace.getConfiguration('crystal-lang', scope);
 }
