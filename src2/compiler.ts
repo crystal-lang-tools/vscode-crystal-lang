@@ -7,7 +7,7 @@ import path = require("path");
 import * as yaml from 'yaml';
 
 import { execAsync, shellEscape } from "./tools";
-import { getProjectRoot, get_config, outputChannel } from "./vscode";
+import { getProjectRoot, getConfig, outputChannel } from "./vscode";
 import { spawnProblemsTool } from "./problems";
 
 
@@ -46,7 +46,7 @@ interface Shard {
 }
 
 export async function getCompilerPath(): Promise<string> {
-  const config = get_config();
+  const config = getConfig();
 
   if (config.has('compiler')) {
     const exe = config.get<string>('compiler');
@@ -60,7 +60,7 @@ export async function getCompilerPath(): Promise<string> {
 }
 
 export async function getDocumentMainFile(document: TextDocument): Promise<string> {
-  const config = get_config();
+  const config = getConfig();
   const projectRoot = getProjectRoot(document.uri);
 
   // Specs are their own main files
@@ -115,7 +115,7 @@ export async function getDocumentMainFile(document: TextDocument): Promise<strin
 async function getDocumentShardTarget(document: TextDocument): Promise<{ response: string, error }> {
   const compiler = await getCompilerPath();
   const projectRoot = getProjectRoot(document.uri);
-  const config = get_config();
+  const config = getConfig();
 
 
   const targets = getShardYmlTargets(projectRoot);
@@ -336,7 +336,7 @@ async function getCrystalEnv(): Promise<{ [key: string]: string; }> {
   return env;
 }
 
-export async function getCrystalLibraryPath(
+export async function getPathToLibrary(
   library: string, project: WorkspaceFolder
 ): Promise<string> {
   try {
@@ -360,4 +360,33 @@ export async function getCrystalLibraryPath(
   }
 
   return;
+}
+
+export async function getListOfLibraries(uri: Uri): Promise<string[]> {
+  const crystalEnv = (await getCrystalEnv()).CRYSTAL_PATH;
+
+  if (!crystalEnv) return [];
+
+  const libraries: string[] = []
+
+  const paths = crystalEnv.split(":")
+  paths.forEach(async (p: string) => {
+    try {
+      if (!path.isAbsolute(p))
+        p = path.join(uri.fsPath, p)
+
+      if (!existsSync(p)) return;
+
+      const items = readdirSync(p);
+
+      const folders = items.map((v) => { return v.replace('.cr', '') });
+
+      libraries.push(...folders)
+
+    } catch (err) {
+      outputChannel.appendLine(err.toString())
+    }
+  })
+
+  return libraries;
 }

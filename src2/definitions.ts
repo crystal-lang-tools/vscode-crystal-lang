@@ -4,8 +4,8 @@ import * as crypto from 'crypto';
 import { existsSync } from "fs";
 import glob = require("glob");
 
-import { getCursorPath, getProjectRoot, get_config, outputChannel } from "./vscode";
-import { findProblems, getCompilerPath, getCrystalLibraryPath, getDocumentMainFile } from "./compiler";
+import { getCursorPath, getProjectRoot, getConfig, outputChannel } from "./vscode";
+import { findProblems, getCompilerPath, getPathToLibrary, getDocumentMainFile } from "./compiler";
 import { execAsync, shellEscape } from "./tools";
 
 export function registerDefinitions(selector: DocumentSelector, context: ExtensionContext): Disposable {
@@ -39,7 +39,7 @@ class CrystalDefinitionProvider implements DefinitionProvider {
     position: Position,
     token: CancellationToken
   ): Promise<Definition | LocationLink[]> {
-    const config = get_config();
+    const config = getConfig();
     if (!config.get<boolean>("definitions")) return;
 
     const hash = this.computeHash(document, position);
@@ -55,6 +55,8 @@ class CrystalDefinitionProvider implements DefinitionProvider {
       const textRange = document.getWordRangeAtPosition(position, /[^\"]+/)
 
       let text = requireMatches[1];
+      outputChannel.appendLine(`[Impl] Identified: ${text}`)
+
       if (text.includes('*')) {
         const list = glob.sync(text, { cwd: projectRoot.uri.fsPath, ignore: 'lib/**' })
         const items: LocationLink[] = []
@@ -74,8 +76,6 @@ class CrystalDefinitionProvider implements DefinitionProvider {
         return items;
       };
 
-      outputChannel.appendLine(`[Impl] Identified: ${text}`)
-
       const dir = path.dirname(document.fileName);
       if (/^\.{1,2}\/\w+/.test(text)) {
         if (!text.endsWith('.cr')) text += '.cr'
@@ -93,7 +93,7 @@ class CrystalDefinitionProvider implements DefinitionProvider {
       }
 
       // Search CRYSTAL_PATH for the library
-      const libraryPath = await getCrystalLibraryPath(text, projectRoot)
+      const libraryPath = await getPathToLibrary(text, projectRoot)
       if (libraryPath) {
         const result: LocationLink[] = [{
           targetUri: Uri.file(libraryPath),
@@ -151,7 +151,7 @@ async function spawnImplTool(
   token: CancellationToken
 ): Promise<ImplResponse> {
   const compiler = await getCompilerPath();
-  const config = get_config();
+  const config = getConfig();
   const cursor = getCursorPath(document, position);
   const mainFile = await getDocumentMainFile(document);
   const projectRoot = getProjectRoot(document.uri);

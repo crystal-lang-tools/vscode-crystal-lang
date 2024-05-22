@@ -6,7 +6,7 @@ import temp = require("temp");
 import path = require("path");
 import glob = require("glob");
 
-import { getProjectRoot, get_config, outputChannel, setStatusBar } from "./vscode";
+import { getProjectRoot, getConfig, outputChannel, setStatusBar } from "./vscode";
 import { findProblems, getCompilerPath, getCrystalVersion } from "./compiler";
 import { execAsync, shellEscape } from "./tools";
 
@@ -392,7 +392,7 @@ export async function spawnSpecTool(
   // Get compiler stuff
   const compiler = await getCompilerPath();
   const compiler_version = await getCrystalVersion();
-  const config = get_config();
+  const config = getConfig();
 
   // create a tempfile
   const tempFile = temp.path({ suffix: ".xml" })
