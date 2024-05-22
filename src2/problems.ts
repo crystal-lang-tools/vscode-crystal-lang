@@ -1,6 +1,6 @@
 import { TextDocument, WorkspaceFolder, workspace } from "vscode";
 
-import { get_config, outputChannel, setStatusBar } from "./vscode";
+import { getConfig, outputChannel, setStatusBar } from "./vscode";
 import { diagnosticCollection, findProblems, getCompilerPath } from "./compiler";
 import { execAsync, shellEscape } from "./tools";
 
@@ -18,7 +18,7 @@ export async function handleDocumentProblems(document: TextDocument, mainFile: s
 }
 
 export async function spawnProblemsTool(document: TextDocument, mainFile: string, projectRoot: WorkspaceFolder): Promise<void> {
-  const config = get_config();
+  const config = getConfig();
   const compiler = await getCompilerPath();
 
   if (!mainFile) {

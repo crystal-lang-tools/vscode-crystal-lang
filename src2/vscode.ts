@@ -66,7 +66,7 @@ export function getCursorPath(document: TextDocument, position: Position): strin
   return path;
 }
 
-export function get_config(uri: Uri = undefined): WorkspaceConfiguration {
+export function getConfig(uri: Uri = undefined): WorkspaceConfiguration {
   let scope: ConfigurationScope = {
     uri: uri,
     languageId: 'crystal'
