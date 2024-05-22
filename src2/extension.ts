@@ -3,7 +3,7 @@ import { DocumentSelector, LanguageClient, LanguageClientOptions, ServerOptions 
 import { existsSync } from "fs";
 import { E_CANCELED } from "async-mutex";
 
-import { getProjectRoot, get_config as getConfig, outputChannel } from "./vscode";
+import { getProjectRoot, getConfig, outputChannel } from "./vscode";
 import { registerFormatter } from "./format";
 import { handleDocumentProblems } from "./problems";
 import { compilerMutex, getDocumentMainFile } from "./compiler";
