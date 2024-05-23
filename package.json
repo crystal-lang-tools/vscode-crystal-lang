@@ -49,9 +49,9 @@
 				"configuration": "./config/crystal-language-configuration.json"
 			},
 			{
-				"id": "ecr",
+				"id": "html.ecr",
 				"aliases": [
-					"Embedded Crystal"
+					"HTML (Crystal - ECR)"
 				],
 				"extensions": [
 					".ecr"
@@ -79,9 +79,15 @@
 				"path": "./syntaxes/crystal.json"
 			},
 			{
-				"language": "ecr",
-				"scopeName": "text.ecr",
-				"path": "./syntaxes/ecr.json"
+				"language": "html.ecr",
+				"scopeName": "text.html.ecr",
+				"path": "./syntaxes/ecr.json",
+				"embeddedLanguages": {
+					"source.css": "css",
+					"source.html": "html",
+					"source.js": "javascript",
+					"source.crystal": "crystal"
+				}
 			},
 			{
 				"language": "slang",
@@ -106,7 +112,7 @@
 				"path": "./snippets/crystal.json"
 			},
 			{
-				"language": "ecr",
+				"language": "html.ecr",
 				"path": "./snippets/ecr.json"
 			},
 			{

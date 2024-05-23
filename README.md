@@ -99,3 +99,5 @@ See [Changelog](https://github.com/crystal-lang-tools/vscode-crystal-lang/blob/m
 - [@nobodywasishere](https://github.com/nobodywasishere) Margret Riegert - maintainer
 
 [See all contributors](https://github.com/crystal-lang-tools/vscode-crystal-lang/graphs/contributors)
+
+ECR syntax highlighting adapted from [bung87/vscode-rails](https://github.com/bung87/vscode-rails) under the MIT license.
