@@ -5,6 +5,7 @@ import { Mutex } from "async-mutex";
 import { cwd } from "process";
 import path = require("path");
 import * as yaml from 'yaml';
+import glob = require("glob");
 
 import { execAsync, shellEscape } from "./tools";
 import { getProjectRoot, getConfig, outputChannel } from "./vscode";
@@ -354,6 +355,12 @@ export async function getPathToLibrary(
       if (existsSync(libraryPath)) {
         return libraryPath;
       }
+
+      // Special handling for 'lib'
+      const items = glob.sync(`./*/src/${library}`, { cwd: dir })
+      if (items[0]) {
+        return path.join(dir, items[0])
+      }
     }
   } catch (err) {
     outputChannel.appendLine(JSON.stringify(err))
@@ -372,19 +379,33 @@ export async function getListOfLibraries(uri: Uri): Promise<string[]> {
   const paths = crystalEnv.split(":")
   paths.forEach(async (p: string) => {
     try {
+      // Need to handle the lib folder special
+      let libPath = false;
+      if (p === "lib") libPath = true;
+
       if (!path.isAbsolute(p))
         p = path.join(uri.fsPath, p)
 
       if (!existsSync(p)) return;
 
-      const items = readdirSync(p);
+      let globString = "./**/*.cr"
+      if (libPath) globString = "./*/src/**/*.cr"
 
-      const folders = items.map((v) => { return v.replace('.cr', '') });
+      let items = glob.sync(globString, { cwd: p })
 
-      libraries.push(...folders)
+      for (const item of items) {
+        let parsedItem = item;
 
+        if (libPath) {
+          parsedItem = item.replace(/^[^\/\\]*[\/\\]src[\/\\]/, '')
+        }
+
+        parsedItem = parsedItem.replace('.cr', '')
+
+        libraries.push(parsedItem);
+      }
     } catch (err) {
-      outputChannel.appendLine(err.toString())
+      outputChannel.appendLine(JSON.stringify(err))
     }
   })
 

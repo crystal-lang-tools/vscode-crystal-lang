@@ -10,6 +10,7 @@ import { compilerMutex, getDocumentMainFile } from "./compiler";
 import { registerDefinitions } from "./definitions";
 import { CrystalTestingProvider } from "./spec";
 import { registerSymbols } from "./symbols";
+import { registerCompletion } from "./completion";
 
 
 let languageContext: ExtensionContext
@@ -20,6 +21,7 @@ let disposeSave: Disposable
 let disposeDefinitions: Disposable
 let disposeSpecs: CrystalTestingProvider
 let disposeSymbols: Disposable
+let disposeComplete: Disposable
 
 const selector: DocumentSelector = [
   { language: 'crystal', scheme: 'file' },
@@ -99,6 +101,10 @@ async function activateLanguageFeatures(context: ExtensionContext) {
     disposeSymbols = registerSymbols(selector, context)
   }
 
+  if (disposeComplete === undefined) {
+    disposeComplete = registerCompletion(selector, context)
+  }
+
   activateSpecExplorer();
 }
 
@@ -129,6 +135,11 @@ async function deactivateLanguageFeatures() {
   if (disposeSymbols) {
     disposeSymbols.dispose()
     disposeSymbols = undefined
+  }
+
+  if (disposeComplete) {
+    disposeComplete.dispose()
+    disposeComplete = undefined
   }
 
   deactivateSpecExplorer();

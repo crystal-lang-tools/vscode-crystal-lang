@@ -54,7 +54,7 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
     token: CancellationToken
   ): ProviderResult<SymbolInformation[] | DocumentSymbol[]> {
     if (document.fileName.endsWith(".ecr")) return;
-    outputChannel.appendLine(`[Symbols] Searching for symbols in ${document.fileName}`);
+    // outputChannel.appendLine(`[Symbols] Searching for symbols in ${document.fileName}`);
 
     const container: SymbolLoc[] = [];
     const symbols: SymbolInformation[] = []
@@ -262,7 +262,7 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
       }
 
       // outputChannel.appendLine(`[Symbols] Found symbols: ${symbols.map(s => s?.name).join(", ")}`);
-      outputChannel.appendLine(`[Symbols] Success.`)
+      // outputChannel.appendLine(`[Symbols] Success.`)
       return symbols;
     } catch (err) {
       outputChannel.appendLine(`[Symbols] Error: ${JSON.stringify(err)}`)
