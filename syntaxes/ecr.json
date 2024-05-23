@@ -1,39 +1,154 @@
 {
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "HTML (Crystal - ECR)",
+	"scopeName": "text.html.ecr",
 	"fileTypes": [
 		"ecr"
 	],
-	"foldingStartMarker": "(?x)\n\t\t(<(?i:head|body|table|thead|tbody|tfoot|tr|div|select|fieldset|style|script|ul|ol|form|dl)\\b.*?>\n\t\t|<!--(?!.*-->)\n\t\t|\\{\\s*($|\\?>\\s*$|//|/\\*(.*\\*/\\s*$|(?!.*?\\*/)))\n\t\t)",
-	"foldingStopMarker": "(?x)\n\t\t(</(?i:head|body|table|thead|tbody|tfoot|tr|div|select|fieldset|style|script|ul|ol|form|dl)>\n\t\t|^\\s*-->\n\t\t|(^|\\s)\\}\n\t\t)",
-	"name": "Embed Crystal",
-	"scopeName": "text.ecr",
-	"repository": {
-		"ecr_tag": {
+	"injections": {
+		"text.html.ecr - (meta.embedded.block.ecr | meta.embedded.line.ecr | meta.tag | comment), L:meta.tag, L:source.js.embedded.html": {
 			"patterns": [
 				{
-					"begin": "<%(?!#)(=|-)?",
-					"end": "%>",
-					"name": "source.embed.crystal",
+					"begin": "(^\\s*)(?=<%+#(?![^%]*%>))",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.whitespace.comment.leading.ecr"
+						}
+					},
+					"end": "(?!\\G)(\\s*$\\n)?",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.whitespace.comment.trailing.ecr"
+						}
+					},
 					"patterns": [
 						{
-							"include": "source.crystal"
+							"include": "#comment"
 						}
 					]
 				},
 				{
-					"begin": "<%#",
-					"end": "%>",
-					"name": "comment.block.ecr"
+					"begin": "(^\\s*)(?=<%(?![^%]*%>))",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.whitespace.embedded.leading.ecr"
+						}
+					},
+					"end": "(?!\\G)(\\s*$\\n)?",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.whitespace.embedded.trailing.ecr"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#tags"
+						}
+					]
+				},
+				{
+					"include": "#comment"
+				},
+				{
+					"include": "#tags"
 				}
 			]
 		}
 	},
 	"patterns": [
 		{
-			"include": "#ecr_tag"
-		},
-		{
 			"include": "text.html.basic"
 		}
-	]
+	],
+	"repository": {
+		"comment": {
+			"patterns": [
+				{
+					"begin": "<%+#",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.begin.ecr"
+						}
+					},
+					"end": "%>",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.end.ecr"
+						}
+					},
+					"name": "comment.block.ecr"
+				}
+			]
+		},
+		"tags": {
+			"patterns": [
+				{
+					"begin": "<%+(?!>)[-=]?(?![^%]*%>)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.section.embedded.begin.ecr"
+						}
+					},
+					"contentName": "source.crystal.embedded.ecr",
+					"end": "-?%>",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.embedded.end.ecr"
+						},
+						"1": {
+							"name": "source.crystal"
+						}
+					},
+					"name": "meta.embedded.block.ecr",
+					"patterns": [
+						{
+							"captures": {
+								"1": {
+									"name": "punctuation.definition.comment.ecr"
+								}
+							},
+							"match": "(#).*?(?=-?%>)",
+							"name": "comment.line.number-sign.ecr"
+						},
+						{
+							"include": "source.crystal"
+						}
+					]
+				},
+				{
+					"begin": "<%+(?!>)[-=]?",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.section.embedded.begin.ecr"
+						}
+					},
+					"contentName": "source.crystal.embedded.ecr",
+					"end": "-?%>",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.embedded.end.ecr"
+						},
+						"1": {
+							"name": "source.crystal"
+						}
+					},
+					"name": "meta.embedded.line.ecr",
+					"patterns": [
+						{
+							"captures": {
+								"1": {
+									"name": "punctuation.definition.comment.ecr"
+								}
+							},
+							"match": "(#).*?(?=-?%>)",
+							"name": "comment.line.number-sign.ecr"
+						},
+						{
+							"include": "source.crystal"
+						}
+					]
+				}
+			]
+		}
+	}
 }
