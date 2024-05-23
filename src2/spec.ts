@@ -142,10 +142,10 @@ export class CrystalTestingProvider {
     this.projectFolders = folders
   }
 
-  async handleDocumentSpecs(e: TextDocument) {
+  async handleDocumentSpecs(e: TextDocument, token?: CancellationToken) {
     if (e.uri.scheme === "file" && this.isSpecFile(e.uri.fsPath)) {
       this.deleteTestItem(e.uri.fsPath);
-      this.getProjectTestItems(getProjectRoot(e.uri), [e.uri.fsPath])
+      this.getProjectTestItems(getProjectRoot(e.uri), [e.uri.fsPath], token)
     }
   }
 
@@ -168,7 +168,7 @@ export class CrystalTestingProvider {
     return foundChild
   }
 
-  async getProjectTestItems(workspace: WorkspaceFolder, paths?: string[]): Promise<void> {
+  async getProjectTestItems(workspace: WorkspaceFolder, paths?: string[], token?: CancellationToken): Promise<void> {
     if (specRunnerMutex.isLocked()) {
       return;
     }
@@ -178,7 +178,7 @@ export class CrystalTestingProvider {
     const release = await specRunnerMutex.acquire();
     const dispose = setStatusBar('searching for specs...');
 
-    await spawnSpecTool(workspace, true, paths)
+    await spawnSpecTool(workspace, true, paths, token)
       .then((junit) => {
         if (junit) this.convertJunitTestcases(junit)
         outputChannel.appendLine(`[Spec] (${workspace.name}) Success.`)

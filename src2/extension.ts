@@ -1,12 +1,11 @@
-import { Disposable, ConfigurationChangeEvent, ExtensionContext, workspace, TextDocument } from "vscode";
+import { Disposable, ConfigurationChangeEvent, ExtensionContext, workspace, TextDocument, CancellationTokenSource } from "vscode";
 import { DocumentSelector, LanguageClient, LanguageClientOptions, ServerOptions } from "vscode-languageclient/node";
 import { existsSync } from "fs";
-import { E_CANCELED } from "async-mutex";
 
 import { getProjectRoot, getConfig, outputChannel } from "./vscode";
 import { registerFormatter } from "./format";
 import { handleDocumentProblems } from "./problems";
-import { compilerMutex, getDocumentMainFile } from "./compiler";
+import { getDocumentMainFile } from "./compiler";
 import { registerDefinitions } from "./definitions";
 import { CrystalTestingProvider } from "./spec";
 import { registerSymbols } from "./symbols";
@@ -22,6 +21,8 @@ let disposeDefinitions: Disposable
 let disposeSpecs: CrystalTestingProvider
 let disposeSymbols: Disposable
 let disposeComplete: Disposable
+
+let compilerCancellationToken: CancellationTokenSource = new CancellationTokenSource();
 
 const selector: DocumentSelector = [
   { language: 'crystal', scheme: 'file' },
@@ -166,6 +167,8 @@ async function handleConfigChange(e: ConfigurationChangeEvent) {
         activateLanguageServer(lspExecutable)
       } else {
         outputChannel.appendLine(`[Crystal] Failed to find LSP executable at ${lspExecutable}, falling back to default behavior`)
+        deactivateLanguageServer()
+        activateLanguageFeatures(languageContext)
       }
     } else {
       if (lspExecutable === undefined || lspExecutable.length == 0) {
@@ -200,27 +203,19 @@ async function handleSaveDocument(e: TextDocument): Promise<void> {
   if (e.uri.scheme !== "file" || !(e.fileName.endsWith(".cr") || e.fileName.endsWith(".ecr")))
     return;
 
-  compilerMutex.cancel()
-  compilerMutex.acquire()
-    .then(async (release) => {
-      try {
-        const config = getConfig();
-        const mainFile = await getDocumentMainFile(e);
-        const projectRoot = getProjectRoot(e.uri);
+  compilerCancellationToken.cancel()
+  compilerCancellationToken = new CancellationTokenSource();
+  const token = compilerCancellationToken.token;
 
-        if (config.get<boolean>("problems")) {
-          await handleDocumentProblems(e, mainFile, projectRoot)
-        }
+  const config = getConfig();
+  const mainFile = await getDocumentMainFile(e);
+  const projectRoot = getProjectRoot(e.uri);
 
-        if (config.get<boolean>("spec-explorer")) {
-          await disposeSpecs.handleDocumentSpecs(e)
-        }
-      } finally {
-        release()
-      }
-    })
-    .catch(e => {
-      if (e === E_CANCELED) return;
-      throw e;
-    });
+  if (config.get<boolean>("problems")) {
+    await handleDocumentProblems(e, mainFile, projectRoot, token);
+  }
+
+  if (config.get<boolean>("spec-explorer")) {
+    await disposeSpecs.handleDocumentSpecs(e, token)
+  }
 }

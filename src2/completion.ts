@@ -34,10 +34,11 @@ class CrystalCompletionItemProvider implements CompletionItemProvider {
     const line = document.lineAt(position.line);
     if (!line || /^\s*#\s*(?!{).+/.test(line.text)) return [];
 
-    outputChannel.appendLine(`[Completion] Running...`)
 
     // `require` autocomplete
     if (/^\s*require\s+"(.*)"\s*$/.test(line.text)) {
+      outputChannel.appendLine(`[Completion] Running...`)
+
       const items: CompletionItem[] = []
 
       const projectRoot = getProjectRoot(document.uri);

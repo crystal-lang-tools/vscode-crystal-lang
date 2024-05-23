@@ -1,7 +1,6 @@
-import { existsSync, readFileSync, readdirSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { Diagnostic, DiagnosticCollection, DiagnosticSeverity, Range, TextDocument, Uri, WorkspaceFolder, languages, workspace } from "vscode";
 import { execSync } from "child_process";
-import { Mutex } from "async-mutex";
 import { cwd } from "process";
 import path = require("path");
 import * as yaml from 'yaml';
@@ -12,7 +11,6 @@ import { getProjectRoot, getConfig, outputChannel } from "./vscode";
 import { spawnProblemsTool } from "./problems";
 
 
-export const compilerMutex = new Mutex();
 export const diagnosticCollection: DiagnosticCollection = languages.createDiagnosticCollection("crystal")
 
 
