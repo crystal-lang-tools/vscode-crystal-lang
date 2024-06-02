@@ -55,7 +55,7 @@ class CrystalDefinitionProvider implements DefinitionProvider {
       const textRange = document.getWordRangeAtPosition(position, /[^\"]+/)
 
       let text = requireMatches[1];
-      outputChannel.appendLine(`[Impl] Identified: ${text}`)
+      outputChannel.appendLine(`[Implementations] Identified: ${text}`)
 
       if (text.includes('*')) {
         const list = glob.sync(text, { cwd: projectRoot.uri.fsPath, ignore: 'lib/**' })
@@ -107,11 +107,11 @@ class CrystalDefinitionProvider implements DefinitionProvider {
       return [];
     }
 
-    outputChannel.appendLine('[Impl] Getting implementations...')
+    outputChannel.appendLine('[Implementations] Getting implementations...')
     const result = await spawnImplTool(document, position, token)
 
     if (result === undefined || result.status !== 'ok') {
-      outputChannel.appendLine(`[Impl] No implementation found.`)
+      outputChannel.appendLine(`[Implementations] No implementation found.`)
       this.cache.set(hash, [])
       return [];
     }
