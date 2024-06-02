@@ -1,11 +1,13 @@
-import { CancellationToken, Definition, DefinitionProvider, Disposable, DocumentSelector, ExtensionContext, Location, LocationLink, Position, Range, TextDocument, Uri, languages } from "vscode";
-import path = require("path");
+import {
+  CancellationToken, Definition, DefinitionProvider,
+  Disposable, DocumentSelector, ExtensionContext,
+  Location, LocationLink, Position,
+  TextDocument, Uri, languages
+} from "vscode";
 import * as crypto from 'crypto';
-import { existsSync } from "fs";
-import glob = require("glob");
 
 import { getCursorPath, getProjectRoot, getConfig, outputChannel } from "./vscode";
-import { findProblems, getCompilerPath, getPathToLibrary, getDocumentMainFile } from "./compiler";
+import { findProblems, getCompilerPath, getDocumentMainFile } from "./compiler";
 import { execAsync, shellEscape } from "./tools";
 
 export function registerDefinitions(selector: DocumentSelector, context: ExtensionContext): Disposable {
