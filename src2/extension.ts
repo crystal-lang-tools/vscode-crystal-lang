@@ -11,6 +11,7 @@ import { CrystalTestingProvider } from "./spec";
 import { registerSymbols } from "./symbols";
 import { registerCompletion } from "./completion";
 import { registerRequireDefinitions } from "./requires";
+import { registerHover } from "./hover";
 
 
 let languageContext: ExtensionContext
@@ -23,8 +24,11 @@ let disposeSpecs: CrystalTestingProvider
 let disposeSymbols: Disposable
 let disposeComplete: Disposable
 let disposeRequire: Disposable
+let disposeHover: Disposable
 
 let compilerCancellationToken: CancellationTokenSource = new CancellationTokenSource();
+
+export const wordPattern = /(?:-?(?:0(?:b|o|x))?\d+(?:\.\d+)?(?:_?[iuf]\d+)?)|@{0,2}(?:(?:(?<!:):)?[A-Za-z][^-`~@#%^&()=+[{}|;:'\",<>\/.*\]\s\\!?]*[!?]?)/
 
 const selector: DocumentSelector = [
   { language: 'crystal', scheme: 'file' },
@@ -112,6 +116,10 @@ async function activateLanguageFeatures(context: ExtensionContext) {
     disposeRequire = registerRequireDefinitions(selector, context)
   }
 
+  if (disposeHover === undefined) {
+    disposeHover = registerHover(selector, context)
+  }
+
   activateSpecExplorer();
 }
 
@@ -152,6 +160,11 @@ async function deactivateLanguageFeatures() {
   if (disposeRequire) {
     disposeRequire.dispose()
     disposeRequire = undefined
+  }
+
+  if (disposeHover) {
+    disposeHover.dispose()
+    disposeHover = undefined
   }
 
   deactivateSpecExplorer();
