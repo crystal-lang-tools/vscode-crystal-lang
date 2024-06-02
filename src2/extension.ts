@@ -10,6 +10,7 @@ import { registerDefinitions } from "./definitions";
 import { CrystalTestingProvider } from "./spec";
 import { registerSymbols } from "./symbols";
 import { registerCompletion } from "./completion";
+import { registerRequireDefinitions } from "./requires";
 
 
 let languageContext: ExtensionContext
@@ -21,6 +22,7 @@ let disposeDefinitions: Disposable
 let disposeSpecs: CrystalTestingProvider
 let disposeSymbols: Disposable
 let disposeComplete: Disposable
+let disposeRequire: Disposable
 
 let compilerCancellationToken: CancellationTokenSource = new CancellationTokenSource();
 
@@ -106,6 +108,10 @@ async function activateLanguageFeatures(context: ExtensionContext) {
     disposeComplete = registerCompletion(selector, context)
   }
 
+  if (disposeRequire === undefined) {
+    disposeRequire = registerRequireDefinitions(selector, context)
+  }
+
   activateSpecExplorer();
 }
 
@@ -141,6 +147,11 @@ async function deactivateLanguageFeatures() {
   if (disposeComplete) {
     disposeComplete.dispose()
     disposeComplete = undefined
+  }
+
+  if (disposeRequire) {
+    disposeRequire.dispose()
+    disposeRequire = undefined
   }
 
   deactivateSpecExplorer();

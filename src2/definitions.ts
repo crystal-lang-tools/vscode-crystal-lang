@@ -48,70 +48,14 @@ class CrystalDefinitionProvider implements DefinitionProvider {
     }
 
     const line = document.lineAt(position.line);
-    const projectRoot = getProjectRoot(document.uri);
     const requireMatches = /^\s*require\s+"(.+)"\s*$/.exec(line.text);
+    if (requireMatches?.length > 1) return [];
 
-    if (requireMatches?.length > 1) {
-      const textRange = document.getWordRangeAtPosition(position, /[^\"]+/)
-
-      let text = requireMatches[1];
-      outputChannel.appendLine(`[Implementations] Identified: ${text}`)
-
-      if (text.includes('*')) {
-        const list = glob.sync(text, { cwd: projectRoot.uri.fsPath, ignore: 'lib/**' })
-        const items: LocationLink[] = []
-
-        for (let item of list) {
-          if (!item.endsWith(".cr"))
-            continue;
-
-          const itemPath = path.join(projectRoot.uri.fsPath, item)
-          items.push({
-            targetUri: Uri.file(itemPath),
-            targetRange: new Range(new Position(0, 0), new Position(0, 0)),
-            originSelectionRange: textRange
-          })
-        }
-
-        return items;
-      };
-
-      const dir = path.dirname(document.fileName);
-      if (/^\.{1,2}\/\w+/.test(text)) {
-        if (!text.endsWith('.cr')) text += '.cr'
-
-        const loc = path.join(dir, text);
-        if (!existsSync(loc)) return [];
-
-        const result: LocationLink[] = [{
-          targetUri: Uri.file(loc),
-          targetRange: new Range(new Position(0, 0), new Position(0, 0)),
-          originSelectionRange: textRange
-        }]
-        this.cache.set(hash, result)
-        return result;
-      }
-
-      // Search CRYSTAL_PATH for the library
-      const libraryPath = await getPathToLibrary(text, projectRoot)
-      if (libraryPath) {
-        const result: LocationLink[] = [{
-          targetUri: Uri.file(libraryPath),
-          targetRange: new Range(new Position(0, 0), new Position(0, 0)),
-          originSelectionRange: textRange
-        }]
-        this.cache.set(hash, result)
-        return result
-      }
-
-      return [];
-    }
-
-    outputChannel.appendLine('[Implementations] Getting implementations...')
+    outputChannel.appendLine('[Impl] Getting implementations...')
     const result = await spawnImplTool(document, position, token)
 
     if (result === undefined || result.status !== 'ok') {
-      outputChannel.appendLine(`[Implementations] No implementation found.`)
+      outputChannel.appendLine(`[Impl] No implementation found.`)
       this.cache.set(hash, [])
       return [];
     }
@@ -127,7 +71,7 @@ class CrystalDefinitionProvider implements DefinitionProvider {
     }
 
     if (links.length === 0) {
-      outputChannel.appendLine(`[Implementations] No implementation found.`)
+      outputChannel.appendLine(`[Impl] No implementation found.`)
     }
 
     this.cache.set(hash, links)
