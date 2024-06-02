@@ -8,7 +8,7 @@ import * as crypto from 'crypto';
 
 import { getConfig, getCursorPath, getProjectRoot, outputChannel, setStatusBar } from "./vscode";
 import { findProblems, getCompilerPath, getDocumentMainFile } from "./compiler";
-import { execAsync, shellEscape } from "./tools";
+import { Cache, execAsync, shellEscape } from "./tools";
 import { keywords } from "./keywords";
 import { wordPattern } from "./extension";
 
@@ -26,20 +26,7 @@ export function registerHover(
 
 
 class CrystalHoverProvider implements HoverProvider {
-  private cache: Map<string, Hover> = new Map();
-
-  private computeHash(document: TextDocument, position: Position): string {
-    const wordRange = document.getWordRangeAtPosition(position);
-    const wordStart = wordRange ? wordRange.start : position;
-    const content = document.getText();
-    const hash = crypto.createHash('sha256');
-
-    hash.update(content);
-    hash.update(wordStart.line.toString());
-    hash.update(wordStart.character.toString());
-
-    return hash.digest('hex');
-  }
+  private cache: Cache<Hover> = new Cache();
 
   async provideHover(
     document: TextDocument,
@@ -49,7 +36,7 @@ class CrystalHoverProvider implements HoverProvider {
     const config = getConfig();
     if (!config.get<boolean>("hover")) return;
 
-    const hash = this.computeHash(document, position);
+    const hash = this.cache.computeHash(document, position);
     if (this.cache.has(hash)) {
       return this.cache.get(hash)!
     }
