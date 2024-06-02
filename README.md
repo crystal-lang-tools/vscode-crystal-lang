@@ -35,7 +35,7 @@ For debugging support, it's recommended to follow the guide [here](https://dev.t
 ## Settings
 
 - `compiler` - set a custom absolute path for the Crystal compiler
-- `definitions` - enables jump-to-definition
+- `definitions` - enables jump-to-definition for code, "require" jump-to-definiton handled separately
 - `dependencies` - use the dependencies tool to determine the main for each file, required if there's multiple entrypoints to the project, can be slow
 - `flags` - flags to pass to the compiler
 - `hover` - show type information on hover
