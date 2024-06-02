@@ -44,11 +44,18 @@ export async function execAsync(command: string, cwd: string, token: Cancellatio
 
       resolve({ stdout, stderr });
     })
+    let childExited = false;
+
+    child.on('exit', () => {
+      childExited = true
+    })
 
     token?.onCancellationRequested(() => {
-      terminate(child.pid, () => {
-        outputChannel.appendLine(`[Terminate] ${child.pid} killed successfully`)
-      })
+      if (!childExited) {
+        terminate(child.pid, () => {
+          outputChannel.appendLine(`[Terminate] ${child.pid} stopped successfully`)
+        })
+      }
     })
   })
 }
