@@ -1,4 +1,9 @@
-import { CancellationToken, Position, Range, TestItem, TestMessage, TestRun, TestRunProfileKind, TestRunRequest, TextDocument, Uri, WorkspaceFolder, tests, workspace } from "vscode";
+import {
+  CancellationToken, Position, Range,
+  TestItem, TestMessage, TestRun,
+  TestRunProfileKind, TestRunRequest, TextDocument,
+  Uri, WorkspaceFolder, tests, workspace
+} from "vscode";
 import { Mutex } from "async-mutex";
 import { existsSync, readFile } from "fs";
 import * as junit2json from 'junit2json';
@@ -90,6 +95,11 @@ export class CrystalTestingProvider {
           let args = []
 
           for (let arg of runnerArgs) {
+            if (!arg.endsWith(".cr")) {
+              args = []
+              break;
+            }
+
             const argProjectRoot = getProjectRoot(Uri.file(arg))
             if (workspace.uri.fsPath === argProjectRoot.uri.fsPath &&
               workspace.uri.fsPath !== arg && !(args.includes(arg))) {
