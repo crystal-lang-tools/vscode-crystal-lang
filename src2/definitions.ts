@@ -8,7 +8,7 @@ import * as crypto from 'crypto';
 
 import { getCursorPath, getProjectRoot, getConfig, outputChannel } from "./vscode";
 import { findProblems, getCompilerPath, getDocumentMainFile } from "./compiler";
-import { execAsync, shellEscape } from "./tools";
+import { Cache, execAsync, shellEscape } from "./tools";
 
 export function registerDefinitions(selector: DocumentSelector, context: ExtensionContext): Disposable {
   const disposable = languages.registerDefinitionProvider(
@@ -21,20 +21,7 @@ export function registerDefinitions(selector: DocumentSelector, context: Extensi
 }
 
 class CrystalDefinitionProvider implements DefinitionProvider {
-  private cache: Map<string, Definition | LocationLink[]> = new Map();
-
-  private computeHash(document: TextDocument, position: Position): string {
-    const wordRange = document.getWordRangeAtPosition(position);
-    const wordStart = wordRange ? wordRange.start : position;
-    const content = document.getText();
-    const hash = crypto.createHash('sha256');
-
-    hash.update(content);
-    hash.update(wordStart.line.toString());
-    hash.update(wordStart.character.toString());
-
-    return hash.digest('hex');
-  }
+  private cache: Cache<Definition | LocationLink[]> = new Cache();
 
   async provideDefinition(
     document: TextDocument,
@@ -44,7 +31,7 @@ class CrystalDefinitionProvider implements DefinitionProvider {
     const config = getConfig();
     if (!config.get<boolean>("definitions")) return;
 
-    const hash = this.computeHash(document, position);
+    const hash = this.cache.computeHash(document, position);
     if (this.cache.has(hash)) {
       return this.cache.get(hash)!
     }

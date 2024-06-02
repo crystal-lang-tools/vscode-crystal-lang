@@ -1,9 +1,9 @@
 import { ChildProcess, ExecException, exec } from "child_process";
 import terminate from "terminate";
-import { promisify } from "util";
-import { CancellationToken, workspace } from "vscode";
-import { outputChannel } from "./vscode";
+import { CancellationToken, Position, TextDocument, workspace } from "vscode";
+import * as crypto from 'crypto';
 
+import { outputChannel } from "./vscode";
 
 function execWrapper(
   command: string,
@@ -72,4 +72,33 @@ export function shellEscape(arg: string): string {
   if (arg === null || arg === undefined) return;
   if (/[^A-Za-z0-9_\/:=-]/.test(arg)) return arg.replace(/([$!'"();`?{}[\]<>&%#~@\\ ])/g, '\\$1')
   return arg
+}
+
+export class Cache<T> {
+  private cache: Map<string, T> = new Map()
+
+  computeHash(document: TextDocument, position: Position): string {
+    const wordRange = document.getWordRangeAtPosition(position);
+    const wordStart = wordRange ? wordRange.start : position;
+    const content = document.getText();
+    const hash = crypto.createHash('sha256');
+
+    hash.update(content);
+    hash.update(wordStart.line.toString());
+    hash.update(wordStart.character.toString());
+
+    return hash.digest('hex');
+  }
+
+  has(hash: string) {
+    return this.cache.has(hash)
+  }
+
+  get(hash: string) {
+    return this.cache.get(hash)
+  }
+
+  set(hash: string, value: T) {
+    return this.cache.set(hash, value)
+  }
 }
