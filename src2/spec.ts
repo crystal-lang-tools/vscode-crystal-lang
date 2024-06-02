@@ -249,6 +249,8 @@ export class CrystalTestingProvider {
                 }).join("\n\n\n")
               ),
               testcase.time * 1000);
+          } else if (testcase.skipped) {
+            run.skipped(exists)
           } else {
             run.passed(exists, testcase.time * 1000);
           }
