@@ -43,9 +43,6 @@ class CrystalRequireDefinitionProvider implements DefinitionProvider {
     position: Position,
     token: CancellationToken
   ): Promise<Definition | LocationLink[]> {
-    const config = getConfig();
-    if (!config.get<boolean>("definitions")) return;
-
     const hash = this.computeHash(document, position);
     if (this.cache.has(hash)) {
       return this.cache.get(hash)!
