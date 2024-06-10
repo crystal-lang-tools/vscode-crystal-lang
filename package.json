@@ -223,6 +223,11 @@
 					"type": "boolean",
 					"default": false,
 					"description": "Disable garbage collection for running the compiler tools. Can improve performance at the expense of memory."
+				},
+				"crystal-lang.unreachable": {
+					"type": "boolean",
+					"default": false,
+					"description": "Marks unreachable methods and the number of times methods are used"
 				}
 			}
 		},
