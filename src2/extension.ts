@@ -12,6 +12,7 @@ import { registerSymbols } from "./symbols";
 import { registerCompletion } from "./completion";
 import { registerRequireDefinitions } from "./requires";
 import { registerHover } from "./hover";
+import { handleDocumentUnreachable } from "./unreachable";
 
 
 let languageContext: ExtensionContext
@@ -241,5 +242,9 @@ async function handleSaveDocument(e: TextDocument): Promise<void> {
 
   if (config.get<boolean>("spec-explorer")) {
     await disposeSpecs.handleDocumentSpecs(e, token)
+  }
+
+  if (config.get<boolean>("unreachable")) {
+    await handleDocumentUnreachable(e, token);
   }
 }
