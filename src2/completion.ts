@@ -128,7 +128,6 @@ class CrystalHierarchyCompletionProvider implements CompletionItemProvider {
             return this.generateCompletions(word, response, wordRange, locationSymbol);
           })
       });
-
   }
 
   generateCompletions(word: string, response: HierarchyType, wordRange: Range, locationSymbol: string) {
@@ -214,6 +213,10 @@ export async function spawnHierarchyTool(document: TextDocument, token: Cancella
 
       return JSON.parse(response.stdout);
     })
+    .catch((err) => {
+      outputChannel.appendLine(`[Hierarchy] Error: ${JSON.stringify(err)}`)
+    })
+    .finally(() => outputChannel.appendLine(`[Hierarchy] Done.`));
 }
 
 function getHierarchyTypes(type: HierarchyType): string[] {

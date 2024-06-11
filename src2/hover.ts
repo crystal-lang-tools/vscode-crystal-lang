@@ -148,4 +148,7 @@ async function spawnContextTool(
       findProblems(response.stderr, document.uri);
       return JSON.parse(response.stdout);
     })
+    .catch((err) => {
+      outputChannel.appendLine(`[Hover] Error: ${JSON.stringify(err)}`)
+    })
 }
