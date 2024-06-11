@@ -2,6 +2,7 @@ import { ChildProcess, ExecException, exec } from "child_process";
 import terminate from "terminate";
 import { CancellationToken, Position, TextDocument, workspace } from "vscode";
 import * as crypto from 'crypto';
+import { readFile, readFileSync } from "fs";
 
 import { outputChannel } from "./vscode";
 
@@ -77,15 +78,25 @@ export function shellEscape(arg: string): string {
 export class Cache<T> {
   private cache: Map<string, T> = new Map()
 
-  computeHash(document: TextDocument, position: Position): string {
-    const wordRange = document.getWordRangeAtPosition(position);
-    const wordStart = wordRange ? wordRange.start : position;
-    const content = document.getText();
+  computeHash(document: TextDocument, position: Position, disk: boolean = false): string {
+    let content: string
+
+    if (disk) {
+      content = readFileSync(document.uri.fsPath).toString()
+    } else {
+      content = document.getText()
+    }
+
     const hash = crypto.createHash('sha256');
 
     hash.update(content);
-    hash.update(wordStart.line.toString());
-    hash.update(wordStart.character.toString());
+
+    if (position) {
+      const wordRange = document.getWordRangeAtPosition(position);
+      const wordStart = wordRange ? wordRange.start : position;
+      hash.update(wordStart.line.toString());
+      hash.update(wordStart.character.toString());
+    }
 
     return hash.digest('hex');
   }

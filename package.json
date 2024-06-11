@@ -2,7 +2,7 @@
 	"name": "crystal-lang",
 	"displayName": "Crystal Language",
 	"description": "The Crystal Programming Language",
-	"version": "0.10.0-alpha3",
+	"version": "0.10.0-alpha4",
 	"publisher": "crystal-lang-tools",
 	"icon": "images/icon.gif",
 	"license": "MIT",
@@ -228,6 +228,11 @@
 					"type": "boolean",
 					"default": false,
 					"description": "Marks unreachable methods and the number of times methods are used"
+				},
+				"crystal-lang.hierarchy-complete": {
+					"type": "boolean",
+					"default": true,
+					"description": "Autocompletes type hierarchy when modifying classes/modules/structs"
 				}
 			}
 		},
