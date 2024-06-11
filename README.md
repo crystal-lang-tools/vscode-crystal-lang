@@ -47,6 +47,7 @@ For debugging support, it's recommended to follow the guide [here](https://dev.t
 - `spec-explorer` - enable the built-in testing UI for specs, recommended for Crystal >= 1.11 due to `--dry-run` flag
 - `spec-tags` - specific tags to pass to the spec runner
 - `disable-gc` - disable the garbage collector when running compiler tools, can provide increased performance at the cost of increased memory usage, defaults to false
+- `unreachable` - gives a warning for unreachable methods that could have semantic errors
 - `hierarchy-complete` - autocompletes type hierarchy when modifying classes/modules/structs
 
 By default, the problems runner, hover provider, and definitions provider are turned on. This may not be ideal for larger projects due to compile times and memory usage, so it is recommended to turn them off in the vscode settings. That can be done per-project by creating a `.vscode/settings.json` file with:
@@ -60,6 +61,8 @@ By default, the problems runner, hover provider, and definitions provider are tu
   "crystal-lang.hover": false,
   "crystal-lang.problems": false,
   "crystal-lang.spec-explorer": false,
+  "crystal-lang.unreachable": false,
+  "crystal-lang.disable-gc": false,
 }
 ```
 
