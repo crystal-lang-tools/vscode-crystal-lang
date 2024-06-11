@@ -1,5 +1,10 @@
-import { Disposable, ConfigurationChangeEvent, ExtensionContext, workspace, TextDocument, CancellationTokenSource } from "vscode";
-import { DocumentSelector, LanguageClient, LanguageClientOptions, ServerOptions } from "vscode-languageclient/node";
+import {
+  Disposable, ConfigurationChangeEvent, ExtensionContext,
+  workspace, TextDocument, CancellationTokenSource
+} from "vscode";
+import {
+  DocumentSelector, LanguageClient, LanguageClientOptions, ServerOptions
+} from "vscode-languageclient/node";
 import { existsSync } from "fs";
 
 import { getProjectRoot, getConfig, outputChannel } from "./vscode";

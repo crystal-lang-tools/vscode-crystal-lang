@@ -1,7 +1,13 @@
-import { CancellationToken, DocumentFormattingEditProvider, DocumentSelector, ExtensionContext, FormattingOptions, Range, TextDocument, TextEdit, languages, Disposable } from "vscode";
+import {
+  CancellationToken, DocumentFormattingEditProvider, DocumentSelector,
+  ExtensionContext, FormattingOptions, Range,
+  TextDocument, TextEdit, languages, Disposable
+} from "vscode";
 import { spawn } from "child_process";
+
 import { getCompilerPath, findProblemsRaw } from "./compiler";
 import { setStatusBar, outputChannel } from "./vscode";
+
 
 function getFormatRange(document: TextDocument): Range {
   return new Range(

@@ -1,4 +1,6 @@
-import { CancellationToken, TextDocument, WorkspaceFolder, workspace } from "vscode";
+import {
+  CancellationToken, TextDocument, WorkspaceFolder
+} from "vscode";
 
 import { getConfig, outputChannel, setStatusBar } from "./vscode";
 import { diagnosticCollection, findProblems, getCompilerPath } from "./compiler";

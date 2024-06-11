@@ -9,7 +9,7 @@ import * as crypto from 'crypto';
 import { existsSync } from "fs";
 import glob = require("glob");
 
-import { getProjectRoot, getConfig, outputChannel } from "./vscode";
+import { getProjectRoot } from "./vscode";
 import { getPathToLibrary } from "./compiler";
 
 export function registerRequireDefinitions(selector: DocumentSelector, context: ExtensionContext): Disposable {

@@ -1,5 +1,8 @@
+import {
+  Position, TextDocument, Uri, WorkspaceConfiguration,
+  WorkspaceFolder, window, workspace, ConfigurationScope
+} from "vscode";
 import { existsSync } from "fs";
-import { Position, TextDocument, Uri, WorkspaceConfiguration, WorkspaceFolder, window, workspace, ConfigurationScope, CancellationTokenSource } from "vscode";
 import path = require("path");
 
 
