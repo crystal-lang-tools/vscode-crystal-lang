@@ -107,5 +107,6 @@ async function spawnImplTool(
       } catch {
         outputChannel.appendLine(`[Impl] Error: ${JSON.stringify(err)}`)
       }
-    });
+    })
+    .finally(() => outputChannel.appendLine(`[Impl] Done.`));
 }
