@@ -1,20 +1,11 @@
 import {
-  CancellationToken,
-  DocumentSelector,
-  DocumentSymbol,
-  DocumentSymbolProvider,
-  ExtensionContext,
-  languages,
-  Location,
-  Position,
-  ProviderResult,
-  SymbolKind,
-  SymbolInformation,
-  TextDocument,
-  Disposable,
-  Uri,
-  Range,
+  CancellationToken, DocumentSelector, DocumentSymbolProvider,
+  ExtensionContext, languages, Location,
+  Position, ProviderResult, SymbolKind,
+  SymbolInformation, TextDocument, Disposable,
+  Uri, Range
 } from 'vscode';
+
 import { outputChannel } from './vscode';
 
 const MODULE_OR_LIB_PATTERN =

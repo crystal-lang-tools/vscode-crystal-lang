@@ -2,7 +2,7 @@ import { ChildProcess, ExecException, exec } from "child_process";
 import terminate from "terminate";
 import { CancellationToken, Position, TextDocument, workspace } from "vscode";
 import * as crypto from 'crypto';
-import { readFile, readFileSync } from "fs";
+import { readFileSync } from "fs";
 
 import { outputChannel } from "./vscode";
 

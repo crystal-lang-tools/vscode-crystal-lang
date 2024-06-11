@@ -4,7 +4,6 @@ import {
   HoverProvider, MarkdownString, Position,
   TextDocument, TextLine, languages
 } from "vscode";
-import * as crypto from 'crypto';
 
 import { getConfig, getCursorPath, getProjectRoot, outputChannel, setStatusBar } from "./vscode";
 import { findProblems, getCompilerPath, getDocumentMainFile } from "./compiler";
