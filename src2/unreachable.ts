@@ -1,7 +1,7 @@
 import {
-  CancellationToken, DecorationOptions, DecorationRangeBehavior,
-  Position, Range, TextDocument,
-  window
+  CancellationToken, Diagnostic, DiagnosticCollection, DiagnosticSeverity, Position, Range, TextDocument,
+  Uri, languages,
+  window,
 } from "vscode";
 import path = require("path");
 
@@ -17,22 +17,49 @@ interface UnreachableCode {
   count: number
 }
 
-const decorationType = window.createTextEditorDecorationType({
-  isWholeLine: true,
-  rangeBehavior: DecorationRangeBehavior.OpenOpen,
-  after: {
-    margin: '0 0 0 1em',
-    color: '#999',
-    fontStyle: 'italic',
-  }
-});
-
+const unreachableDiagnostics: DiagnosticCollection = languages.createDiagnosticCollection("crystal")
 
 export async function handleDocumentUnreachable(document: TextDocument, token: CancellationToken) {
   const dispose = setStatusBar("finding unreachable code...")
+  let editor = window.activeTextEditor
 
   return await spawnUnreachableTool(document, token)
-    .then(values => decorate(document, values))
+    .then(values => {
+      if (!values) return;
+
+      let diagnostics: [Uri, Diagnostic[]][] = []
+
+      for (const value of values) {
+        if (value.count !== 0) continue;
+
+        const location = value.location.split(":")
+        const methodSize = value.name.split(/[#\.]/).pop().length
+
+        let indent = 9
+
+        if (value.name.includes("#") || value.name.match(/^::[a-z]+/)) {
+          indent = 4
+        }
+
+        const col = Number(location.pop()) - 1 + indent
+        const line = Number(location.pop()) - 1
+        const filePath = location.join(":")
+        const projectRoot = getProjectRoot(document.uri)
+
+        const range = new Range(
+          new Position(line, col),
+          new Position(line, col + methodSize)
+        )
+        const diag = new Diagnostic(range, "Unused method - could have semantic errors", DiagnosticSeverity.Warning)
+
+        diagnostics.push([
+          Uri.file(path.resolve(projectRoot.uri.fsPath, filePath)),
+          [diag]
+        ])
+      }
+
+      unreachableDiagnostics.set(diagnostics)
+    })
     .finally(() => dispose())
 }
 
@@ -50,41 +77,13 @@ async function spawnUnreachableTool(
   outputChannel.appendLine(`[Unreachable] (${projectRoot.name}) $ ${cmd}`)
 
   return await execAsync(cmd, projectRoot.uri.fsPath, token)
-    .then(response => JSON.parse(response.stdout));
-}
+    .then(response => {
+      outputChannel.appendLine(JSON.stringify(response))
 
-async function decorate(document: TextDocument, values: UnreachableCode[]) {
-  let decorationsArray: DecorationOptions[] = []
-  let editor = window.activeTextEditor
-
-  for (let value of values) {
-    const location = value.location.split(":")
-    const methodSize = value.name.split(/[#\.]/).pop().length
-
-    const col = Number(location.pop()) - 1 + (value.name.includes("#") ? 4 : 9)
-    const line = Number(location.pop()) - 1
-    const filePath = location.join(":")
-    const projectRoot = getProjectRoot(document.uri)
-
-    if (path.resolve(projectRoot.uri.fsPath, filePath) != editor.document.uri.fsPath) continue;
-
-
-    const range = new Range(
-      new Position(line, col),
-      new Position(line, col + methodSize)
-    )
-
-    const decoration = {
-      range: range,
-      renderOptions: {
-        after: {
-          contentText: `# ${value.count} usages`
-        }
-      }
-    }
-
-    decorationsArray.push(decoration)
-  }
-
-  editor.setDecorations(decorationType, decorationsArray)
+      return JSON.parse(response.stdout)
+    })
+    .catch((err) => {
+      outputChannel.appendLine(`[Unreachable] Error: ${JSON.stringify(err)}`)
+    })
+    .finally(() => outputChannel.appendLine(`[Unreachable] (${projectRoot.name}) Done.`));
 }
