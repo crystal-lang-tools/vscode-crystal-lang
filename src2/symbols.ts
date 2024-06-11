@@ -52,7 +52,7 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
   provideDocumentSymbols(
     document: TextDocument,
     token: CancellationToken
-  ): ProviderResult<SymbolInformation[] | DocumentSymbol[]> {
+  ): ProviderResult<SymbolInformation[]> {
     if (document.fileName.endsWith(".ecr")) return;
     // outputChannel.appendLine(`[Symbols] Searching for symbols in ${document.fileName}`);
 
@@ -300,4 +300,24 @@ export function registerSymbols(
   context.subscriptions.push(disposable);
 
   return disposable;
+}
+
+export async function getLocationSymbol(document: TextDocument, position: Position, token: CancellationToken): Promise<string> {
+  const provider = new CrystalDocumentSymbolProvider();
+  const symbols = await provider.provideDocumentSymbols(document, token);
+
+  let name = ""
+
+  for (let symbol of symbols) {
+    const range = new Range(
+      new Position(symbol.location.range.start.line + 1, symbol.location.range.start.character),
+      new Position(symbol.location.range.end.line, symbol.location.range.end.character)
+    )
+
+    if (range.contains(position) && symbol.name.match(/^[A-Z]/)) {
+      name = symbol.name + "::" + name
+    }
+  }
+
+  return name;
 }

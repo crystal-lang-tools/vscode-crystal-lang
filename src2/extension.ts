@@ -9,7 +9,7 @@ import { getDocumentMainFile } from "./compiler";
 import { registerDefinitions } from "./definitions";
 import { CrystalTestingProvider } from "./spec";
 import { registerSymbols } from "./symbols";
-import { registerCompletion } from "./completion";
+import { registerCompletion, updateHierarchyCache } from "./completion";
 import { registerRequireDefinitions } from "./requires";
 import { registerHover } from "./hover";
 import { handleDocumentUnreachable } from "./unreachable";
@@ -30,6 +30,8 @@ let disposeHover: Disposable
 let compilerCancellationToken: CancellationTokenSource = new CancellationTokenSource();
 
 export const wordPattern = /(?:-?(?:0(?:b|o|x))?\d+(?:\.\d+)?(?:_?[iuf]\d+)?)|@{0,2}(?:(?:(?<!:):)?[A-Za-z][^-`~@#%^&()=+[{}|;:'\",<>\/.*\]\s\\!?]*[!?]?)/
+export const constPattern = /(?::{1,2})?(?:[A-Z][a-zA-Z0-9]*(?:::))*(?:[A-Z][a-zA-Z0-9]*(?:\([A-Z][a-zA-Z0-9]*(?:, +[A-Z][a-zA-Z0-9]*)*?\))?|:{1,2})(?::{1,2})?/
+
 
 const selector: DocumentSelector = [
   { language: 'crystal', scheme: 'file' },
@@ -246,5 +248,9 @@ async function handleSaveDocument(e: TextDocument): Promise<void> {
 
   if (config.get<boolean>("unreachable")) {
     await handleDocumentUnreachable(e, token);
+  }
+
+  if (config.get<boolean>("hierarchy-complete")) {
+    await updateHierarchyCache(e, token);
   }
 }
