@@ -19,9 +19,9 @@ const STRUCT_PATTERN =
 const CONSTANT_PATTERN =
   /^\s*(?:([A-Z0-9_]+)\s+=.+|(?:private\s+)?(?:alias|type)\s+(\w+))[\r\n;]?$/;
 const ENUM_OR_UNION_PATTERN =
-  /^\s*(?:private\s+)?(?:enum|union)\s+([:\w]+)[\r\n;]?$/;
+  /^\s*(?:private\s+)?(?:enum|union)\s+([:\w]+)(?:\s+:\s+\w+)?[\r\n;]?$/;
 const DEF_PATTERN =
-  /^\s*(?:abstract\s+)?(?:(?:private|protected)\s+)?(?:def|fun)\s+([^\( ]*)(?:[\(\)\*:,]+)?.*$/;
+  /^\s*(abstract\s+)?(?:(?:private|protected)\s+)?(?:def|fun)\s+([^\( ]*)(?:[\(\)\*:,]+)?.*$/;
 const PROPERTY_PATTERN =
   /^\s*(?:(?:private|protected)\s+)?(?:class_)?(?:property|getter|setter)(?:!|\?)?\s+(\w+)(?:(?:\s+:\s+\w+)?(?:\s*=.+)?)?(?:,\s*)?[\r\n;]?/;
 const IVAR_PATTERN = /^\s*(@\w+)\s+[:=].+[\r\n;]?$/;
@@ -70,14 +70,14 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
         matches = DEF_PATTERN.exec(line);
         if (matches && matches.length) {
           const symbol = {
-            name: matches[1],
+            name: matches[2],
             kind: SymbolKind.Function,
             start: index,
             endLine: null,
             endCol: line.length
           }
 
-          if (!line.includes("abstract")) {
+          if (!matches[1]) {
             container.push(symbol)
           } else {
             symbols.push(this.dumpContainer(symbol, document.uri))
@@ -125,6 +125,20 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
           };
 
           symbols.push(this.dumpContainer(symbol, document.uri))
+
+          matches = BLOCK_START_PATTERN.exec(line);
+          if (matches && matches.length) {
+            const symbol = {
+              name: null,
+              kind: null,
+              start: index,
+              endLine: null,
+              endCol: line.length
+            };
+
+            container.push(symbol)
+          }
+
           continue;
         }
 
