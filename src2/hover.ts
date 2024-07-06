@@ -5,9 +5,9 @@ import {
   TextDocument, TextLine, languages
 } from "vscode";
 
-import { getConfig, getCursorPath, getProjectRoot, outputChannel, setStatusBar } from "./vscode";
-import { findProblems, getCompilerPath, getDocumentMainFile } from "./compiler";
-import { Cache, execAsync, shellEscape } from "./tools";
+import { getConfig, getCursorPath, getFlags, getProjectRoot, outputChannel, setStatusBar } from "./vscode";
+import { findProblems, getCompilerPath, getDocumentMainFiles } from "./compiler";
+import { Cache, execAsync } from "./tools";
 import { keywords } from "./keywords";
 import { wordPattern } from "./extension";
 
@@ -53,6 +53,8 @@ class CrystalHoverProvider implements HoverProvider {
 
     return spawnContextTool(document, position, token)
       .then((response) => {
+        if (!response) return;
+
         const context = this.parseContext(response, line, text);
 
         this.cache.set(hash, context)
@@ -134,21 +136,31 @@ async function spawnContextTool(
   token: CancellationToken
 ): Promise<ContextResponse> {
   const config = getConfig();
-  const compiler = await getCompilerPath();
   const cursor = getCursorPath(document, position);
-  const mainFile = await getDocumentMainFile(document);
+  const mainFiles = await getDocumentMainFiles(document);
   const projectRoot = getProjectRoot(document.uri);
 
-  const cmd = `${shellEscape(compiler)} tool context -c ${shellEscape(cursor)} ${shellEscape(mainFile)} -f json --no-color  ${config.get<string>("flags")}`
+  const cmd = await getCompilerPath();
+  const args = [
+    'tool', 'context', '-c', cursor, ...mainFiles,
+    '-f', 'json', '--no-color',
+    ...getFlags(config)
+  ]
 
-  outputChannel.appendLine(`[Hover] (${projectRoot.name}) $ ${cmd}`)
+  outputChannel.appendLine(`[Hover] (${projectRoot.name}) $ ${cmd} ${args.join(' ')}`)
 
-  return await execAsync(cmd, projectRoot.uri.fsPath, token)
+  return await execAsync(cmd, args, { cwd: projectRoot.uri.fsPath, token: token })
     .then((response) => {
+      if (response.stdout.length === 0) {
+        outputChannel.appendLine(`[Hover] Error: ${response.stderr}`)
+        return;
+      }
+
       findProblems(response.stderr, document.uri);
+
       return JSON.parse(response.stdout);
     })
     .catch((err) => {
-      outputChannel.appendLine(`[Hover] Error: ${JSON.stringify(err)}`)
+      outputChannel.appendLine(`[Hover] Error: ${err?.message || JSON.stringify(err)}`)
     })
 }

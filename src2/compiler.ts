@@ -10,8 +10,8 @@ import path = require("path");
 import * as yaml from 'yaml';
 import glob = require("glob");
 
-import { execAsync, shellEscape } from "./tools";
-import { getProjectRoot, getConfig, outputChannel } from "./vscode";
+import { execAsync } from "./tools";
+import { getProjectRoot, getConfig, outputChannel, getFlags } from "./vscode";
 import { spawnProblemsTool } from "./problems";
 
 
@@ -59,16 +59,16 @@ export async function getCompilerPath(): Promise<string> {
   const command =
     (process.platform === 'win32' ? 'where' : 'which') + ' crystal';
 
-  return (await execAsync(command, process.cwd())).stdout.trim();
+  return execSync(command).toString().trim();
 }
 
-export async function getDocumentMainFile(document: TextDocument): Promise<string> {
+export async function getDocumentMainFiles(document: TextDocument): Promise<string[]> {
   const config = getConfig();
   const projectRoot = getProjectRoot(document.uri);
 
   // Specs are their own main files
   if (document.fileName.endsWith('_spec.cr')) {
-    return document.fileName;
+    return [document.fileName];
   }
 
   // Use main if provided and it exists
@@ -76,13 +76,20 @@ export async function getDocumentMainFile(document: TextDocument): Promise<strin
     const mainFile = config.get<string>("main").replace(
       "${workspaceRoot}", projectRoot.uri.fsPath
     )
-    if (mainFile.includes('*') || existsSync(mainFile)) return mainFile;
+    if (existsSync(mainFile)) return [mainFile];
+
+    if (mainFile.includes('*')) {
+      const globbed = glob.sync(mainFile)
+
+      if (globbed?.length > 0) return globbed;
+    }
+
     outputChannel.appendLine(`[Crystal] Main file ${mainFile} doesn't exist, using fallbacks`)
   }
 
   if (config.get<boolean>("dependencies")) {
     const shardTarget = await getDocumentShardTarget(document);
-    if (shardTarget.response) return shardTarget.response;
+    if (shardTarget.response) return [shardTarget.response];
     if (shardTarget.error) return;
   }
 
@@ -94,32 +101,33 @@ export async function getDocumentMainFile(document: TextDocument): Promise<strin
     // Use a target with the shard name
     var main = shard.targets?.[shard.name]?.main;
     if (main && existsSync(path.resolve(projectRoot.uri.fsPath, main)))
-      return path.resolve(projectRoot.uri.fsPath, main);
+      return [path.resolve(projectRoot.uri.fsPath, main)];
 
     if (shard.targets) {
       // Use the first target if it exists
       main = Object.values(shard.targets)[0]?.main;
       if (main && existsSync(path.resolve(projectRoot.uri.fsPath, main)))
-        return path.resolve(projectRoot.uri.fsPath, main);
+        return [path.resolve(projectRoot.uri.fsPath, main)];
     }
 
     // Splat all top-level files in source folder,
     // only if the file is in the /src or /lib directories
     if (document.uri.fsPath.includes(path.join(projectRoot.uri.fsPath, 'src')) ||
       document.uri.fsPath.includes(path.join(projectRoot.uri.fsPath, 'lib'))) {
-      return path.join(projectRoot.uri.fsPath, 'src', '*.cr')
+      const globbed = glob.sync(path.join(projectRoot.uri.fsPath, 'src', '*.cr'))
+
+      if (globbed?.length > 0) return globbed;
     }
   }
 
   // single independent file (like a script)
-  return document.fileName;
+  return [document.fileName];
 }
 
 async function getDocumentShardTarget(document: TextDocument): Promise<{ response: string, error }> {
-  const compiler = await getCompilerPath();
+  const cmd = await getCompilerPath();
   const projectRoot = getProjectRoot(document.uri);
   const config = getConfig();
-
 
   const targets = getShardYmlTargets(projectRoot);
 
@@ -129,17 +137,22 @@ async function getDocumentShardTarget(document: TextDocument): Promise<{ respons
     const targetPath = path.resolve(projectRoot.uri.fsPath, target);
     if (!existsSync(targetPath)) continue;
 
-    const cmd = `${shellEscape(compiler)} tool dependencies ${shellEscape(targetPath)} -f flat --no-color ${config.get<string>("flags")}`
-    outputChannel.appendLine(`[Dependencies] (${projectRoot.name}) $ ${cmd}`)
+    const args = [
+      'tool', 'dependencies', targetPath,
+      '-f', 'flat', '--no-color',
+      ...getFlags(config)
+    ]
+
+    outputChannel.appendLine(`[Dependencies] (${projectRoot.name}) $ ${cmd} ${args.join(' ')}`)
 
     const targetDocument = await workspace.openTextDocument(Uri.parse(targetPath))
 
-    const result = await execAsync(cmd, projectRoot.uri.fsPath)
+    const result = await execAsync(cmd, args, { cwd: projectRoot.uri.fsPath })
       .then((resp) => {
         return { response: resp, error: false }
       })
       .catch((err) => {
-        spawnProblemsTool(targetDocument, target, projectRoot);
+        spawnProblemsTool(targetDocument, [target], projectRoot);
         return { response: undefined, error: err }
       })
 
@@ -308,9 +321,8 @@ export interface SemVer {
  * @return {*}  {Promise<SemVer>}
  */
 export async function getCrystalVersion(): Promise<SemVer> {
-  const compiler = await getCompilerPath();
-  const cmd = `${shellEscape(compiler)} --version`
-  const response = await execAsync(cmd, cwd())
+  const cmd = await getCompilerPath();
+  const response = await execAsync(cmd, ['--version'], { cwd: cwd() })
 
   const match = response.stdout.match(/Crystal (\d+)\.(\d+)\.(\d+)/)
 
@@ -325,7 +337,7 @@ const CRYSTAL_PATH = process.env.CRYSTAL_PATH || '';
 
 async function getCrystalEnv(): Promise<{ [key: string]: string; }> {
   const compiler = await getCompilerPath();
-  const output = execSync(`${shellEscape(compiler)} env`).toString()
+  const output = await (await execAsync(compiler, ['env'])).stdout
   const lines = output.split(/\r?\n/)
   const env: { [key: string]: string } = {}
 

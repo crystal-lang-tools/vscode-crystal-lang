@@ -10,7 +10,7 @@ import { existsSync } from "fs";
 import { getProjectRoot, getConfig, outputChannel } from "./vscode";
 import { registerFormatter } from "./format";
 import { handleDocumentProblems } from "./problems";
-import { getDocumentMainFile } from "./compiler";
+import { getDocumentMainFiles } from "./compiler";
 import { registerDefinitions } from "./definitions";
 import { CrystalTestingProvider } from "./spec";
 import { registerSymbols } from "./symbols";
@@ -251,11 +251,11 @@ async function handleSaveDocument(e: TextDocument): Promise<void> {
   const token = compilerCancellationToken.token;
 
   const config = getConfig();
-  const mainFile = await getDocumentMainFile(e);
+  const mainFiles = await getDocumentMainFiles(e);
   const projectRoot = getProjectRoot(e.uri);
 
   if (config.get<boolean>("problems")) {
-    await handleDocumentProblems(e, mainFile, projectRoot, token);
+    await handleDocumentProblems(e, mainFiles, projectRoot, token);
   }
 
   if (config.get<boolean>("spec-explorer")) {

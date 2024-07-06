@@ -7,9 +7,9 @@ import {
 import glob = require("glob");
 import path = require("path");
 
-import { getConfig, getProjectRoot, outputChannel } from "./vscode";
-import { findProblems, getCompilerPath, getDocumentMainFile, getListOfLibraries } from "./compiler";
-import { Cache, execAsync, shellEscape } from "./tools";
+import { getConfig, getFlags, getProjectRoot, outputChannel } from "./vscode";
+import { findProblems, getCompilerPath, getDocumentMainFiles, getListOfLibraries } from "./compiler";
+import { Cache, execAsync } from "./tools";
 import { constPattern } from "./extension";
 import { getLocationSymbol } from "./symbols";
 
@@ -198,15 +198,19 @@ interface HierarchyVar {
 
 export async function spawnHierarchyTool(document: TextDocument, token: CancellationToken): Promise<HierarchyType> {
   const config = getConfig();
-  const compiler = await getCompilerPath();
-  const mainFile = await getDocumentMainFile(document);
+  const mainFiles = await getDocumentMainFiles(document);
   const projectRoot = getProjectRoot(document.uri);
 
-  const cmd = `${shellEscape(compiler)} tool hierarchy ${shellEscape(mainFile)} -f json --no-color ${config.get<string>("flags")}`
+  const cmd = await getCompilerPath();
+  const args = [
+    'tool', 'hierarchy', ...mainFiles,
+    '-f', 'json', '--no-color',
+    ...getFlags(config)
+  ]
 
-  outputChannel.appendLine(`[Hierarchy] (${projectRoot.name}) $ ${cmd}`)
+  outputChannel.appendLine(`[Hierarchy] (${projectRoot.name}) $ ${cmd} ${args.join(' ')}`)
 
-  return await execAsync(cmd, projectRoot.uri.fsPath, token)
+  return await execAsync(cmd, args, { cwd: projectRoot.uri.fsPath, token: token })
     .then((response) => {
       findProblems(response.stderr, document.uri);
       outputChannel.appendLine(`[Hierarchy] (${projectRoot.name}) Done.`);

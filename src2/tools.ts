@@ -1,4 +1,4 @@
-import { ChildProcess, ExecException, exec } from "child_process";
+import { ChildProcess, ExecException, SpawnOptions, exec, spawn } from "child_process";
 import terminate from "terminate";
 import { CancellationToken, Position, TextDocument, workspace } from "vscode";
 import * as crypto from 'crypto';
@@ -6,73 +6,58 @@ import { readFileSync } from "fs";
 
 import { outputChannel } from "./vscode";
 
-function execWrapper(
-  command: string,
-  cwd: string,
-  callback?: (
-    error: (ExecException & { stdout: string; stderr: string }) | {},
-    stdout: string,
-    stderr: string
-  ) => void
-): ChildProcess {
-  const disable_gc = workspace.getConfiguration('crystal-lang').get<boolean>('disable-gc', false);
-  const env = { ...process.env }
-
-  if (disable_gc) {
-    env['GC_DONT_GC'] = '1'
-  }
-
-  const response = exec(command, { 'cwd': cwd, env }, (err, stdout, stderr) => {
-    if (err) {
-      callback({ ...err, stderr, stdout }, stdout, stderr);
-      return;
-    }
-
-    callback(err, stdout, stderr);
-  });
-
-  return response;
+interface ExecOptions extends SpawnOptions {
+  token?: CancellationToken | null
 }
 
-// export const execAsync = promisify(execWrapper);
-export async function execAsync(command: string, cwd: string, token: CancellationToken = undefined): Promise<{ stdout: string, stderr: string }> {
+interface ExecResponse {
+  stdout: string,
+  stderr: string
+}
+
+export async function execAsync(cmd: string, args: string[], options: ExecOptions | null = null): Promise<ExecResponse> {
+  const disable_gc = workspace.getConfiguration('crystal-lang').get<boolean>('disable-gc', false);
+  if (disable_gc) {
+    options.env = { ...options.env, 'GC_DONT_GC': '1' };
+  }
+
   return new Promise((resolve, reject) => {
-    const child = execWrapper(command, cwd, (error, stdout, stderr) => {
-      if (error) {
-        reject(error);
-        return;
-      }
+    const child = spawn(cmd, args, options)
+    let childExited = false
+    const stdout: string[] = []
+    const stderr: string[] = []
 
-      resolve({ stdout, stderr });
+    child.stdout.on('data', (data) => {
+      stdout.push(data.toString())
     })
-    let childExited = false;
 
-    child.on('exit', () => {
+    child.stderr.on('data', (data) => {
+      stderr.push(data.toString())
+    })
+
+    child.on('error', (err) => {
+      childExited = true
+      outputChannel.appendLine(`[Crystal] Failed to execute \`${cmd} ${args.join(' ')}\`: ${err.name} - ${err.message}`)
+      reject(err)
+    })
+
+    child.on('close', (code, signal) => {
+      resolve({ stdout: stdout.join(''), stderr: stderr.join('') });
+    })
+
+    child.on('exit', (code, signal) => {
       childExited = true
     })
 
-    token?.onCancellationRequested(() => {
+    options.token?.onCancellationRequested(() => {
       if (!childExited) {
-        terminate(child.pid, () => {
-          outputChannel.appendLine(`[Terminate] ${child.pid} stopped successfully`)
-        })
+        terminate(
+          child.pid,
+          () => outputChannel.appendLine(`[Terminate] ${child.pid} stopped successfully`)
+        )
       }
     })
   })
-}
-
-/**
- * Escape characters for passing to `exec`. Does not escape '*' as it's needed for some shard mainfiles.
- * Borrowed from https://taozhi.medium.com/escape-shell-command-in-nodejs-629ded063535.
- *
- * @export
- * @param {string} arg
- * @return {*}  {string}
- */
-export function shellEscape(arg: string): string {
-  if (arg === null || arg === undefined) return;
-  if (/[^A-Za-z0-9_\/:=-]/.test(arg)) return arg.replace(/([$!'"();`?{}[\]<>&%#~@\\ ])/g, '\\$1')
-  return arg
 }
 
 export class Cache<T> {

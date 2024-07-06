@@ -11,9 +11,9 @@ import temp = require("temp");
 import path = require("path");
 import glob = require("glob");
 
-import { getProjectRoot, getConfig, outputChannel, setStatusBar } from "./vscode";
+import { getProjectRoot, getConfig, outputChannel, setStatusBar, getFlags, getSpecTags } from "./vscode";
 import { findProblems, getCompilerPath, getCrystalVersion } from "./compiler";
-import { execAsync, shellEscape } from "./tools";
+import { execAsync } from "./tools";
 
 
 const specRunnerMutex = new Mutex();
@@ -402,7 +402,7 @@ export async function spawnSpecTool(
   token: CancellationToken = null
 ): Promise<TestSuite | void> {
   // Get compiler stuff
-  const compiler = await getCompilerPath();
+  const cmd = await getCompilerPath();
   const compiler_version = await getCrystalVersion();
   const config = getConfig();
 
@@ -410,25 +410,27 @@ export async function spawnSpecTool(
   const tempFile = temp.path({ suffix: ".xml" })
 
   // execute crystal spec
-  let cmd = [
-    shellEscape(compiler),
+  let args = [
     "spec", "--junit_output", "--no-color",
-    shellEscape(tempFile),
-    config.get<string>("flags"), config.get<string>("spec-tags")
+    tempFile,
+    ...getFlags(config),
+    ...getSpecTags(config)
   ]
 
   // Only valid for Crystal >= 1.11
   if (dry_run && compiler_version.minor > 10) {
-    cmd.push("--dry-run")
+    args.push("--dry-run")
   }
+
   if (paths) {
     for (let path of paths) {
-      cmd.push(shellEscape(path))
+      args.push(path)
     }
   }
-  outputChannel.appendLine(`[Spec] (${space.name}) $ ` + cmd.join(" "));
 
-  await execAsync(cmd.join(" "), space.uri.fsPath, token)
+  outputChannel.appendLine(`[Spec] (${space.name}) $ ${cmd} ${args.join(' ')}`);
+
+  await execAsync(cmd, args, { cwd: space.uri.fsPath, token: token })
     .catch((err) => {
       findProblems(err.stderr, space.uri);
       if (err?.signal === "SIGKILL") return;

@@ -2,13 +2,13 @@ import {
   CancellationToken, TextDocument, WorkspaceFolder
 } from "vscode";
 
-import { getConfig, outputChannel, setStatusBar } from "./vscode";
+import { getConfig, getFlags, outputChannel, setStatusBar } from "./vscode";
 import { diagnosticCollection, findProblems, getCompilerPath } from "./compiler";
-import { execAsync, shellEscape } from "./tools";
+import { execAsync } from "./tools";
 
 
 export async function handleDocumentProblems(
-  document: TextDocument, mainFile: string, projectRoot: WorkspaceFolder,
+  document: TextDocument, mainFiles: string[], projectRoot: WorkspaceFolder,
   token?: CancellationToken
 ): Promise<void> {
   if (document.uri === undefined || document.uri.scheme !== "file")
@@ -16,20 +16,20 @@ export async function handleDocumentProblems(
 
   const dispose = setStatusBar('finding problems...');
 
-  return spawnProblemsTool(document, mainFile, projectRoot, token)
+  return spawnProblemsTool(document, mainFiles, projectRoot, token)
     .finally(() => {
       dispose()
     })
 }
 
 export async function spawnProblemsTool(
-  document: TextDocument, mainFile: string, projectRoot: WorkspaceFolder,
+  document: TextDocument, mainFiles: string[], projectRoot: WorkspaceFolder,
   token?: CancellationToken
 ): Promise<void> {
   const config = getConfig();
-  const compiler = await getCompilerPath();
+  const cmd = await getCompilerPath();
 
-  if (!mainFile) {
+  if (!mainFiles || mainFiles.length == 0) {
     const err = `[Problems] Error: No main file set or found for ${document.fileName}`
     outputChannel.appendLine(err)
     return Promise.reject(err)
@@ -37,10 +37,16 @@ export async function spawnProblemsTool(
 
   const output = process.platform === "win32" ? "nul" : "/dev/null"
 
-  const cmd = `${shellEscape(compiler)} build ${shellEscape(mainFile)} --no-debug --no-color --no-codegen --error-trace -f json -o ${output} ${config.get<string>("flags")}`
+  const args = [
+    'build', ...mainFiles,
+    '--no-debug', '--no-color', '--no-codegen', '--error-trace',
+    '-f', 'json', '-o', output,
+    ...getFlags(config)
+  ]
 
-  outputChannel.appendLine(`[Problems] (${projectRoot.name}) $ ${cmd}`)
-  return execAsync(cmd, projectRoot.uri.fsPath, token)
+  outputChannel.appendLine(`[Problems] (${projectRoot.name}) $ ${cmd} ${args.join(' ')}`)
+
+  return execAsync(cmd, args, { cwd: projectRoot.uri.fsPath, token: token })
     .then(() => {
       diagnosticCollection.clear()
       outputChannel.appendLine("[Problems] No problems found.")

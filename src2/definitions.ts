@@ -6,9 +6,9 @@ import {
 } from "vscode";
 import * as crypto from 'crypto';
 
-import { getCursorPath, getProjectRoot, getConfig, outputChannel } from "./vscode";
-import { findProblems, getCompilerPath, getDocumentMainFile } from "./compiler";
-import { Cache, execAsync, shellEscape } from "./tools";
+import { getCursorPath, getProjectRoot, getConfig, outputChannel, getFlags } from "./vscode";
+import { findProblems, getCompilerPath, getDocumentMainFiles } from "./compiler";
+import { Cache, execAsync } from "./tools";
 
 export function registerDefinitions(selector: DocumentSelector, context: ExtensionContext): Disposable {
   const disposable = languages.registerDefinitionProvider(
@@ -83,18 +83,23 @@ async function spawnImplTool(
   position: Position,
   token: CancellationToken
 ): Promise<ImplResponse> {
-  const compiler = await getCompilerPath();
   const config = getConfig();
   const cursor = getCursorPath(document, position);
-  const mainFile = await getDocumentMainFile(document);
+  const mainFiles = await getDocumentMainFiles(document);
   const projectRoot = getProjectRoot(document.uri);
 
-  if (!mainFile) return;
+  if (!mainFiles || mainFiles.length == 0) return;
 
-  const cmd = `${shellEscape(compiler)} tool implementations -c ${shellEscape(cursor)} ${shellEscape(mainFile)} -f json --no-color ${config.get<string>("flags")}`
-  outputChannel.appendLine(`[Impl] (${projectRoot.name}) $ ${cmd}`);
+  const cmd = await getCompilerPath();
+  const args = [
+    'tool', 'implementations', '-c', cursor, ...mainFiles,
+    '-f', 'json', '--no-color',
+    ...getFlags(config)
+  ]
 
-  return execAsync(cmd, projectRoot.uri.fsPath, token)
+  outputChannel.appendLine(`[Impl] (${projectRoot.name}) $ ${cmd} ${args.join(' ')}`);
+
+  return execAsync(cmd, args, { cwd: projectRoot.uri.fsPath, token: token })
     .then((response) => {
       return JSON.parse(response.stdout);
     })
