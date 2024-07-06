@@ -42,7 +42,7 @@ For debugging support, it's recommended to follow the guide [here](https://dev.t
 - `main` - set a main executable to use for the current project (`${workspaceRoot}/src/main.cr`)
 - `problems` - runs the compiler on save and reports any issues
 - `server` - absolute path to an LSP executable to use instead of the custom features provided by this extension, like [Crystalline](https://github.com/elbywan/crystalline)
-- `server-env` - object defining env variables to pass to the LSP (reload required)
+- `server-env` - object defining env variables to pass to the LSP
 - `shards` - set a custom absolute path for the shards executable
 - `spec-explorer` - enable the built-in testing UI for specs, recommended for Crystal >= 1.11 due to `--dry-run` flag
 - `spec-tags` - specific tags to pass to the spec runner

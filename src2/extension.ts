@@ -50,12 +50,13 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   const config = getConfig();
   const lspExecutable = config.get<string>("server");
+  const lspEnv = config.get<object>("server-env");
 
   workspace.onDidChangeConfiguration((e) => handleConfigChange(e))
 
   // TODO: search path for lspExecutable
   if (existsSync(lspExecutable)) {
-    activateLanguageServer(lspExecutable);
+    activateLanguageServer(lspExecutable, lspEnv);
   } else {
     if (!(lspExecutable.length == 0)) {
       outputChannel.appendLine(`[Crystal] Failed to find LSP executable at ${lspExecutable}, falling back to default behavior`)
@@ -75,11 +76,16 @@ export function deactivate() {
 }
 
 
-async function activateLanguageServer(executable: string) {
+async function activateLanguageServer(executable: string, env: object) {
   if (lspClient === undefined) {
     outputChannel.appendLine(`[Crystal] Loading LSP from ${executable}`)
 
     let serverOptions: ServerOptions = { command: executable, args: [] }
+
+    if (env) {
+      serverOptions.options = { env: { ...process.env, ...env } }
+    }
+
     let clientOptions: LanguageClientOptions = {
       documentSelector: selector,
       synchronize: {
@@ -194,13 +200,14 @@ async function handleConfigChange(e: ConfigurationChangeEvent) {
   const config = getConfig();
 
   // Check if LSP config changed and auto-stop/start LSP
-  if (e.affectsConfiguration("crystal-lang.server")) {
+  if (e.affectsConfiguration("crystal-lang.server") || e.affectsConfiguration("crystal-lang.server-env")) {
     const lspExecutable = config.get<string>("server");
+    const lspEnv = config.get<object>("server-env");
 
     if (lspClient === undefined || !lspClient.isRunning) {
       if (existsSync(lspExecutable)) {
         deactivateLanguageFeatures()
-        activateLanguageServer(lspExecutable)
+        activateLanguageServer(lspExecutable, lspEnv)
       } else {
         outputChannel.appendLine(`[Crystal] Failed to find LSP executable at ${lspExecutable}, falling back to default behavior`)
         deactivateLanguageServer()
@@ -213,7 +220,7 @@ async function handleConfigChange(e: ConfigurationChangeEvent) {
       } else {
         outputChannel.appendLine(`[Crystal] Restarting LSP`)
         deactivateLanguageServer()
-        activateLanguageServer(lspExecutable)
+        activateLanguageServer(lspExecutable, lspEnv)
       }
     }
   }
