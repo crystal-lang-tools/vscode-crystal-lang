@@ -5,9 +5,9 @@ import {
 } from "vscode";
 import path = require("path");
 
-import { getConfig, getProjectRoot, outputChannel, setStatusBar } from "./vscode";
-import { getCompilerPath, getDocumentMainFile } from "./compiler";
-import { execAsync, shellEscape } from "./tools";
+import { getConfig, getProjectRoot, outputChannel, setStatusBar, getFlags } from "./vscode";
+import { getCompilerPath, getDocumentMainFiles } from "./compiler";
+import { execAsync } from "./tools";
 
 
 interface UnreachableCode {
@@ -68,15 +68,19 @@ async function spawnUnreachableTool(
   document: TextDocument, token: CancellationToken
 ): Promise<UnreachableCode[]> {
   const config = getConfig();
-  const compiler = await getCompilerPath();
-  const mainFile = await getDocumentMainFile(document);
+  const mainFiles = await getDocumentMainFiles(document);
   const projectRoot = getProjectRoot(document.uri);
 
-  const cmd = `${shellEscape(compiler)} tool unreachable ${shellEscape(mainFile)} -f json --tallies --no-color ${config.get<string>("flags")}`
+  const cmd = await getCompilerPath();
+  const args = [
+    'tool', 'unreachable', ...mainFiles,
+    '-f', 'json', '--tallies', '--no-color',
+    ...getFlags(config)
+  ]
 
-  outputChannel.appendLine(`[Unreachable] (${projectRoot.name}) $ ${cmd}`)
+  outputChannel.appendLine(`[Unreachable] (${projectRoot.name}) $ ${cmd} ${args.join(' ')}`)
 
-  return await execAsync(cmd, projectRoot.uri.fsPath, token)
+  return await execAsync(cmd, args, { cwd: projectRoot.uri.fsPath, token: token })
     .then(response => {
       outputChannel.appendLine(JSON.stringify(response))
 

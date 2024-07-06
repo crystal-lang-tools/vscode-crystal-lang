@@ -76,3 +76,11 @@ export function getConfig(uri: Uri = undefined): WorkspaceConfiguration {
   }
   return workspace.getConfiguration('crystal-lang', scope);
 }
+
+export function getFlags(config: WorkspaceConfiguration): string[] {
+  return config.get<string[]>("flags", [])
+}
+
+export function getSpecTags(config: WorkspaceConfiguration): string[] {
+  return config.get<string[]>("spec-tags", [])
+}
