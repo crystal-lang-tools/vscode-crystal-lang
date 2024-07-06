@@ -60,8 +60,17 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
 	if (existsSync(lsp)) {
 		crystalOutputChannel.appendLine(`[Crystal] loading lsp ${lsp}`)
+		const server_env = config["server-env"]
 
-		let serverOptions: ServerOptions = { command: lsp, args: [] }
+		let serverOptions: ServerOptions = {
+			command: lsp,
+			args: []
+		}
+
+		if (server_env) {
+			serverOptions.options = { env: { ...process.env, ...server_env } }
+		}
+
 		let clientOptions: LanguageClientOptions = {
 			documentSelector: selector,
 			synchronize: {
