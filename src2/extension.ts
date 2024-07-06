@@ -105,7 +105,7 @@ async function deactivateLanguageServer() {
   outputChannel.appendLine("[Crystal] Deactivating LSP")
 
   if (lspClient) {
-    lspClient.stop()
+    await lspClient.stop()
   }
 }
 
@@ -219,7 +219,7 @@ async function handleConfigChange(e: ConfigurationChangeEvent) {
         activateLanguageFeatures(languageContext)
       } else {
         outputChannel.appendLine(`[Crystal] Restarting LSP`)
-        deactivateLanguageServer()
+        await deactivateLanguageServer()
         activateLanguageServer(lspExecutable, lspEnv)
       }
     }
