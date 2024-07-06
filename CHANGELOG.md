@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.9.5] - 2024-07-05
+
+### Add
+
+- Add configuration option `crystal-lang.server-env` for adding environment variables to be passed to the LSP
+
 ## [0.9.4] - 2024-05-16
 
 ### Add
