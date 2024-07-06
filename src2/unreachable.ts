@@ -58,6 +58,7 @@ export async function handleDocumentUnreachable(document: TextDocument, token: C
         ])
       }
 
+      unreachableDiagnostics.clear()
       unreachableDiagnostics.set(diagnostics)
     })
     .finally(() => dispose())
