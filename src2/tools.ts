@@ -17,12 +17,16 @@ interface ExecResponse {
 
 export async function execAsync(cmd: string, args: string[], options: ExecOptions | null = null): Promise<ExecResponse> {
   const disable_gc = workspace.getConfiguration('crystal-lang').get<boolean>('disable-gc', false);
-  if (!options.env) {
-    options.env = { ...process.env }
-  }
 
   if (disable_gc) {
-    options.env['GC_DONT_GC'] = '1';
+    options = {
+      ...options,
+      env: {
+        ...process.env,
+        ...options?.env,
+        'GC_DONT_GC': '1'
+      }
+    };
   }
 
   return new Promise((resolve, reject) => {

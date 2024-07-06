@@ -337,7 +337,7 @@ const CRYSTAL_PATH = process.env.CRYSTAL_PATH || '';
 
 async function getCrystalEnv(): Promise<{ [key: string]: string; }> {
   const compiler = await getCompilerPath();
-  const output = await (await execAsync(compiler, ['env'])).stdout
+  const output = (await execAsync(compiler, ['env'])).stdout
   const lines = output.split(/\r?\n/)
   const env: { [key: string]: string } = {}
 
