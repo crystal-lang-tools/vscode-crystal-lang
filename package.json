@@ -2,7 +2,7 @@
 	"name": "crystal-lang",
 	"displayName": "Crystal Language",
 	"description": "The Crystal Programming Language",
-	"version": "0.9.4",
+	"version": "0.9.5",
 	"publisher": "crystal-lang-tools",
 	"icon": "images/icon.gif",
 	"license": "MIT",
@@ -167,6 +167,11 @@
 					"type": "string",
 					"default": "",
 					"description": "[Experimental][Reload required]\nAbsolute path for Scry/Crystalline LSP server binary\n(Language Server Protocol for Crystal)."
+				},
+				"crystal-lang.server-env": {
+					"type": "object",
+					"default": {},
+					"description": "[Experimental][Reload required]\nEnvironment object to pass to the LSP"
 				},
 				"crystal-lang.main": {
 					"type": "string",
