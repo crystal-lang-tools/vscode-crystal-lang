@@ -212,13 +212,17 @@ export async function spawnHierarchyTool(document: TextDocument, token: Cancella
 
   return await execAsync(cmd, args, { cwd: projectRoot.uri.fsPath, token: token })
     .then((response) => {
+      if (response.stdout.length === 0) {
+        outputChannel.appendLine(`[Hierarchy] Error: ${response.stderr}`)
+        return;
+      }
+
       findProblems(response.stderr, document.uri);
-      outputChannel.appendLine(`[Hierarchy] (${projectRoot.name}) Done.`);
 
       return JSON.parse(response.stdout);
     })
     .catch((err) => {
-      outputChannel.appendLine(`[Hierarchy] Error: ${JSON.stringify(err)}`)
+      outputChannel.appendLine(`[Hierarchy] Error: ${err?.message || JSON.stringify(err)}`)
     })
     .finally(() => outputChannel.appendLine(`[Hierarchy] Done.`));
 }

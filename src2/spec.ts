@@ -411,8 +411,7 @@ export async function spawnSpecTool(
 
   // execute crystal spec
   let args = [
-    "spec", "--junit_output", "--no-color",
-    tempFile,
+    "spec", "--junit_output", tempFile, "--no-color",
     ...getFlags(config),
     ...getSpecTags(config)
   ]
