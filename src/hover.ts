@@ -278,6 +278,7 @@ async function spawnContextTool(
 
 	return await execAsync(cmd, folder.uri.fsPath)
 		.then((response) => {
+			response = response.replace(/^start\n/, "");
 			findProblems(response, document.uri);
 			return JSON.parse(response);
 		}).catch((err) => {
