@@ -18,6 +18,7 @@ import { registerCompletion, updateHierarchyCache } from "./completion";
 import { registerRequireDefinitions } from "./requires";
 import { registerHover } from "./hover";
 import { handleDocumentUnreachable } from "./unreachable";
+import { registerMacroHover } from "./macro";
 
 
 let languageContext: ExtensionContext
@@ -31,6 +32,7 @@ let disposeSymbols: Disposable
 let disposeComplete: Disposable
 let disposeRequire: Disposable
 let disposeHover: Disposable
+let disposeMacroHover: Disposable
 
 let compilerCancellationToken: CancellationTokenSource = new CancellationTokenSource();
 
@@ -138,6 +140,10 @@ async function activateLanguageFeatures(context: ExtensionContext) {
     disposeHover = registerHover(selector, context)
   }
 
+  if (disposeMacroHover === undefined) {
+    disposeMacroHover = registerMacroHover(selector, context)
+  }
+
   activateSpecExplorer();
 }
 
@@ -183,6 +189,11 @@ async function deactivateLanguageFeatures() {
   if (disposeHover) {
     disposeHover.dispose()
     disposeHover = undefined
+  }
+
+  if (disposeMacroHover) {
+    disposeMacroHover.dispose()
+    disposeMacroHover = undefined
   }
 
   deactivateSpecExplorer();
