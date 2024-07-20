@@ -233,6 +233,11 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Autocompletes type hierarchy when modifying classes/modules/structs"
+				},
+				"crystal-lang.macro-hover": {
+					"type": "boolean",
+					"default": false,
+					"description": "Show macro expansion on hover"
 				}
 			}
 		},
