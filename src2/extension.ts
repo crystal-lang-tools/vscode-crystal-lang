@@ -70,52 +70,54 @@ export async function activate(context: ExtensionContext): Promise<void> {
   activateSpecExplorer();
 }
 
-export async function deactivate() {
-  await deactivateLanguageServer()
-  await deactivateLanguageFeatures()
-
-  if (compilerCancellationToken) {
-    compilerCancellationToken.cancel()
+export function deactivate() {
+  if (lspClient === undefined) {
+    return
   }
+
+  return lspClient.stop()
 }
 
-
-async function activateLanguageServer(executable: string, env: object) {
-  if (lspClient === undefined) {
-    outputChannel.appendLine(`[Crystal] Loading LSP from ${executable}`)
-
-    let serverOptions: ServerOptions = { command: executable, args: [] }
-
-    if (env) {
-      serverOptions.options = { env: { ...process.env, ...env } }
-    }
-
-    let clientOptions: LanguageClientOptions = {
-      documentSelector: selector,
-      synchronize: {
-        configurationSection: "crystal-lang",
-        fileEvents: workspace.createFileSystemWatcher("**/*.cr")
-      },
-      outputChannel: outputChannel
-    }
-
-    lspClient = new LanguageClient("Crystal Language", serverOptions, clientOptions)
+function activateLanguageServer(executable: string, env: object) {
+  if (lspClient !== undefined) {
+    lspClient.stop()
+    lspClient = undefined
   }
+
+  outputChannel.appendLine(`[Crystal] Loading LSP from ${executable}`)
+
+  let serverOptions: ServerOptions = { command: executable, args: [] }
+
+  if (env) {
+    serverOptions.options = { env: { ...process.env, ...env } }
+  }
+
+  let clientOptions: LanguageClientOptions = {
+    documentSelector: selector,
+    synchronize: {
+      configurationSection: "crystal-lang",
+      fileEvents: workspace.createFileSystemWatcher("**/*.cr")
+    },
+    outputChannel: outputChannel
+  }
+
+  lspClient = new LanguageClient("Crystal Language", serverOptions, clientOptions)
 
   lspClient.start()
 }
 
-async function deactivateLanguageServer() {
+function deactivateLanguageServer() {
   outputChannel.appendLine("[Crystal] Deactivating LSP")
 
   if (lspClient) {
-    await lspClient.stop()
+    lspClient.stop()
+    lspClient = undefined
   }
 }
 
 
-async function activateLanguageFeatures(context: ExtensionContext) {
-  const config = getConfig();
+function activateLanguageFeatures(context: ExtensionContext) {
+  outputChannel.appendLine("[Crystal] Activating built-in language features")
 
   if (disposeFormat === undefined) {
     disposeFormat = registerFormatter(selector, context)
@@ -123,6 +125,9 @@ async function activateLanguageFeatures(context: ExtensionContext) {
 
   if (disposeSave === undefined) {
     disposeSave = workspace.onDidSaveTextDocument((e) => handleSaveDocument(e))
+  }
+
+  if (disposeDefinitions === undefined) {
     disposeDefinitions = registerDefinitions(selector, context)
   }
 
@@ -148,6 +153,7 @@ async function activateLanguageFeatures(context: ExtensionContext) {
 }
 
 function activateSpecExplorer() {
+  outputChannel.appendLine("[Crystal] Activating spec explorer")
   const config = getConfig();
 
   if (disposeSpecs === undefined && config.get<boolean>("spec-explorer")) {
@@ -155,7 +161,9 @@ function activateSpecExplorer() {
   }
 }
 
-async function deactivateLanguageFeatures() {
+function deactivateLanguageFeatures() {
+  outputChannel.appendLine("[Crystal] Deactivating built-in language features")
+
   if (disposeFormat) {
     disposeFormat.dispose()
     disposeFormat = undefined
@@ -200,6 +208,8 @@ async function deactivateLanguageFeatures() {
 }
 
 function deactivateSpecExplorer() {
+  outputChannel.appendLine("[Crystal] Deactivating spec explorer")
+
   if (disposeSpecs) {
     disposeSpecs.controller.dispose();
     disposeSpecs = undefined;
@@ -221,17 +231,17 @@ async function handleConfigChange(e: ConfigurationChangeEvent) {
         activateLanguageServer(lspExecutable, lspEnv)
       } else {
         outputChannel.appendLine(`[Crystal] Failed to find LSP executable at ${lspExecutable}, falling back to default behavior`)
-        await deactivateLanguageServer()
-        await activateLanguageFeatures(languageContext)
+        deactivateLanguageServer()
+        activateLanguageFeatures(languageContext)
       }
     } else {
       if (lspExecutable === undefined || lspExecutable.length == 0) {
-        await deactivateLanguageServer()
-        await activateLanguageFeatures(languageContext)
+        deactivateLanguageServer()
+        activateLanguageFeatures(languageContext)
       } else {
         outputChannel.appendLine(`[Crystal] Restarting LSP`)
-        await deactivateLanguageServer()
-        await activateLanguageServer(lspExecutable, lspEnv)
+        deactivateLanguageServer()
+        activateLanguageServer(lspExecutable, lspEnv)
       }
     }
   }
@@ -241,13 +251,11 @@ async function handleConfigChange(e: ConfigurationChangeEvent) {
 
     if (disposeSpecs === undefined) {
       if (specExplorer) {
-        outputChannel.appendLine(`[Crystal] Activating spec explorer`)
-        await activateSpecExplorer();
+        activateSpecExplorer();
       }
     } else {
       if (!specExplorer) {
-        outputChannel.appendLine(`[Crystal] Deactivating spec explorer`)
-        await deactivateSpecExplorer();
+        deactivateSpecExplorer();
       }
     }
   }
