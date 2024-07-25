@@ -64,13 +64,15 @@ export async function activate(context: ExtensionContext): Promise<void> {
       outputChannel.appendLine(`[Crystal] Failed to find LSP executable at ${lspExecutable}, falling back to default behavior`)
     }
 
-    activateLanguageFeatures(context)
+    activateLanguageFeatures(context);
   }
+
+  activateSpecExplorer();
 }
 
-export function deactivate() {
-  deactivateLanguageServer()
-  deactivateLanguageFeatures()
+export async function deactivate() {
+  await deactivateLanguageServer()
+  await deactivateLanguageFeatures()
 
   if (compilerCancellationToken) {
     compilerCancellationToken.cancel()
@@ -143,8 +145,6 @@ async function activateLanguageFeatures(context: ExtensionContext) {
   if (disposeMacroHover === undefined) {
     disposeMacroHover = registerMacroHover(selector, context)
   }
-
-  activateSpecExplorer();
 }
 
 function activateSpecExplorer() {
@@ -221,17 +221,17 @@ async function handleConfigChange(e: ConfigurationChangeEvent) {
         activateLanguageServer(lspExecutable, lspEnv)
       } else {
         outputChannel.appendLine(`[Crystal] Failed to find LSP executable at ${lspExecutable}, falling back to default behavior`)
-        deactivateLanguageServer()
-        activateLanguageFeatures(languageContext)
+        await deactivateLanguageServer()
+        await activateLanguageFeatures(languageContext)
       }
     } else {
       if (lspExecutable === undefined || lspExecutable.length == 0) {
-        deactivateLanguageServer()
-        activateLanguageFeatures(languageContext)
+        await deactivateLanguageServer()
+        await activateLanguageFeatures(languageContext)
       } else {
         outputChannel.appendLine(`[Crystal] Restarting LSP`)
         await deactivateLanguageServer()
-        activateLanguageServer(lspExecutable, lspEnv)
+        await activateLanguageServer(lspExecutable, lspEnv)
       }
     }
   }
@@ -242,12 +242,12 @@ async function handleConfigChange(e: ConfigurationChangeEvent) {
     if (disposeSpecs === undefined) {
       if (specExplorer) {
         outputChannel.appendLine(`[Crystal] Activating spec explorer`)
-        activateSpecExplorer();
+        await activateSpecExplorer();
       }
     } else {
       if (!specExplorer) {
         outputChannel.appendLine(`[Crystal] Deactivating spec explorer`)
-        deactivateSpecExplorer();
+        await deactivateSpecExplorer();
       }
     }
   }
