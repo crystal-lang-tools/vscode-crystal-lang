@@ -17,7 +17,7 @@ const CLASS_PATTERN =
 const STRUCT_PATTERN =
   /^\s*(?:abstract\s+)?(?:private\s+)?(?:struct|record)\s+([:\w]+(?:\([\w, ]+\))?)(?:\s+<\s+[:\w]+)?(?:.+do(?:\s+\|.+\|)?)?[\r\n;]?$/;
 const CONSTANT_PATTERN =
-  /^\s*(?:([A-Z0-9_]+)\s+=.+|(?:private\s+)?(?:alias|type)\s+(\w+))[\r\n;]?$/;
+  /^\s*(?:private\s+)?(?:type\s+|alias\s+)?([A-Z][A-Za-z0-9]*)\s+=\s+(.+)$/;
 const ENUM_OR_UNION_PATTERN =
   /^\s*(?:private\s+)?(?:enum|union)\s+([:\w]+)(?:\s+:\s+\w+)?[\r\n;]?$/;
 const DEF_PATTERN =
