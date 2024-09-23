@@ -266,6 +266,13 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
         }
       }
 
+      for (const symbol of container) {
+        if (symbol && symbol?.name) {
+          symbol.endLine = lines.length;
+          symbols.push(this.dumpContainer(symbol, document.uri))
+        }
+      }
+
       // outputChannel.appendLine(`[Symbols] Found symbols: ${symbols.map(s => s?.name).join(", ")}`);
       // outputChannel.appendLine(`[Symbols] Success.`)
       return symbols;
