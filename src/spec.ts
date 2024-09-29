@@ -377,7 +377,7 @@ export async function spawnSpecTool(
   }
   crystalOutputChannel.appendLine(`[Spec] (${space.name}) $ ` + cmd);
 
-  await execAsync(cmd, space.uri.fsPath).catch((err) => {
+  await execAsync(cmd, space.uri.fsPath, `crystal-${path.basename(space.uri.fsPath)}-specs`).catch((err) => {
     if (err.stderr) {
       findProblems(err.stderr, space.uri)
     } else if (err.message) {

@@ -7,6 +7,7 @@ import * as yaml from 'yaml';
 import { cwd } from 'process';
 import { Mutex } from 'async-mutex';
 import { spawnProblemsTool } from './problems';
+import { homedir } from 'os';
 
 export const crystalOutputChannel = window.createOutputChannel("Crystal", "log")
 
@@ -27,6 +28,7 @@ export const compiler_mutex: Mutex = new Mutex();
 function execWrapper(
 	command: string,
 	cwd: string,
+	target: string | null,
 	callback?: (
 		error: (ExecException & { stdout: string; stderr: string }) | {},
 		stdout: string,
@@ -38,6 +40,15 @@ function execWrapper(
 
 	if (disable_gc) {
 		env['GC_DONT_GC'] = '1'
+	}
+
+	// Don't want to interfere with the global cache
+	if (target) {
+		const cache_dir = env['XDG_CACHE_HOME'] ||
+			(homedir() ? path.join(homedir(), '.cache') : undefined) ||
+			path.join(cwd, '.crystal');
+
+		env['CRYSTAL_CACHE_DIR'] = path.join(cache_dir, target)
 	}
 
 	const response = exec(command, { 'cwd': cwd, env }, (err, stdout, stderr) => {
@@ -83,7 +94,7 @@ export async function getCompilerPath(): Promise<string> {
 	const command =
 		(process.platform === 'win32' ? 'where' : 'which') + ' crystal';
 
-	return (await execAsync(command, process.cwd())).trim();
+	return (await execAsync(command, process.cwd(), null)).trim();
 }
 
 /**
@@ -103,7 +114,7 @@ export async function getShardsPath(): Promise<string> {
 	const command =
 		(process.platform === 'win32' ? 'where' : 'which') + ' shards';
 
-	return (await execAsync(command, process.cwd())).trim();
+	return (await execAsync(command, process.cwd(), null)).trim();
 }
 
 /**
@@ -266,7 +277,7 @@ export async function getShardMainPath(document: TextDocument): Promise<string> 
  */
 export async function getCrystalLibPath(): Promise<string> {
 	const compiler = await getCompilerPath();
-	const libpath = await execAsync(`${compiler} env CRYSTAL_PATH`, process.cwd());
+	const libpath = await execAsync(`${compiler} env CRYSTAL_PATH`, process.cwd(), null);
 
 	return libpath.replace(/^lib[:;]|(?:\r)?\n/g, '');
 }
@@ -317,7 +328,7 @@ export interface SemVer {
 export async function getCrystalVersion(): Promise<SemVer> {
 	const compiler = await getCompilerPath();
 	const cmd = `${shellEscape(compiler)} --version`
-	const response = await execAsync(cmd, cwd())
+	const response = await execAsync(cmd, cwd(), null)
 
 	const match = response.match(/Crystal (\d+)\.(\d+)\.(\d+)/)
 
@@ -501,7 +512,7 @@ export async function getShardTargetForFile(document: TextDocument): Promise<{ r
 		crystalOutputChannel.appendLine(`[Dependencies] ${space.name} $ ${cmd}`)
 		const targetDocument = await workspace.openTextDocument(Uri.parse(targetPath))
 
-		const result = await execAsync(cmd, space.uri.fsPath)
+		const result = await execAsync(cmd, space.uri.fsPath, null)
 			.then((resp) => {
 				return { response: resp, error: undefined };
 			})

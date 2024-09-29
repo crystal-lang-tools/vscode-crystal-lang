@@ -276,7 +276,7 @@ async function spawnContextTool(
 
 	crystalOutputChannel.appendLine(`[Context] (${folder.name}) $ ${cmd}`);
 
-	return await execAsync(cmd, folder.uri.fsPath)
+	return await execAsync(cmd, folder.uri.fsPath, `crystal-${folder.name}-${path.basename(main)}`)
 		.then((response) => {
 			findProblems(response, document.uri);
 			return JSON.parse(response);
