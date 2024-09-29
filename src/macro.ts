@@ -1,5 +1,6 @@
 import { Position, TextDocument, commands, window, workspace } from 'vscode';
 import { crystalOutputChannel, execAsync, findProblems, getCompilerPath, getCursorPath, getShardMainPath, getWorkspaceFolder, shellEscape } from './tools';
+import path = require('path');
 
 export const macroOutputChannel = window.createOutputChannel("Crystal Macro", "markdown")
 
@@ -39,13 +40,13 @@ export async function spawnMacroExpandTool(document: TextDocument, position: Pos
   const cmd = `${shellEscape(compiler)} tool expand ${shellEscape(main)} --cursor ${shellEscape(cursor)} ${config.get<string>("flags")}`
 
   crystalOutputChannel.appendLine(`[Macro Expansion] (${folder.name}) $ ` + cmd)
-  return await execAsync(cmd, folder.uri.fsPath)
+  return await execAsync(cmd, folder.uri.fsPath, `crystal-${folder.name}-${path.basename(main)}`)
     .then((response) => {
       return response;
     })
     .catch(async (err) => {
       const new_cmd = cmd + ' -f json'
-      await execAsync(new_cmd, folder.uri.fsPath)
+      await execAsync(new_cmd, folder.uri.fsPath, `crystal-${folder.name}-${path.basename(main)}`)
         .catch((err) => {
           findProblems(err.stderr, document.uri)
           crystalOutputChannel.appendLine(`[Macro Expansion] Error: ${err.message}`)

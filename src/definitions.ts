@@ -115,6 +115,6 @@ async function spawnImplTool(
 	crystalOutputChannel.appendLine(`[Implementations] (${folder.name}) $ ${cmd}`);
 
 	return JSON.parse(
-		await execAsync(cmd, folder.uri.fsPath)
+		await execAsync(cmd, folder.uri.fsPath, `crystal-${folder.name}-${path.basename(main)}`)
 	);
 }

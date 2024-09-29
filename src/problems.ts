@@ -1,5 +1,6 @@
 import { TextDocument, workspace } from "vscode";
 import { setStatusBar, compiler_mutex, crystalOutputChannel, diagnosticCollection, execAsync, findProblems, getCompilerPath, getShardMainPath, getWorkspaceFolder, shellEscape } from "./tools";
+import path = require("path");
 
 export function registerProblems(): void {
   workspace.onDidOpenTextDocument((e) => handleDocument(e))
@@ -42,7 +43,7 @@ export async function spawnProblemsTool(document: TextDocument, mainFile: string
   const main = mainFile || await getShardMainPath(document);
   if (!main) return;
 
-  const folder = getWorkspaceFolder(document.uri).uri.fsPath;
+  const folder = getWorkspaceFolder(document.uri);
   const config = workspace.getConfiguration('crystal-lang');
 
   // If document is in a folder of the same name as the document, it will throw an
@@ -56,7 +57,7 @@ export async function spawnProblemsTool(document: TextDocument, mainFile: string
   const cmd = `${shellEscape(compiler)} build ${shellEscape(main)} --no-debug --no-color --no-codegen --error-trace -f json -o ${output} ${config.get<string>("flags")}`
 
   crystalOutputChannel.appendLine(`[Problems] (${getWorkspaceFolder(document.uri).name}) $ ` + cmd)
-  await execAsync(cmd, folder)
+  await execAsync(cmd, folder.uri.fsPath, `crystal-${folder.name}-${path.basename(main)}`)
     .then((response) => {
       diagnosticCollection.clear()
       crystalOutputChannel.appendLine("[Problems] No problems found.")
