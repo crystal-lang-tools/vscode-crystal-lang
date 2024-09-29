@@ -2,7 +2,7 @@
 	"name": "crystal-lang",
 	"displayName": "Crystal Language",
 	"description": "The Crystal Programming Language",
-	"version": "0.10.0-alpha8",
+	"version": "0.10.0-alpha10",
 	"publisher": "crystal-lang-tools",
 	"icon": "images/icon.gif",
 	"license": "MIT",
@@ -12,7 +12,7 @@
 	},
 	"bugs": "https://github.com/crystal-lang-tools/vscode-crystal-lang/issues",
 	"engines": {
-		"vscode": "^1.70.0"
+		"vscode": "^1.90.0"
 	},
 	"keywords": [
 		"crystal",
@@ -238,6 +238,17 @@
 					"type": "boolean",
 					"default": false,
 					"description": "Show macro expansion on hover"
+				},
+				"crystal-lang.trace.server": {
+					"scope": "window",
+					"type": "string",
+					"enum": [
+						"off",
+						"messages",
+						"verbose"
+					],
+					"default": "off",
+					"description": "Traces the communication between VS Code and the language server."
 				}
 			}
 		},
@@ -272,15 +283,15 @@
 		"junit2json": "~3.1.4",
 		"temp": "~0.9.4",
 		"terminate": "^2.6.1",
-		"vscode-languageclient": "^8.1.0",
+		"vscode-languageclient": "^9.0.1",
 		"yaml": "^2.1.1"
 	},
 	"devDependencies": {
 		"@types/express-serve-static-core": "^4.17.30",
-		"@types/node": "^14.11.1",
+		"@types/node": "^22.0.0",
 		"@types/temp": "^0.9.4",
-		"@types/vscode": "^1.70.0",
-		"@vscode/vsce": "^2.22.0",
+		"@types/vscode": "^1.90.0",
+		"@vscode/vsce": "^2.31.0",
 		"esbuild": "^0.19.8",
 		"minimist": ">=1.2.2",
 		"prettier": "^2.8.4",

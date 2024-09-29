@@ -6,3 +6,4 @@ out/main.js.map
 .gitignore
 tsconfig.json
 node_modules/
+images/vscode-example.gif
