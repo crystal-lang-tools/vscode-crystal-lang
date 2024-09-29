@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.9.6] - 2024-09-29
+
+### Fix
+
+- Use separate cache directory for each project / target [#201](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/201)
+
 ## [0.9.5] - 2024-07-05
 
 ### Add
