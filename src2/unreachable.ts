@@ -81,7 +81,10 @@ async function spawnUnreachableTool(
 
   outputChannel.appendLine(`[Unreachable] (${projectRoot.name}) $ ${cmd} ${args.join(' ')}`)
 
-  return await execAsync(cmd, args, { cwd: projectRoot.uri.fsPath, token: token })
+  return await execAsync(cmd, args, {
+    cwd: projectRoot.uri.fsPath, token: token,
+    cache_target: `crystal-${projectRoot.name}-${path.basename(mainFiles[0])}`
+  })
     .then(response => {
       outputChannel.appendLine(JSON.stringify(response))
 

@@ -429,7 +429,10 @@ export async function spawnSpecTool(
 
   outputChannel.appendLine(`[Spec] (${space.name}) $ ${cmd} ${args.join(' ')}`);
 
-  await execAsync(cmd, args, { cwd: space.uri.fsPath, token: token })
+  await execAsync(cmd, args, {
+    cwd: space.uri.fsPath, token: token,
+    cache_target: `crystal-${space.name}-specs`
+  })
     .catch((err) => {
       findProblems(err.stderr, space.uri);
       if (err?.signal === "SIGKILL") return;

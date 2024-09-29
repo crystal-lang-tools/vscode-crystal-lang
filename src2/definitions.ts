@@ -9,6 +9,7 @@ import * as crypto from 'crypto';
 import { getCursorPath, getProjectRoot, getConfig, outputChannel, getFlags } from "./vscode";
 import { findProblems, getCompilerPath, getDocumentMainFiles } from "./compiler";
 import { Cache, execAsync } from "./tools";
+import path = require("path");
 
 export function registerDefinitions(selector: DocumentSelector, context: ExtensionContext): Disposable {
   const disposable = languages.registerDefinitionProvider(
@@ -99,7 +100,10 @@ async function spawnImplTool(
 
   outputChannel.appendLine(`[Impl] (${projectRoot.name}) $ ${cmd} ${args.join(' ')}`);
 
-  return execAsync(cmd, args, { cwd: projectRoot.uri.fsPath, token: token })
+  return execAsync(cmd, args, {
+    cwd: projectRoot.uri.fsPath, token: token,
+    cache_target: `crystal-${projectRoot.name}-${path.basename(mainFiles[0])}`
+  })
     .then((response) => {
       return JSON.parse(response.stdout);
     })

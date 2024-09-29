@@ -10,6 +10,7 @@ import { findProblems, getCompilerPath, getDocumentMainFiles } from "./compiler"
 import { Cache, execAsync } from "./tools";
 import { keywords } from "./keywords";
 import { wordPattern } from "./extension";
+import path = require("path");
 
 
 export function registerHover(
@@ -149,7 +150,10 @@ async function spawnContextTool(
 
   outputChannel.appendLine(`[Hover] (${projectRoot.name}) $ ${cmd} ${args.join(' ')}`)
 
-  return await execAsync(cmd, args, { cwd: projectRoot.uri.fsPath, token: token })
+  return await execAsync(cmd, args, {
+    cwd: projectRoot.uri.fsPath, token: token,
+    cache_target: `crystal-${projectRoot.name}-${path.basename(mainFiles[0])}`
+  })
     .then((response) => {
       if (response.stdout.length === 0) {
         outputChannel.appendLine(`[Hover] Error: ${response.stderr}`)

@@ -5,6 +5,7 @@ import {
 import { getConfig, getFlags, outputChannel, setStatusBar } from "./vscode";
 import { diagnosticCollection, findProblems, getCompilerPath } from "./compiler";
 import { execAsync } from "./tools";
+import path = require("path");
 
 
 export async function handleDocumentProblems(
@@ -46,7 +47,10 @@ export async function spawnProblemsTool(
 
   outputChannel.appendLine(`[Problems] (${projectRoot.name}) $ ${cmd} ${args.join(' ')}`)
 
-  return execAsync(cmd, args, { cwd: projectRoot.uri.fsPath, token: token })
+  return execAsync(cmd, args, {
+    cwd: projectRoot.uri.fsPath, token: token,
+    cache_target: `crystal-${projectRoot.name}-${path.basename(mainFiles[0])}`
+  })
     .then(() => {
       diagnosticCollection.clear()
       outputChannel.appendLine("[Problems] No problems found.")

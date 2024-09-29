@@ -7,6 +7,7 @@ import {
 import { findProblems, getCompilerPath, getDocumentMainFiles } from "./compiler";
 import { getConfig, getCursorPath, getFlags, getProjectRoot, outputChannel } from "./vscode";
 import { Cache, execAsync } from "./tools";
+import path = require("path");
 
 export function registerMacroHover(
   selector: DocumentSelector,
@@ -63,6 +64,7 @@ export async function spawnMacroExpandTool(document: TextDocument, position: Pos
   const mainFiles = await getDocumentMainFiles(document);
   if (!mainFiles || mainFiles.length === 0) return;
 
+  const projectRoot = getProjectRoot(document.uri);
   const cursor = getCursorPath(document, position);
   const folder = getProjectRoot(document.uri);
   const config = getConfig();
@@ -75,7 +77,10 @@ export async function spawnMacroExpandTool(document: TextDocument, position: Pos
 
   outputChannel.appendLine(`[Macro Expansion] (${folder.name}) $ ${cmd} ${args.join(' ')}`)
 
-  return await execAsync(cmd, args, { cwd: folder.uri.fsPath, token: token })
+  return await execAsync(cmd, args, {
+    cwd: folder.uri.fsPath, token: token,
+    cache_target: `crystal-${projectRoot.name}-${path.basename(mainFiles[0])}`
+  })
     .then((response) => {
       if (response.stdout.length === 0) {
         outputChannel.appendLine(`[Macro Expansion] Error: ${response.stderr}`)

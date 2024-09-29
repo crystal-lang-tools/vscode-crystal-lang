@@ -3,11 +3,14 @@ import terminate from "terminate";
 import { CancellationToken, Position, TextDocument, workspace } from "vscode";
 import * as crypto from 'crypto';
 import { readFileSync } from "fs";
+import { homedir } from "os";
+import path = require("path");
 
 import { outputChannel } from "./vscode";
 
 interface ExecOptions extends SpawnOptions {
-  token?: CancellationToken | null
+  token?: CancellationToken | null,
+  cache_target?: string | null
 }
 
 interface ExecResponse {
@@ -25,6 +28,27 @@ export async function execAsync(cmd: string, args: string[], options: ExecOption
         ...process.env,
         ...options?.env,
         'GC_DONT_GC': '1'
+      }
+    };
+  }
+
+  if (options?.cache_target) {
+    // Don't want to interfere with the global cache
+    const cache_dir = process.env['XDG_CACHE_HOME'] ||
+      (homedir() ? path.join(homedir(), '.cache') : undefined) ||
+      path.join(options.cwd.toString(), '.crystal');
+
+    options = {
+      ...options,
+      env: {
+        ...process.env,
+        ...options?.env,
+        'CRYSTAL_CACHE_DIR': path.join(
+          cache_dir,
+          options.cache_target
+            .replace('/', '-')
+            .replace('\\', '-')
+        )
       }
     };
   }

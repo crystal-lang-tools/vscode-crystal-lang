@@ -210,7 +210,10 @@ export async function spawnHierarchyTool(document: TextDocument, token: Cancella
 
   outputChannel.appendLine(`[Hierarchy] (${projectRoot.name}) $ ${cmd} ${args.join(' ')}`)
 
-  return await execAsync(cmd, args, { cwd: projectRoot.uri.fsPath, token: token })
+  return await execAsync(cmd, args, {
+    cwd: projectRoot.uri.fsPath, token: token,
+    cache_target: `crystal-${projectRoot.name}-${path.basename(mainFiles[0])}`
+  })
     .then((response) => {
       if (response.stdout.length === 0) {
         outputChannel.appendLine(`[Hierarchy] Error: ${response.stderr}`)
