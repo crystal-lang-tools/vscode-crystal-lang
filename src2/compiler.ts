@@ -213,7 +213,7 @@ export async function findProblems(response: string, uri: Uri): Promise<void> {
   }
 
   let diagnostics = []
-  if (!JSON.parse(response).status) {
+  if (!JSON.parse(response)?.status) {
     let lastIdx = -1
 
     for (let i = 0; i < parsedResponses.length; i++) {

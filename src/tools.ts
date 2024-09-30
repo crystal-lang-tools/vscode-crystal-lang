@@ -374,7 +374,7 @@ export async function findProblems(response: string, uri: Uri): Promise<void> {
 		return await findProblemsRaw(response, uri)
 	}
 
-	if (!JSON.parse(response).status) {
+	if (!JSON.parse(response)?.status) {
 		for (let resp of parsedResponses) {
 			if (resp.line == null)
 				resp.line = 1
