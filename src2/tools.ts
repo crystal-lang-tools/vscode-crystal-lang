@@ -1,12 +1,13 @@
 import { ChildProcess, ExecException, SpawnOptions, exec, spawn } from "child_process";
 import terminate from "terminate";
-import { CancellationToken, Position, TextDocument, workspace } from "vscode";
+import { CancellationToken, Position, TextDocument, TextDocumentChangeReason, workspace } from "vscode";
 import * as crypto from 'crypto';
 import { readFileSync } from "fs";
 import { homedir } from "os";
 import path = require("path");
 
 import { outputChannel } from "./vscode";
+import { TextDocumentContents } from "./symbols";
 
 interface ExecOptions extends SpawnOptions {
   token?: CancellationToken | null,
@@ -107,7 +108,7 @@ export async function execAsync(cmd: string, args: string[], options: ExecOption
 export class Cache<T> {
   private cache: Map<string, T> = new Map()
 
-  computeHash(document: TextDocument, position: Position, disk: boolean = false): string {
+  computeHash(document: TextDocument | TextDocumentContents, position: Position, disk: boolean = false): string {
     let content: string
 
     if (disk) {
@@ -120,7 +121,7 @@ export class Cache<T> {
 
     hash.update(content);
 
-    if (position) {
+    if (position && 'getWordRangeAtPosition' in document) {
       const wordRange = document.getWordRangeAtPosition(position);
       const wordStart = wordRange ? wordRange.start : position;
       hash.update(wordStart.line.toString());

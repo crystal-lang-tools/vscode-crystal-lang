@@ -3,10 +3,16 @@ import {
   ExtensionContext, languages, Location,
   Position, ProviderResult, SymbolKind,
   SymbolInformation, TextDocument, Disposable,
-  Uri, Range
+  Uri, Range,
+  WorkspaceSymbolProvider,
+  workspace
 } from 'vscode';
+import { glob } from 'glob';
+import path = require('path');
+import { lstatSync, readFileSync } from 'fs';
 
 import { outputChannel } from './vscode';
+import { Cache } from './tools';
 
 const MODULE_OR_LIB_PATTERN =
   /^\s*(?:private\s+)?(?:module|lib)\s+([:\w]+(?:\([\w, ]+\))?)[\r\n;]?$/;
@@ -28,7 +34,7 @@ const IVAR_PATTERN = /^\s*(@\w+)\s+[:=].+[\r\n;]?$/;
 const CLASS_IVAR_PATTERN = /^\s*(@@\w+)\s+[:=].+[\r\n;]?$/;
 const VARIABLE_PATTERN = /^\s*(\w+)\s+[:=].+[\r\n;]?$/;
 const CONTROL_PATTERN = /^\s*(?:.*=\s+)?(select|case|if|unless|until|while|begin)(?:\s+.*)?$/;
-const BLOCK_START_PATTERN = /^\s*.*\s+(do|begin)\s*(?:\|[^|]*\|)?\s*$/;
+const BLOCK_START_PATTERN = /^\s*(.*)\s+(do|begin)\s*(?:\|[^|]*\|)?\s*$/;
 
 
 interface SymbolLoc {
@@ -39,21 +45,88 @@ interface SymbolLoc {
   endCol: number
 }
 
-class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
+export interface TextDocumentContents {
+  uri: Uri,
+  fileName: string,
+  getText: () => string,
+}
+
+class CrystalSymbolProvider implements WorkspaceSymbolProvider {
+  private cache: Cache<SymbolInformation[]> = new Cache();
+
+  provideWorkspaceSymbols(query: string, token: CancellationToken): ProviderResult<SymbolInformation[]> {
+    const workspaceFolders = workspace.workspaceFolders;
+    if (!workspaceFolders) return [];
+
+    let allSymbols: SymbolInformation[] = [];
+
+    try {
+      for (const folder of workspaceFolders) {
+        const crystalFiles = this.getCrystalFiles(folder.uri.fsPath);
+
+        for (const fileName of crystalFiles) {
+          if (token.isCancellationRequested) return [];
+
+          const filePath = path.join(folder.uri.fsPath, fileName);
+          if (lstatSync(filePath).isDirectory()) continue;
+
+          const document = this.createTextDocument(filePath);
+
+          // Compute the hash for the document
+          const hash = this.cache.computeHash(document, new Position(0, 0));
+
+          // Check if the symbols are already cached
+          if (this.cache.has(hash)) {
+            allSymbols.push(...this.cache.get(hash)!);
+          } else {
+            const symbols = this.provideDocumentSymbols(document, token) as SymbolInformation[];
+            if (symbols) {
+              allSymbols.push(...symbols);
+              // Cache the symbols
+              this.cache.set(hash, symbols);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      outputChannel.appendLine(JSON.stringify(e));
+    }
+
+    return allSymbols;
+  }
+
+  private getCrystalFiles(directory: string): string[] {
+    return glob.sync(`**/*.cr`, { cwd: directory });
+  }
+
+  private createTextDocument(filePath: string): TextDocumentContents {
+    const openDocument = workspace.textDocuments.find(doc => doc.uri.fsPath == filePath);
+    if (openDocument) {
+      return openDocument;
+    }
+
+    const content = readFileSync(filePath, 'utf-8');
+    return {
+      uri: Uri.parse(filePath),
+      fileName: path.basename(filePath),
+      getText: () => content
+    };
+  }
+
+  resolveWorkspaceSymbol?(symbol: SymbolInformation, token: CancellationToken): ProviderResult<SymbolInformation> {
+    return symbol;
+  }
+
   provideDocumentSymbols(
-    document: TextDocument,
+    document: TextDocument | TextDocumentContents,
     token: CancellationToken
   ): ProviderResult<SymbolInformation[]> {
     if (document.fileName.endsWith(".ecr")) return;
-    // outputChannel.appendLine(`[Symbols] Searching for symbols in ${document.fileName}`);
 
     const container: SymbolLoc[] = [];
-    const symbols: SymbolInformation[] = []
-    let inMacro = false
+    const symbols: SymbolInformation[] = [];
 
-    const lines = document
-      .getText()
-      .split(/\r?\n/);
+    const lines = document.getText().split(/\r?\n/);
     let matches: RegExpExecArray;
 
     try {
@@ -75,12 +148,12 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
             start: index,
             endLine: null,
             endCol: line.length
-          }
+          };
 
           if (!matches[1]) {
-            container.push(symbol)
+            container.push(symbol);
           } else {
-            symbols.push(this.dumpContainer(symbol, document.uri))
+            symbols.push(this.dumpContainer(symbol, document.uri));
           }
 
           continue;
@@ -90,13 +163,15 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
         if (matches && matches.length) {
           const symbol = {
             name: matches[1],
-            kind: SymbolKind.Function,
+            kind: SymbolKind.Method,
             start: index,
             endLine: null,
             endCol: line.length
           };
 
-          container.push(symbol)
+          this.checkIfInNamespace(container, symbol);
+
+          container.push(symbol);
           continue;
         }
 
@@ -110,7 +185,7 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
             endCol: line.length
           };
 
-          container.push(symbol)
+          container.push(symbol);
           continue;
         }
 
@@ -118,13 +193,13 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
         if (matches && matches.length) {
           const symbol = {
             name: matches[1],
-            kind: SymbolKind.Method,
+            kind: SymbolKind.Property,
             start: index,
             endLine: null,
             endCol: line.length
           };
 
-          symbols.push(this.dumpContainer(symbol, document.uri))
+          symbols.push(this.dumpContainer(symbol, document.uri));
 
           matches = BLOCK_START_PATTERN.exec(line);
           if (matches && matches.length) {
@@ -136,7 +211,7 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
               endCol: line.length
             };
 
-            container.push(symbol)
+            container.push(symbol);
           }
 
           continue;
@@ -152,7 +227,7 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
             endCol: line.length
           };
 
-          container.push(symbol)
+          container.push(symbol);
           continue;
         }
 
@@ -166,7 +241,7 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
             endCol: line.length
           };
 
-          container.push(symbol)
+          container.push(symbol);
           continue;
         }
 
@@ -180,12 +255,11 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
             endCol: line.length
           };
 
-          container.push(symbol)
+          container.push(symbol);
           continue;
         }
 
-        // Need to just match the end, there's no symbol for a case statement
-        matches = CONTROL_PATTERN.exec(line) || BLOCK_START_PATTERN.exec(line);
+        matches = CONTROL_PATTERN.exec(line);
         if (matches && matches.length) {
           const symbol = {
             name: null,
@@ -195,7 +269,23 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
             endCol: line.length
           };
 
-          container.push(symbol)
+          container.push(symbol);
+          continue;
+        }
+
+        matches = BLOCK_START_PATTERN.exec(line);
+        if (matches && matches.length) {
+          const symbol = {
+            name: matches[1],
+            kind: SymbolKind.Namespace,
+            start: index,
+            endLine: null,
+            endCol: line.length
+          };
+
+          this.checkIfInNamespace(container, symbol);
+
+          container.push(symbol);
           continue;
         }
 
@@ -209,7 +299,7 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
             endCol: line.length
           };
 
-          symbols.push(this.dumpContainer(symbol, document.uri))
+          symbols.push(this.dumpContainer(symbol, document.uri));
           continue;
         }
 
@@ -223,7 +313,7 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
             endCol: line.length
           };
 
-          symbols.push(this.dumpContainer(symbol, document.uri))
+          symbols.push(this.dumpContainer(symbol, document.uri));
           continue;
         }
 
@@ -237,7 +327,7 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
             endCol: line.length
           };
 
-          symbols.push(this.dumpContainer(symbol, document.uri))
+          symbols.push(this.dumpContainer(symbol, document.uri));
           continue;
         }
 
@@ -251,16 +341,21 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
             endCol: line.length
           };
 
-          symbols.push(this.dumpContainer(symbol, document.uri))
+          this.checkIfInNamespace(container, symbol);
+
+          if (symbol?.name) {
+            symbols.push(this.dumpContainer(symbol, document.uri));
+          }
+
           continue;
         }
 
         if (/^\s*end(?:\..*)?$/.test(line)) {
-          const symbol = container.pop()
+          const symbol = container.pop();
 
           if (symbol && symbol?.name) {
             symbol.endLine = index;
-            symbols.push(this.dumpContainer(symbol, document.uri))
+            symbols.push(this.dumpContainer(symbol, document.uri));
           }
           continue;
         }
@@ -269,15 +364,22 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
       for (const symbol of container) {
         if (symbol && symbol?.name) {
           symbol.endLine = lines.length;
-          symbols.push(this.dumpContainer(symbol, document.uri))
+          symbols.push(this.dumpContainer(symbol, document.uri));
         }
       }
 
-      // outputChannel.appendLine(`[Symbols] Found symbols: ${symbols.map(s => s?.name).join(", ")}`);
-      // outputChannel.appendLine(`[Symbols] Success.`)
       return symbols;
     } catch (err) {
-      outputChannel.appendLine(`[Symbols] Error: ${JSON.stringify(err)}`)
+      outputChannel.appendLine(`[Symbols] Error: ${JSON.stringify(err)}`);
+    }
+  }
+
+  private checkIfInNamespace(container: SymbolLoc[], symbol: { name: string; kind: SymbolKind; start: number; endLine: any; endCol: number; }) {
+    for (let c of container) {
+      if (c.kind == SymbolKind.Function || c.kind == SymbolKind.Method || c.kind == SymbolKind.Namespace) {
+        symbol.name = null;
+        return;
+      }
     }
   }
 
@@ -290,32 +392,45 @@ class CrystalDocumentSymbolProvider implements DocumentSymbolProvider {
           symbol.endCol
         )
       )
-    )
+    );
 
     if (symbol?.name) {
-      const symbolInfo = new SymbolInformation(symbol.name, symbol.kind, '', loc)
+      const symbolInfo = new SymbolInformation(symbol.name, symbol.kind, '', loc);
       return symbolInfo;
     }
   }
 }
 
 
+
 export function registerSymbols(
   selector: DocumentSelector,
   context: ExtensionContext
 ): Disposable {
-  const disposable = languages.registerDocumentSymbolProvider(
+  const disposableDocument = languages.registerDocumentSymbolProvider(
     selector,
-    new CrystalDocumentSymbolProvider()
+    new CrystalSymbolProvider()
   )
 
-  context.subscriptions.push(disposable);
+  const disposableWorkspace = languages.registerWorkspaceSymbolProvider(
+    new CrystalSymbolProvider()
+  )
+
+  context.subscriptions.push(disposableDocument);
+  context.subscriptions.push(disposableWorkspace);
+
+  const disposable: Disposable = {
+    dispose() {
+      disposableDocument.dispose()
+      disposableWorkspace.dispose()
+    },
+  }
 
   return disposable;
 }
 
 export async function getLocationSymbol(document: TextDocument, position: Position, token: CancellationToken): Promise<string> {
-  const provider = new CrystalDocumentSymbolProvider();
+  const provider = new CrystalSymbolProvider();
   const symbols = await provider.provideDocumentSymbols(document, token);
 
   let name = ""
