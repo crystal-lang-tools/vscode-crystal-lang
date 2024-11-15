@@ -41,6 +41,9 @@ class CrystalDefinitionProvider implements DefinitionProvider {
     const requireMatches = /^\s*require\s+"(.+)"\s*$/.exec(line.text);
     if (requireMatches?.length > 1) return [];
 
+    // Cannot run implementations tool on unsaved file
+    if (document.isDirty) return;
+
     outputChannel.appendLine('[Impl] Getting implementations...')
     const result = await spawnImplTool(document, position, token)
 

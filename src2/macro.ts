@@ -36,6 +36,8 @@ class CrystalMacroHoverProvider implements HoverProvider {
       return this.cache.get(hash)!
     }
 
+    if (document.isDirty) return;
+
     outputChannel.appendLine(`[Macro Expansion] Getting expansion...`)
 
     return spawnMacroExpandTool(document, position, token)

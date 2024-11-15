@@ -49,6 +49,9 @@ class CrystalHoverProvider implements HoverProvider {
     const text = document.getText(wordRange);
     if (keywords.includes(text)) return;
 
+    // Cannot run hover tool on unsaved file
+    if (document.isDirty) return;
+
     const dispose = setStatusBar('running context tool...');
     outputChannel.appendLine(`[Hover] Getting context...`)
 
