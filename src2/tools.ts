@@ -2,7 +2,7 @@ import { ChildProcess, ExecException, SpawnOptions, exec, spawn } from "child_pr
 import terminate from "terminate";
 import { CancellationToken, Position, TextDocument, TextDocumentChangeReason, workspace } from "vscode";
 import * as crypto from 'crypto';
-import { readFileSync } from "fs";
+import { readFileSync, statSync } from "fs";
 import { homedir } from "os";
 import path = require("path");
 
@@ -141,5 +141,28 @@ export class Cache<T> {
 
   set(hash: string, value: T) {
     return this.cache.set(hash, value)
+  }
+}
+
+export class MtimeCache<T> {
+  private cache: Map<string, { mtime: number, data: T }> = new Map();
+
+  computeMtimeHash(filePath: string): number {
+    const stats = statSync(filePath);
+    return stats.mtimeMs; // Use mtimeMs for millisecond precision
+  }
+
+  has(filePath: string, mtime: number): boolean {
+    const cached = this.cache.get(filePath);
+    return cached !== undefined && cached.mtime === mtime;
+  }
+
+  get(filePath: string): T | undefined {
+    const cached = this.cache.get(filePath);
+    return cached?.data;
+  }
+
+  set(filePath: string, mtime: number, value: T): void {
+    this.cache.set(filePath, { mtime, data: value });
   }
 }

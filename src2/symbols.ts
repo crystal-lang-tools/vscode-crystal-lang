@@ -12,7 +12,7 @@ import path = require('path');
 import { lstatSync, readFileSync } from 'fs';
 
 import { outputChannel } from './vscode';
-import { Cache } from './tools';
+import { Cache, MtimeCache } from './tools';
 
 const MODULE_OR_LIB_PATTERN =
   /^\s*(?:private\s+)?(?:module|lib)\s+([:\w]+(?:\([\w, ]+\))?)[\r\n;]?$/;
@@ -52,7 +52,7 @@ export interface TextDocumentContents {
 }
 
 class CrystalSymbolProvider implements WorkspaceSymbolProvider {
-  private cache: Cache<SymbolInformation[]> = new Cache();
+  private cache: MtimeCache<SymbolInformation[]> = new MtimeCache();
 
   provideWorkspaceSymbols(query: string, token: CancellationToken): ProviderResult<SymbolInformation[]> {
     const workspaceFolders = workspace.workspaceFolders;
@@ -70,20 +70,28 @@ class CrystalSymbolProvider implements WorkspaceSymbolProvider {
           const filePath = path.join(folder.uri.fsPath, fileName);
           if (lstatSync(filePath).isDirectory()) continue;
 
-          const document = this.createTextDocument(filePath);
+          const openDocument = workspace.textDocuments.find(doc => doc.uri.fsPath === filePath);
+          const mtime = this.cache.computeMtimeHash(filePath);
 
-          // Compute the hash for the document
-          const hash = this.cache.computeHash(document, new Position(0, 0));
-
-          // Check if the symbols are already cached
-          if (this.cache.has(hash)) {
-            allSymbols.push(...this.cache.get(hash)!);
-          } else {
-            const symbols = this.provideDocumentSymbols(document, token) as SymbolInformation[];
+          if (openDocument && openDocument.isDirty) {
+            const symbols = this.provideDocumentSymbols(openDocument, token) as SymbolInformation[];
             if (symbols) {
               allSymbols.push(...symbols);
-              // Cache the symbols
-              this.cache.set(hash, symbols);
+
+              this.cache.set(filePath, mtime, symbols);
+            }
+          } else {
+            if (this.cache.has(filePath, mtime)) {
+              allSymbols.push(...this.cache.get(filePath)!);
+            } else {
+              const document = this.createTextDocument(filePath);
+              const symbols = this.provideDocumentSymbols(document, token) as SymbolInformation[];
+
+              if (symbols) {
+                allSymbols.push(...symbols);
+
+                this.cache.set(filePath, mtime, symbols);
+              }
             }
           }
         }
