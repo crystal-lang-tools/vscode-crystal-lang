@@ -177,7 +177,7 @@ class CrystalSymbolProvider implements WorkspaceSymbolProvider {
             endCol: line.length
           };
 
-          this.checkIfInNamespace(container, symbol);
+          this.checkIfInFunction(container, symbol);
 
           container.push(symbol);
           continue;
@@ -291,7 +291,7 @@ class CrystalSymbolProvider implements WorkspaceSymbolProvider {
             endCol: line.length
           };
 
-          this.checkIfInNamespace(container, symbol);
+          this.checkIfInFunction(container, symbol);
 
           container.push(symbol);
           continue;
@@ -349,6 +349,7 @@ class CrystalSymbolProvider implements WorkspaceSymbolProvider {
             endCol: line.length
           };
 
+          this.checkIfInFunction(container, symbol);
           this.checkIfInNamespace(container, symbol);
 
           if (symbol?.name) {
@@ -382,9 +383,18 @@ class CrystalSymbolProvider implements WorkspaceSymbolProvider {
     }
   }
 
+  private checkIfInFunction(container: SymbolLoc[], symbol: { name: string; kind: SymbolKind; start: number; endLine: any; endCol: number; }) {
+    for (let c of container) {
+      if (c.kind == SymbolKind.Function || c.kind == SymbolKind.Method) {
+        symbol.name = null;
+        return;
+      }
+    }
+  }
+
   private checkIfInNamespace(container: SymbolLoc[], symbol: { name: string; kind: SymbolKind; start: number; endLine: any; endCol: number; }) {
     for (let c of container) {
-      if (c.kind == SymbolKind.Function || c.kind == SymbolKind.Method || c.kind == SymbolKind.Namespace) {
+      if (c.kind == SymbolKind.Namespace) {
         symbol.name = null;
         return;
       }
