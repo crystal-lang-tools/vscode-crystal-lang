@@ -53,13 +53,25 @@ export async function getCompilerPath(): Promise<string> {
 
   if (config.has('compiler')) {
     const exe = config.get<string>('compiler');
-    if (path.isAbsolute(exe) && existsSync(exe)) return Promise.resolve(exe);
+    if (path.isAbsolute(exe) && existsSync(exe)) {
+      return Promise.resolve(exe);
+    } else {
+      outputChannel.appendLine("Provided compiler is not an absolute path or does not exist, searching PATH...")
+    }
   }
 
   const command =
     (process.platform === 'win32' ? 'where' : 'which') + ' crystal';
 
-  return execSync(command).toString().trim();
+  let commandPath: string
+  try {
+    commandPath = execSync(command).toString().trim();
+  } catch (err) {
+    outputChannel.appendLine("Failed to find a Crystal compiler")
+    throw "Failed to find a Crystal compiler"
+  }
+
+  return commandPath
 }
 
 export async function getDocumentMainFiles(document: TextDocument): Promise<string[]> {
