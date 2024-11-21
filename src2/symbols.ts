@@ -35,7 +35,7 @@ const CLASS_IVAR_PATTERN = /^\s*(@@\w+)\s+[:=].+[\r\n;]?$/;
 const VARIABLE_PATTERN = /^\s*(\w+)\s+[:=].+[\r\n;]?$/;
 const CONTROL_PATTERN = /^\s*(?:.*=\s+)?(select|case|if|unless|until|while|begin)(?:\s+.*)?$/;
 const BLOCK_START_PATTERN = /^\s*(.*)\s+(do|begin)\s*(?:\|[^|]*\|)?\s*$/;
-
+const ANNOTATION_PATTERN = /^\s*annotation\s+([:\w]+)/
 
 interface SymbolLoc {
   name: string,
@@ -145,6 +145,20 @@ class CrystalSymbolProvider implements WorkspaceSymbolProvider {
 
         matches = /^\s*#(?!{).*$/.exec(line);
         if (matches) {
+          continue;
+        }
+
+        matches = ANNOTATION_PATTERN.exec(line);
+        if (matches && matches.length) {
+          const symbol = {
+            name: matches[1],
+            kind: SymbolKind.Event,
+            start: index,
+            endLine: null,
+            endCol: line.length
+          };
+
+          container.push(symbol);
           continue;
         }
 
