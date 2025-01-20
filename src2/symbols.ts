@@ -15,7 +15,7 @@ import { outputChannel } from './vscode';
 import { Cache, MtimeCache } from './tools';
 
 const MODULE_OR_LIB_PATTERN =
-  /^\s*(?:private\s+)?(?:module|lib)\s+([:\w]+(?:\([\w, ]+\))?)[\r\n;]?$/;
+  /^\s*(?:private\s+)?(module|lib)\s+([:\w]+(?:\([\w, ]+\))?)[\r\n;]?$/;
 const MACRO_PATTERN =
   /^\s*(?:private\s+)?macro\s+(\w+)(?:.*)?[\r\n;]?$/;
 const CLASS_PATTERN =
@@ -27,7 +27,7 @@ const CONSTANT_PATTERN =
 const ENUM_OR_UNION_PATTERN =
   /^\s*(?:private\s+)?(?:enum|union)\s+([:\w]+)(?:\s+:\s+\w+)?[\r\n;]?$/;
 const DEF_PATTERN =
-  /^\s*(abstract\s+)?(?:(?:private|protected)\s+)?(?:def|fun)\s+([^\( ]*)(?:[\(\)\*:,]+)?.*$/;
+  /^\s*(abstract\s+)?(?:(?:private|protected)\s+)?(def|fun)\s+([^\( ]*)(?:[\(\)\*:,]+)?.*$/;
 const PROPERTY_PATTERN =
   /^\s*(?:(?:private|protected)\s+)?(?:class_)?(?:property|getter|setter)(?:!|\?)?\s+(\w+)(?:(?:\s+:\s+\w+)?(?:\s*=.+)?)?(?:,\s*)?[\r\n;]?/;
 const IVAR_PATTERN = /^\s*(@\w+)\s+[:=].+[\r\n;]?$/;
@@ -43,6 +43,7 @@ interface SymbolLoc {
   start: number,
   endLine: number,
   endCol: number
+  lib?: boolean;
 }
 
 export interface TextDocumentContents {
@@ -165,14 +166,22 @@ class CrystalSymbolProvider implements WorkspaceSymbolProvider {
         matches = DEF_PATTERN.exec(line);
         if (matches && matches.length) {
           const symbol = {
-            name: matches[2],
+            name: matches[3],
             kind: SymbolKind.Function,
             start: index,
             endLine: null,
             endCol: line.length
           };
 
-          if (!matches[1]) {
+          let insideLib = false;
+          for (let elem of container) {
+            if (elem?.lib) {
+              insideLib = true;
+              break;
+            }
+          }
+
+          if (!matches[1] && (matches[2] == "def" || !insideLib)) {
             container.push(symbol);
           } else {
             symbols.push(this.dumpContainer(symbol, document.uri));
@@ -256,11 +265,12 @@ class CrystalSymbolProvider implements WorkspaceSymbolProvider {
         matches = MODULE_OR_LIB_PATTERN.exec(line);
         if (matches && matches.length) {
           const symbol = {
-            name: matches[1],
+            name: matches[2],
             kind: SymbolKind.Module,
             start: index,
             endLine: null,
-            endCol: line.length
+            endCol: line.length,
+            lib: matches[1] == "lib"
           };
 
           container.push(symbol);
