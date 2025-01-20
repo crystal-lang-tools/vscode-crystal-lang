@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.9.7] - 2025-01-20
+
+### Change
+
+- Don't start new line as comment if current line is a comment [#205](https://github.com/crystal-lang-tools/vscode-crystal-lang/issues/205)
+
 ## [0.9.6] - 2024-09-29
 
 ### Fix
