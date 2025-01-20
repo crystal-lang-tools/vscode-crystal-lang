@@ -31,15 +31,6 @@ export const crystalConfiguration = <LanguageConfiguration>{
 		decreaseIndentPattern:
 			/^\s*([}\]]([,)]?\s*(#|$)|\.[a-zA-Z_]\w*\b)|(end|rescue|ensure|else|elsif|when|(?:case[\s\S\n]+)in)\b)/,
 	},
-	onEnterRules: [
-		{
-			beforeText: /^\s*#(?!{).*$/,
-			action: {
-				appendText: '# ',
-				indentAction: IndentAction.None,
-			},
-		},
-	],
 	wordPattern:
 		/(?:-?(?:0(?:b|o|x))?\d+(?:\.\d+)?(?:_?[iuf]\d+)?)|@{0,2}(?:(?:(?<!:):)?[A-Za-z][^-`~@#%^&()=+[{}|;:'",<>\/.*\]\s\\!?]*[!?]?)/,
 };
