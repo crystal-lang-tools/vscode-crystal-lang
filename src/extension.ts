@@ -39,7 +39,7 @@ let lsp_client: LanguageClient
 
 export async function activate(context: ExtensionContext): Promise<void> {
 	const config = workspace.getConfiguration("crystal-lang");
-	const lsp = config["server"]
+	const lsp = config["server"] || process.env.CRYSTAL_LSP_PATH
 
 	// Specs enabled regardless of LSP support
 	if (config["spec-explorer"]) new CrystalTestingProvider();
