@@ -26,7 +26,7 @@ const CONSTANT_PATTERN =
 const ENUM_OR_UNION_PATTERN =
 	/^\s*(?:private\s+)?(?:enum|union)\s+(\w+)[\r\n;]?$/;
 const DEF_PATTERN =
-	/^\s*(?:abstract\s+)?(?:(?:private|protected)\s+)?(?:def|fun)\s+(\w+)(?:[\(\)\*:,]+)?.*$/;
+	/^\s*(?:abstract\s+)?(?:(?:private|protected)\s+)?(?:def|fun)\s+(?:self\.)?(\w+)(?:[\(\)\*:,]+)?.*$/;
 const PROPERTY_PATTERN =
 	/^\s*(?:(?:private|protected)\s+)?(?:class_)?(?:property|getter|setter)(?:!|\?)?\s+(\w+)(?:(?:\s+:\s+\w+)?(?:\s*=.+)?)?(?:,\s*)?[\r\n;]?/;
 const IVAR_PATTERN = /^\s*@(\w+)\s+[:=].+[\r\n;]?$/;
