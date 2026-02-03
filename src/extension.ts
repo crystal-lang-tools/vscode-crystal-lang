@@ -17,6 +17,8 @@ import { registerTasks } from './tasks';
 import { existsSync } from 'fs';
 import { LanguageClient, LanguageClientOptions, DocumentSelector, MessageTransports, ServerOptions } from "vscode-languageclient/node"
 import { registerProblems } from './problems';
+import { initializeParser } from './treesitter/parser';
+import { registerSemanticTokensProvider } from './treesitter/semanticTokens';
 
 const selector: DocumentSelector = [
 	{ language: 'crystal', scheme: 'file' },
@@ -48,6 +50,21 @@ export async function activate(context: ExtensionContext): Promise<void> {
 	context.subscriptions.push(
 		languages.setLanguageConfiguration('crystal', crystalConfiguration)
 	);
+
+	// Initialize tree-sitter for enhanced syntax highlighting
+	try {
+		crystalOutputChannel.appendLine('[Crystal] Initializing tree-sitter parser...');
+		const parser = await initializeParser(context);
+		const language = parser.language;
+
+		if (language) {
+			registerSemanticTokensProvider(context, language);
+			crystalOutputChannel.appendLine('[Crystal] Tree-sitter semantic highlighting enabled');
+		}
+	} catch (error) {
+		crystalOutputChannel.appendLine(`[Crystal] Failed to initialize tree-sitter: ${error}`);
+		console.error('Tree-sitter initialization failed:', error);
+	}
 
 	if (existsSync(lsp)) {
 		crystalOutputChannel.appendLine(`[Crystal] loading lsp ${lsp}`)

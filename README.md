@@ -14,6 +14,7 @@ For debugging support, it's recommended to follow the guide [here](https://dev.t
 ## Features
 
 - Syntax highlighting:
+  - **Enhanced tree-sitter-based semantic highlighting** for accurate, context-aware syntax coloring
   - Syntax highlighting support for Crystal, [Slang](https://github.com/jeromegn/slang), and [ECR](https://crystal-lang.org/api/latest/ECR.html) (contributions for other Crystal templating languages welcome)
 - Auto indentation:
   - Automatically indent while coding (after `do`, `if`, etc.)
@@ -92,6 +93,28 @@ See [Changelog](https://github.com/crystal-lang-tools/vscode-crystal-lang/blob/m
 3. Commit your changes `git commit -am 'Add some feature'`
 4. Push to the branch `git push origin my-new-feature`
 5. Create a new Pull Request
+
+### Updating the Tree-Sitter Grammar
+
+The extension uses tree-sitter for enhanced syntax highlighting. The Crystal grammar WASM file is committed to the repository for reliability and simplicity. To update it:
+
+```bash
+# Clone tree-sitter-crystal
+cd /tmp
+git clone https://github.com/crystal-lang-tools/tree-sitter-crystal
+cd tree-sitter-crystal
+
+# Build the WASM file (requires tree-sitter CLI and Docker)
+tree-sitter build --wasm
+
+# Copy to the extension
+cp tree-sitter-crystal.wasm /path/to/vscode-crystal-lang/parsers/
+
+# If queries have changed, update them too
+cp queries/highlights.scm /path/to/vscode-crystal-lang/queries/
+```
+
+After updating, test the extension in the Extension Development Host to ensure highlighting still works correctly.
 
 ## Contributors
 

@@ -1,5 +1,16 @@
 # Change Log
 
+## [Unreleased]
+
+### Added
+
+- **Tree-sitter integration**: Enhanced semantic syntax highlighting using tree-sitter-crystal grammar
+  - Context-aware parsing for more accurate highlighting
+  - Better support for Crystal's macro system
+  - Multi-line construct parsing
+  - Incremental parsing for improved performance
+  - Resolves [tree-sitter-crystal#33](https://github.com/crystal-lang-tools/tree-sitter-crystal/issues/33)
+
 ## [0.9.8] - 2025-10-10
 
 - Dependency security updates

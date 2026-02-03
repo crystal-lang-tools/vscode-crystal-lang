@@ -5,3 +5,4 @@ out/main.js.map
 .gitignore
 tsconfig.json
 node_modules/
+!node_modules/web-tree-sitter/**

@@ -239,7 +239,7 @@
 		"format": "prettier --write ./src/**/*.ts",
 		"package": "vsce package",
 		"vscode:prepublish": "npm run esbuild-base -- --minify",
-		"esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
+		"esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --external:web-tree-sitter --format=cjs --platform=node",
 		"esbuild": "npm run esbuild-base -- --sourcemap",
 		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
 		"test-compile": "tsc -p ./"
@@ -249,6 +249,7 @@
 		"junit2json": "~3.1.4",
 		"temp": "~0.9.4",
 		"vscode-languageclient": "^8.1.0",
+		"web-tree-sitter": "^0.26.5",
 		"yaml": "^2.1.1"
 	},
 	"devDependencies": {
@@ -260,6 +261,7 @@
 		"esbuild": "^0.25.0",
 		"minimist": ">=1.2.2",
 		"prettier": "^2.8.4",
+		"tree-sitter-wasms": "^0.1.13",
 		"typescript": "^4.0.3"
 	},
 	"prettier": {
