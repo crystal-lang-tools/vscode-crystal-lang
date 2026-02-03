@@ -23,6 +23,7 @@ interface CachedTree {
  */
 export class CrystalSemanticTokensProvider implements vscode.DocumentSemanticTokensProvider {
   private trees: Map<string, CachedTree> = new Map();
+  private documentChanges: Map<string, vscode.TextDocumentContentChangeEvent[]> = new Map();
   private query: Parser.Query | null = null;
   private language: Parser.Language | null = null;
 
@@ -38,18 +39,33 @@ export class CrystalSemanticTokensProvider implements vscode.DocumentSemanticTok
 
     // Load the highlights query
     const queryPath = path.join(this.context.extensionPath, 'queries', 'highlights.scm');
-    console.log('[Crystal Tree-sitter] Loading query from:', queryPath);
     const querySource = fs.readFileSync(queryPath, 'utf8');
 
     try {
       this.query = new Parser.Query(language, querySource);
-      console.log('[Crystal Tree-sitter] Query loaded successfully');
     } catch (error) {
       console.error('[Crystal Tree-sitter] Error loading query:', error);
-      console.error('[Crystal Tree-sitter] Query path:', queryPath);
-      console.error('[Crystal Tree-sitter] Query source length:', querySource.length);
       vscode.window.showErrorMessage(`Failed to load Crystal syntax highlighting query: ${error}`);
       throw error;
+    }
+  }
+
+  /**
+   * Track document changes for incremental parsing
+   */
+  onDocumentChange(event: vscode.TextDocumentChangeEvent): void {
+    if (event.document.languageId !== 'crystal') {
+      return;
+    }
+
+    const uri = event.document.uri.toString();
+    const cached = this.trees.get(uri);
+
+    // Only track changes if we have a cached tree for this document
+    if (cached && event.contentChanges.length > 0) {
+      const changes = this.documentChanges.get(uri) || [];
+      changes.push(...event.contentChanges);
+      this.documentChanges.set(uri, changes);
     }
   }
 
@@ -64,14 +80,30 @@ export class CrystalSemanticTokensProvider implements vscode.DocumentSemanticTok
       return null;
     }
 
-    // Parse the document
-    const tree = parseDocument(document);
+    const uri = document.uri.toString();
+    const cached = this.trees.get(uri);
+    const changes = this.documentChanges.get(uri);
+
+    let tree: Parser.Tree | null = null;
+
+    // Use incremental parsing if we have a cached tree and changes
+    if (cached && changes && changes.length > 0 && cached.version < document.version) {
+      tree = parseDocumentIncremental(document, cached.tree, changes);
+      // Clear the changes after applying them
+      this.documentChanges.delete(uri);
+    }
+
+    // Fall back to full parse if incremental parsing failed or not applicable
+    if (!tree) {
+      tree = parseDocument(document);
+    }
+
     if (!tree) {
       return null;
     }
 
-    // Cache the tree for incremental updates
-    this.trees.set(document.uri.toString(), {
+    // Cache the tree for future incremental updates
+    this.trees.set(uri, {
       version: document.version,
       tree,
     });
@@ -98,56 +130,49 @@ export class CrystalSemanticTokensProvider implements vscode.DocumentSemanticTok
     // Execute the query to get captures
     const captures = this.query.captures(tree.rootNode);
 
-    // Process each capture
+    // Process each capture with error handling
     for (const capture of captures) {
-      const { name, node } = capture;
+      try {
+        const { name, node } = capture;
 
-      // Map the capture name to a token type
-      const tokenMapping = mapCaptureToToken(name);
-      if (!tokenMapping) {
+        // Map the capture name to a token type
+        const tokenMapping = mapCaptureToToken(name);
+        if (!tokenMapping) {
+          continue;
+        }
+
+        const tokenTypeIndex = getTokenTypeIndex(tokenMapping.type);
+        if (tokenTypeIndex < 0) {
+          continue;
+        }
+
+        const modifierBitmask = getTokenModifierBitmask(tokenMapping.modifiers || []);
+
+        // Get the range of the node
+        const startPos = new vscode.Position(node.startPosition.row, node.startPosition.column);
+        const endPos = new vscode.Position(node.endPosition.row, node.endPosition.column);
+
+        // Skip multi-line tokens - VSCode's semantic token API works best with single-line tokens
+        // Multi-line constructs (heredocs, multi-line strings, comments) are still highlighted
+        // by the base TextMate grammar
+        if (startPos.line !== endPos.line) {
+          continue;
+        }
+
+        const range = new vscode.Range(startPos, endPos);
+
+        // Add the token
+        builder.push(range, tokenMapping.type, tokenMapping.modifiers || []);
+      } catch (error) {
+        // Log and continue to avoid breaking all highlighting on a single capture error
+        console.error('[Crystal Tree-sitter] Error processing capture:', error);
         continue;
       }
-
-      const tokenTypeIndex = getTokenTypeIndex(tokenMapping.type);
-      if (tokenTypeIndex < 0) {
-        continue;
-      }
-
-      const modifierBitmask = getTokenModifierBitmask(tokenMapping.modifiers || []);
-
-      // Get the range of the node
-      const startPos = new vscode.Position(node.startPosition.row, node.startPosition.column);
-      const endPos = new vscode.Position(node.endPosition.row, node.endPosition.column);
-
-      // Skip multi-line tokens for now (VSCode limitation)
-      if (startPos.line !== endPos.line) {
-        // For multi-line nodes, we could tokenize each line separately
-        // but for now we skip them to keep it simple
-        continue;
-      }
-
-      const range = new vscode.Range(startPos, endPos);
-
-      // Add the token
-      builder.push(range, tokenMapping.type, tokenMapping.modifiers || []);
     }
   }
 
   /**
-   * Update tokens when document changes (for better performance)
-   */
-  async provideDocumentSemanticTokensEdits(
-    document: vscode.TextDocument,
-    previousResultId: string,
-    token: vscode.CancellationToken
-  ): Promise<vscode.SemanticTokens | vscode.SemanticTokensEdits | null> {
-    // For now, just provide full tokens
-    // We could implement incremental updates here in the future
-    return this.provideDocumentSemanticTokens(document, token);
-  }
-
-  /**
-   * Clean up cached tree when document is closed
+   * Clean up cached tree and changes when document is closed
    */
   cleanupDocument(uri: string): void {
     const cached = this.trees.get(uri);
@@ -155,6 +180,7 @@ export class CrystalSemanticTokensProvider implements vscode.DocumentSemanticTok
       cached.tree.delete();
       this.trees.delete(uri);
     }
+    this.documentChanges.delete(uri);
   }
 }
 
@@ -179,6 +205,13 @@ export function registerSemanticTokensProvider(
       provider,
       legend
     )
+  );
+
+  // Track document changes for incremental parsing
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeTextDocument(event => {
+      provider.onDocumentChange(event);
+    })
   );
 
   // Clean up trees when documents are closed

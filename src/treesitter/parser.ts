@@ -14,20 +14,12 @@ export async function initializeParser(context: vscode.ExtensionContext): Promis
     return crystalParser;
   }
 
-  console.log('[Crystal Tree-sitter] Extension context:', {
-    extensionPath: context.extensionPath,
-    extensionUri: context.extensionUri?.toString(),
-    storagePath: context.storagePath,
-  });
-
   if (!parserInitialized) {
-    // Initialize tree-sitter WASM runtime - use extensionPath instead of extensionUri
+    // Initialize tree-sitter WASM runtime
     const wasmPath = path.join(context.extensionPath, 'parsers', 'web-tree-sitter.wasm');
-    console.log('[Crystal Tree-sitter] Loading web-tree-sitter from:', wasmPath);
 
     await Parser.Parser.init({
       locateFile(_file: string, _folder: string) {
-        console.log('[Crystal Tree-sitter] locateFile called with:', _file, _folder);
         return wasmPath;
       }
     });
@@ -36,7 +28,6 @@ export async function initializeParser(context: vscode.ExtensionContext): Promis
 
   // Load Crystal language grammar
   const crystalWasmPath = path.join(context.extensionPath, 'parsers', 'tree-sitter-crystal.wasm');
-  console.log('[Crystal Tree-sitter] Loading tree-sitter-crystal from:', crystalWasmPath);
 
   crystalLanguage = await Parser.Language.load(crystalWasmPath);
 
