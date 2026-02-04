@@ -131,6 +131,13 @@ export class CrystalTestingProvider {
           }
         })
 
+        // Mark tests as started for visual feedback
+        if (request.include) {
+          request.include.forEach((item) => {
+            this.markTestsAsStarted(run, item);
+          });
+        }
+
         let workspaces: WorkspaceFolder[] = []
         runnerArgs.forEach((arg) => {
           const uri = Uri.file(arg)
@@ -210,6 +217,16 @@ export class CrystalTestingProvider {
 
   private formatErrorMessage(v: junit2json.Details): string {
     return `\n  ${v.message.replace("\n", "\n  ")}\n\n${v.inner}`
+  }
+
+  /**
+   * Recursively mark a test item and its children as started
+   */
+  private markTestsAsStarted(run: TestRun, item: TestItem): void {
+    run.started(item);
+    item.children.forEach((child) => {
+      this.markTestsAsStarted(run, child);
+    });
   }
 
   generateRunnerArgs(item: TestItem, includes: readonly TestItem[], excludes: readonly TestItem[]): string[] {
