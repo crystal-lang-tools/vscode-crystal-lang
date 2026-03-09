@@ -242,7 +242,8 @@
 		"esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
 		"esbuild": "npm run esbuild-base -- --sourcemap",
 		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
-		"test-compile": "tsc -p ./"
+		"test-compile": "tsc -p ./",
+		"test": "vitest run"
 	},
 	"dependencies": {
 		"async-mutex": "^0.4.0",
@@ -260,7 +261,8 @@
 		"esbuild": "^0.25.0",
 		"minimist": ">=1.2.2",
 		"prettier": "^2.8.4",
-		"typescript": "^4.0.3"
+		"typescript": "^4.0.3",
+		"vitest": "^4.0.18"
 	},
 	"prettier": {
 		"arrowParens": "avoid",
