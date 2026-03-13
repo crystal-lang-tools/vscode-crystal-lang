@@ -508,6 +508,12 @@ export async function getShardTargetForFile(document: TextDocument): Promise<{ r
 		const targetPath = path.resolve(space.uri.fsPath, target)
 		if (!existsSync(targetPath)) continue;
 
+		// The main file itself won't appear in the dependency list,
+		// so check if the current document IS the target
+		if (targetPath == document.uri.fsPath) {
+			return { response: targetPath, error: undefined };
+		}
+
 		const cmd = `${shellEscape(compiler)} tool dependencies ${shellEscape(targetPath)} -f flat --no-color ${config.get<string>("flags")}`
 		crystalOutputChannel.appendLine(`[Dependencies] ${space.name} $ ${cmd}`)
 		const targetDocument = await workspace.openTextDocument(Uri.parse(targetPath))
