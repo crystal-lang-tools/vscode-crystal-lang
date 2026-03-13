@@ -131,6 +131,13 @@ export class CrystalTestingProvider {
           }
         })
 
+        // Mark tests as started for visual feedback
+        if (request.include) {
+          request.include.forEach((item) => {
+            this.markTestsAsStarted(run, item);
+          });
+        }
+
         let workspaces: WorkspaceFolder[] = []
         runnerArgs.forEach((arg) => {
           const uri = Uri.file(arg)
@@ -212,10 +219,28 @@ export class CrystalTestingProvider {
     return `\n  ${v.message.replace("\n", "\n  ")}\n\n${v.inner}`
   }
 
+  /**
+   * Recursively mark a test item and its children as started
+   */
+  private markTestsAsStarted(run: TestRun, item: TestItem): void {
+    run.started(item);
+    item.children.forEach((child) => {
+      this.markTestsAsStarted(run, child);
+    });
+  }
+
   generateRunnerArgs(item: TestItem, includes: readonly TestItem[], excludes: readonly TestItem[]): string[] {
     if (includes) {
       if (includes.includes(item)) {
-        return [item.uri.fsPath]
+        // Check if this is an individual test case (has line number) or a file/folder
+        if (item.range && item.children.size === 0) {
+          // Individual test case - append line number for Crystal spec
+          const lineNumber = item.range.start.line + 1; // Convert 0-based to 1-based
+          return [`${item.uri.fsPath}:${lineNumber}`]
+        } else {
+          // File or folder - run all tests in it
+          return [item.uri.fsPath]
+        }
       } else {
         let foundChildren = []
         item.children.forEach((child) => {
@@ -234,7 +259,14 @@ export class CrystalTestingProvider {
         return foundChildren
       }
     } else {
-      return [item.uri.fsPath]
+      // Default: run all tests
+      if (item.range && item.children.size === 0) {
+        // Individual test case
+        const lineNumber = item.range.start.line + 1;
+        return [`${item.uri.fsPath}:${lineNumber}`]
+      } else {
+        return [item.uri.fsPath]
+      }
     }
   }
 
