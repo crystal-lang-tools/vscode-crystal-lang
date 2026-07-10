@@ -217,48 +217,51 @@ interface ErrorResponse {
 export async function findProblems(response: string, uri: Uri): Promise<void> {
   const projectRoot = getProjectRoot(uri);
 
+  const lastLine: string | undefined = response.trim().split("\n").pop()
   let parsedResponses: ErrorResponse[];
   try {
-    parsedResponses = JSON.parse(response)
+    if (lastLine && lastLine.startsWith('[')) {
+      parsedResponses = JSON.parse(lastLine)
+    } else {
+      parsedResponses = JSON.parse(response)
+    }
   } catch {
     return findProblemsRaw(response, uri);
   }
 
   let diagnostics = []
-  if (!JSON.parse(response)?.status) {
-    let lastIdx = -1
+  let lastIdx = -1
 
-    for (let i = 0; i < parsedResponses.length; i++) {
-      const response = parsedResponses[i];
-      let uri = Uri.file(response.file)
+  for (let i = 0; i < parsedResponses.length; i++) {
+    const response = parsedResponses[i];
+    let uri = Uri.file(response.file)
 
-      if (uri.fsPath.startsWith(projectRoot.uri.fsPath)) {
-        lastIdx = i
-      }
+    if (uri.fsPath.startsWith(projectRoot.uri.fsPath)) {
+      lastIdx = i
+    }
+  }
+
+  if (lastIdx === -1) {
+    lastIdx = 0
+  }
+
+  for (let i = lastIdx; i < parsedResponses.length; i++) {
+    const resp = parsedResponses[i];
+
+    if (resp.line == null)
+      resp.line = 1
+    if (resp.column == null)
+      resp.column = 1
+    if (resp.size == null)
+      resp.size = 0
+    const range = new Range(resp.line - 1, resp.column - 1, resp.line - 1, (resp.column + resp.size) - 1)
+    const diagnostic = new Diagnostic(range, resp.message, DiagnosticSeverity.Error)
+    var diag_uri = Uri.file(resp.file)
+    if (!path.isAbsolute(resp.file)) {
+      diag_uri = Uri.file(path.resolve(projectRoot.uri.fsPath, resp.file))
     }
 
-    if (lastIdx === -1) {
-      lastIdx = 0
-    }
-
-    for (let i = lastIdx; i < parsedResponses.length; i++) {
-      const resp = parsedResponses[i];
-
-      if (resp.line == null)
-        resp.line = 1
-      if (resp.column == null)
-        resp.column = 1
-      if (resp.size == null)
-        resp.size = 0
-      const range = new Range(resp.line - 1, resp.column - 1, resp.line - 1, (resp.column + resp.size) - 1)
-      const diagnostic = new Diagnostic(range, resp.message, DiagnosticSeverity.Error)
-      var diag_uri = Uri.file(resp.file)
-      if (!path.isAbsolute(resp.file)) {
-        diag_uri = Uri.file(path.resolve(projectRoot.uri.fsPath, resp.file))
-      }
-
-      diagnostics.push([diag_uri, [diagnostic]])
-    }
+    diagnostics.push([diag_uri, [diagnostic]])
   }
 
   diagnosticCollection.clear()
