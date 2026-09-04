@@ -70,7 +70,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 			},
 			outputChannel: crystalOutputChannel
 		}
-		let lsp_client = new LanguageClient("Crystal Language", serverOptions, clientOptions)
+		lsp_client = new LanguageClient("Crystal Language", serverOptions, clientOptions)
 		lsp_client.start()
 
 		return;
